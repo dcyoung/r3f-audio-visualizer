@@ -16,6 +16,14 @@
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "surface.jpg",
+      "type": "image/jpg"
+    },
+    {
+      "src": "surface_normal.jpg",
+      "type": "image/jpg"
     }
   ],
   "start_url": ".",

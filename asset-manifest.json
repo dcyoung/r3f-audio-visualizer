@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/r3f-audio-visualizer/static/css/main.c3d6a39f.css",
-    "main.js": "/r3f-audio-visualizer/static/js/main.c16e97c3.js",
+    "main.css": "/r3f-audio-visualizer/static/css/main.d82b614a.css",
+    "main.js": "/r3f-audio-visualizer/static/js/main.bcc3b419.js",
     "static/js/787.6aaadb25.chunk.js": "/r3f-audio-visualizer/static/js/787.6aaadb25.chunk.js",
     "index.html": "/r3f-audio-visualizer/index.html",
-    "main.c3d6a39f.css.map": "/r3f-audio-visualizer/static/css/main.c3d6a39f.css.map",
-    "main.c16e97c3.js.map": "/r3f-audio-visualizer/static/js/main.c16e97c3.js.map",
+    "main.d82b614a.css.map": "/r3f-audio-visualizer/static/css/main.d82b614a.css.map",
+    "main.bcc3b419.js.map": "/r3f-audio-visualizer/static/js/main.bcc3b419.js.map",
     "787.6aaadb25.chunk.js.map": "/r3f-audio-visualizer/static/js/787.6aaadb25.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c3d6a39f.css",
-    "static/js/main.c16e97c3.js"
+    "static/css/main.d82b614a.css",
+    "static/js/main.bcc3b419.js"
   ]
 }

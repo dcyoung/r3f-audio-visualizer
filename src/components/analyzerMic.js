@@ -1,20 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
+import { folder, useControls } from "leva";
 
 function AnalyzerMic({ freqDataRef }) {
   const audioRef = useRef();
   const analyzerRef = useRef();
   const micStream = useRef();
-  const [micEnabled, setMicEnabled] = useState(false);
 
   const disableMic = () => {
     if (micStream?.current) {
       analyzerRef.current.disconnectInput(micStream.current);
       micStream.current = null;
     }
-    setMicEnabled(false);
   };
-
   const enableMic = () => {
     disableMic();
     if (navigator.mediaDevices) {
@@ -29,8 +27,6 @@ function AnalyzerMic({ freqDataRef }) {
           analyzerRef.current.connectInput(micStream.current);
           // mute output to prevent feedback loops from the speakers
           analyzerRef.current.volume = 0;
-
-          setMicEnabled(true);
         })
         .catch((err) => {
           alert("Microphone access denied by user");
@@ -40,9 +36,19 @@ function AnalyzerMic({ freqDataRef }) {
     }
   };
 
-  const toggleMic = () => {
-    micEnabled ? disableMic() : enableMic();
-  };
+  useControls({
+    "🎤 Microphone": folder({
+      micEnabled: {
+        value: true,
+        // imperatively update the world after Leva input changes
+        onChange: (v) => {
+          v ? enableMic() : disableMic();
+        },
+      },
+      render: (get) => get("mode") === "mic",
+    }),
+  });
+
   const updateFreqData = (instance) => {
     if (!freqDataRef.current) {
       freqDataRef.current = new Array(instance.getBars().length);
@@ -62,17 +68,9 @@ function AnalyzerMic({ freqDataRef }) {
       onCanvasDraw: updateFreqData,
     });
     analyzerRef.current.volume = 0;
-    enableMic();
   }, []);
 
-  return (
-    <div>
-      <audio ref={audioRef} crossOrigin="anonymous" />
-      <button onClick={toggleMic} className="block">
-        🎤 {micEnabled ? "Disable" : "Enable"}
-      </button>
-    </div>
-  );
+  return <audio ref={audioRef} crossOrigin="anonymous" />;
 }
 
 export default AnalyzerMic;

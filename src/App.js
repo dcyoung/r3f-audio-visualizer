@@ -4,23 +4,19 @@ import DataReactiveGrid from "./components/dataReactiveGrid";
 import AnalyzerMic from "./components/analyzerMic";
 import AnaylzerLivestream from "./components/analyzerLivestream";
 import Ground from "./components/ground";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stats } from "@react-three/drei";
 import { KernelSize } from "postprocessing";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { useControls } from "leva";
 
 function App() {
-  const amplitude = 1.0;
+  const { mode, amplitude } = useControls({
+    mode: { value: "waveform", options: ["waveform", "livestream", "mic"] },
+    amplitude: { value: 1.0, min: 0.0, max: 5.0, step: 0.01 },
+  });
   const freqDataRef = useRef();
-
-  const [mode, setMode] = useState("waveform");
-
-  const updateMode = (event) => {
-    if (event.target.value !== mode) {
-      setMode(event.target.value);
-    }
-  };
 
   const isAudioMode = () => {
     return ["livestream", "mic"].includes(mode);
@@ -28,11 +24,6 @@ function App() {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      <select value={mode} onChange={updateMode} className="block">
-        <option value="waveform">Generated Waveform</option>
-        <option value="livestream">Audio - Livestream</option>
-        <option value="mic">Audio - 🎤 Mic</option>
-      </select>
       {isAudioMode() &&
         {
           livestream: <AnaylzerLivestream freqDataRef={freqDataRef} />,

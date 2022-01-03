@@ -1,30 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
+import { folder, useControls } from "leva";
 
 function AnaylzerLivestream({ freqDataRef }) {
   const audioRef = useRef();
   const analyzerRef = useRef();
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const playAudio = () => {
     audioRef.current.src = "https://icecast2.ufpel.edu.br/live";
     audioRef.current.play();
-    analyzerRef.current.volume = 1.0;
-    setIsPlaying(true);
   };
 
   const pauseAudio = () => {
     audioRef.current.pause();
-    setIsPlaying(false);
   };
 
-  const togglePlay = () => {
-    if (isPlaying) {
-      pauseAudio();
-    } else {
-      playAudio();
-    }
-  };
+  useControls({
+    Audio: folder({
+      audioEnabled: {
+        value: true,
+        // imperatively update the world after Leva input changes
+        onChange: (v) => {
+          v ? playAudio() : pauseAudio();
+        },
+      },
+      render: (get) => get("mode") === "livestream",
+    }),
+  });
 
   const updateFreqData = (instance) => {
     if (!freqDataRef.current) {
@@ -45,17 +47,9 @@ function AnaylzerLivestream({ freqDataRef }) {
       onCanvasDraw: updateFreqData,
     });
     analyzerRef.current.volume = 1;
-    playAudio();
   }, []);
 
-  return (
-    <div>
-      <audio ref={audioRef} crossOrigin="anonymous" />
-      <button onClick={togglePlay} className="block">
-        {isPlaying ? "Pause" : "Play"}
-      </button>{" "}
-    </div>
-  );
+  return <audio ref={audioRef} crossOrigin="anonymous" />;
 }
 
 export default AnaylzerLivestream;

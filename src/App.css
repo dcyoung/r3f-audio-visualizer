@@ -38,3 +38,16 @@ body {
 .fullscreen.notready {
   color: #606060;
 }
+
+button.block {
+  display: block;
+  width: 100%;
+  border: none;
+  padding: 14px 28px;
+  text-align: center;
+}
+
+select.block {
+  width: 100%;
+  text-align: center;
+}

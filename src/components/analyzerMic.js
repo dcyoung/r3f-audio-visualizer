@@ -1,32 +1,36 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
 
-function Analyzer({ freqDataRef }) {
+function AnalyzerMic({ freqDataRef }) {
   const audioRef = useRef();
   const analyzerRef = useRef();
+  const micStream = useRef();
+  const [micEnabled, setMicEnabled] = useState(false);
 
-  const playAudio = () => {
-    audioRef.current.src = "https://icecast2.ufpel.edu.br/live";
-    audioRef.current.play();
+  const disableMic = () => {
+    if (micStream?.current) {
+      analyzerRef.current.disconnectInput(micStream.current);
+      micStream.current = null;
+    }
+    setMicEnabled(false);
   };
 
-  const pauseAudio = () => {
-    audioRef.current.pause();
-  };
-
-  const toggleMic = () => {
+  const enableMic = () => {
+    disableMic();
     if (navigator.mediaDevices) {
       navigator.mediaDevices
         .getUserMedia({ audio: true, video: false })
         .then((stream) => {
           audioRef.current.pause();
           // create stream using audioMotion audio context
-          const micStream =
+          micStream.current =
             analyzerRef.current.audioCtx.createMediaStreamSource(stream);
           // connect microphone stream to analyzer
-          analyzerRef.current.connectInput(micStream);
+          analyzerRef.current.connectInput(micStream.current);
           // mute output to prevent feedback loops from the speakers
           analyzerRef.current.volume = 0;
+
+          setMicEnabled(true);
         })
         .catch((err) => {
           alert("Microphone access denied by user");
@@ -36,6 +40,9 @@ function Analyzer({ freqDataRef }) {
     }
   };
 
+  const toggleMic = () => {
+    micEnabled ? disableMic() : enableMic();
+  };
   const updateFreqData = (instance) => {
     if (!freqDataRef.current) {
       freqDataRef.current = new Array(instance.getBars().length);
@@ -46,6 +53,7 @@ function Analyzer({ freqDataRef }) {
       barIdx++;
     }
   };
+
   useEffect(() => {
     analyzerRef.current = new AudioMotionAnalyzer(null, {
       source: audioRef.current,
@@ -53,17 +61,18 @@ function Analyzer({ freqDataRef }) {
       useCanvas: false, // don't use the canvas
       onCanvasDraw: updateFreqData,
     });
-    analyzerRef.current.volume = 1;
-  });
+    analyzerRef.current.volume = 0;
+    enableMic();
+  }, []);
+
   return (
     <div>
       <audio ref={audioRef} crossOrigin="anonymous" />
-      <span>CONTROLS----------</span>
-      <button onClick={() => playAudio()}>Play</button>
-      <button onClick={() => pauseAudio()}>Pause</button>
-      <button onClick={() => toggleMic()}>Mic</button>
+      <button onClick={toggleMic} className="block">
+        🎤 {micEnabled ? "Disable" : "Enable"}
+      </button>
     </div>
   );
 }
 
-export default Analyzer;
+export default AnalyzerMic;

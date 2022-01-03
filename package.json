@@ -18,11 +18,11 @@
     "web-vitals": "^2.1.2"
   },
   "scripts": {
-    "start": "PUBLIC_URL=/ react-scripts start",
-    "build": "PUBLIC_URL=/ react-scripts build",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "react-scripts build && gh-pages -d build",
+    "deploy": "npm run build && gh-pages -d build",
     "format": "npx prettier --write src/ public/"
   },
   "eslintConfig": {

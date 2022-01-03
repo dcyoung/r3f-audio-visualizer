@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/r3f-audio-visualizer/static/css/main.c3d6a39f.css",
+    "main.js": "/r3f-audio-visualizer/static/js/main.9a598020.js",
+    "static/js/787.6aaadb25.chunk.js": "/r3f-audio-visualizer/static/js/787.6aaadb25.chunk.js",
+    "index.html": "/r3f-audio-visualizer/index.html",
+    "main.c3d6a39f.css.map": "/r3f-audio-visualizer/static/css/main.c3d6a39f.css.map",
+    "main.9a598020.js.map": "/r3f-audio-visualizer/static/js/main.9a598020.js.map",
+    "787.6aaadb25.chunk.js.map": "/r3f-audio-visualizer/static/js/787.6aaadb25.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c3d6a39f.css",
+    "static/js/main.9a598020.js"
+  ]
+}

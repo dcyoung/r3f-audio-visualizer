@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import * as THREE from "three";
+import { folder, useControls } from "leva";
 
 function getValueForNormalizedCoord(bars, normalizedCoord) {
   if (bars === undefined || !bars || bars.length === 0) {
@@ -14,22 +15,44 @@ function getValueForNormalizedCoord(bars, normalizedCoord) {
   return valueBelow + (rawIdx % 1) * (valueAbove - valueBelow);
 }
 
-function DataReactiveGrid({
-  dataRef,
-  nGridCols = 100,
-  nGridRows = 100,
-  amplitude = 1.0,
-  cubeSideLength = 0.025,
-  spacingScalar = 5,
-}) {
+function DataReactiveGrid({ dataRef, amplitude = 1.0 }) {
+  const { nGridRows, nGridCols, cubeSideLength, cubeSpacingScalar } =
+    useControls({
+      Grid: folder({
+        nGridRows: {
+          value: 100,
+          min: 1,
+          max: 500,
+          step: 1,
+        },
+        nGridCols: {
+          value: 100,
+          min: 1,
+          max: 500,
+          step: 1,
+        },
+        cubeSideLength: {
+          value: 0.025,
+          min: 0.01,
+          max: 0.5,
+          step: 0.005,
+        },
+        cubeSpacingScalar: {
+          value: 5,
+          min: 1,
+          max: 10,
+          step: 0.5,
+        },
+      }),
+    });
   const ref = useRef();
   const tempObj = new THREE.Object3D();
   const lut = new Lut("cooltowarm");
 
   useFrame(() => {
     //in ms
-    const gridSizeX = nGridRows * spacingScalar * cubeSideLength;
-    const gridSizeY = nGridCols * spacingScalar * cubeSideLength;
+    const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
+    const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;
     const normQuadrantHypotenuse = Math.sqrt(
       Math.pow(0.5, 2) + Math.pow(0.5, 2)
     );

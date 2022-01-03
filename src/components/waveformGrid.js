@@ -2,15 +2,52 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import * as THREE from "three";
+import { folder, useControls } from "leva";
 
-function WaveformGrid({
-  nGridCols = 100,
-  nGridRows = 100,
-  amplitude = 1.0,
-  cubeSideLength = 0.025,
-  spacingScalar = 5,
-  frequencyHz = 2,
-}) {
+function WaveformGrid({ amplitude = 1.0 }) {
+  const {
+    nGridRows,
+    nGridCols,
+    cubeSideLength,
+    cubeSpacingScalar,
+    frequencyHz,
+  } = useControls({
+    Grid: folder({
+      nGridRows: {
+        value: 100,
+        min: 1,
+        max: 500,
+        step: 1,
+      },
+      nGridCols: {
+        value: 100,
+        min: 1,
+        max: 500,
+        step: 1,
+      },
+      cubeSideLength: {
+        value: 0.025,
+        min: 0.01,
+        max: 0.5,
+        step: 0.005,
+      },
+      cubeSpacingScalar: {
+        value: 5,
+        min: 1,
+        max: 10,
+        step: 0.5,
+      },
+    }),
+    "Wave Generator": folder({
+      frequencyHz: {
+        value: 2,
+        min: 0.0,
+        max: 30,
+        step: 0.05,
+      },
+      render: (get) => get("mode") === "waveform",
+    }),
+  });
   const ref = useRef();
   const tempObj = new THREE.Object3D();
   const lut = new Lut("cooltowarm");
@@ -18,8 +55,8 @@ function WaveformGrid({
   useFrame(({ clock }) => {
     //in ms
     const time = 1000 * clock.getElapsedTime();
-    const gridSizeX = nGridRows * spacingScalar * cubeSideLength;
-    const gridSizeY = nGridCols * spacingScalar * cubeSideLength;
+    const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
+    const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;
     const periodSec = 1 / frequencyHz;
     const b = (2 * Math.PI) / periodSec;
     const normQuadrantHypotenuse = Math.sqrt(

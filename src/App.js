@@ -9,7 +9,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stats } from "@react-three/drei";
 import { KernelSize } from "postprocessing";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { useControls } from "leva";
+import { useControls, Leva } from "leva";
 
 function App() {
   const { mode, amplitude } = useControls({
@@ -71,6 +71,7 @@ function App() {
         <Stats />
         <OrbitControls />
       </Canvas>
+      <Leva collapsed={true} />
     </Suspense>
   );
 }

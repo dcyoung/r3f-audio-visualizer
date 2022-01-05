@@ -11,9 +11,15 @@ import { KernelSize } from "postprocessing";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useControls, Leva } from "leva";
 
+// Apple devices/browsers using WebKit do NOT support CrossOrigin Audio
+// see: https://bugs.webkit.org/show_bug.cgi?id=195043
+const SUPPORTED_MODES = navigator.platform.toLowerCase().startsWith("ip")
+  ? ["waveform", "mic"]
+  : ["waveform", "livestream", "mic"];
+
 function App() {
   const { mode, amplitude } = useControls({
-    mode: { value: "waveform", options: ["waveform", "livestream", "mic"] },
+    mode: { value: "waveform", options: SUPPORTED_MODES },
     amplitude: { value: 1.0, min: 0.0, max: 5.0, step: 0.01 },
   });
   const freqDataRef = useRef();

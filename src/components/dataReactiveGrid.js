@@ -18,32 +18,35 @@ function getValueForNormalizedCoord(bars, normalizedCoord) {
 function DataReactiveGrid({ dataRef, amplitude = 1.0 }) {
   const { nGridRows, nGridCols, cubeSideLength, cubeSpacingScalar } =
     useControls({
-      Grid: folder({
-        nGridRows: {
-          value: 100,
-          min: 1,
-          max: 500,
-          step: 1,
+      Grid: folder(
+        {
+          nGridRows: {
+            value: 100,
+            min: 1,
+            max: 500,
+            step: 1,
+          },
+          nGridCols: {
+            value: 100,
+            min: 1,
+            max: 500,
+            step: 1,
+          },
+          cubeSideLength: {
+            value: 0.025,
+            min: 0.01,
+            max: 0.5,
+            step: 0.005,
+          },
+          cubeSpacingScalar: {
+            value: 5,
+            min: 1,
+            max: 10,
+            step: 0.5,
+          },
         },
-        nGridCols: {
-          value: 100,
-          min: 1,
-          max: 500,
-          step: 1,
-        },
-        cubeSideLength: {
-          value: 0.025,
-          min: 0.01,
-          max: 0.5,
-          step: 0.005,
-        },
-        cubeSpacingScalar: {
-          value: 5,
-          min: 1,
-          max: 10,
-          step: 0.5,
-        },
-      }),
+        { collapsed: true }
+      ),
     });
   const ref = useRef();
   const tempObj = new THREE.Object3D();

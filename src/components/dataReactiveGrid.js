@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
-import * as THREE from "three";
+import { Matrix4 } from "three";
 import { folder, useControls } from "leva";
 
 function getValueForNormalizedCoord(bars, normalizedCoord) {
@@ -48,47 +48,58 @@ function DataReactiveGrid({ dataRef, amplitude = 1.0 }) {
         { collapsed: true }
       ),
     });
-  const ref = useRef();
-  const tempObj = new THREE.Object3D();
-  const lut = new Lut("cooltowarm");
+  const meshRef = useRef();
+  const tmpMatrix = useMemo(() => new Matrix4(), []);
+
+  useEffect(() => {
+    const lut = new Lut("cooltowarm");
+    const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
+    let instanceIdx, normGridX, normGridY, normRadialOffset;
+    for (let row = 0; row < nGridRows; row++) {
+      for (let col = 0; col < nGridCols; col++) {
+        instanceIdx = row * nGridCols + col;
+        normGridX = row / nGridRows;
+        normGridY = col / nGridCols;
+        normRadialOffset =
+          Math.hypot(normGridX - 0.5, normGridY - 0.5) / normQuadrantHypotenuse;
+        meshRef.current.setColorAt(instanceIdx, lut.getColor(normRadialOffset));
+      }
+    }
+    meshRef.current.instanceColor.needsUpdate = true;
+  }, [nGridRows, nGridCols]);
 
   useFrame(() => {
     //in ms
     const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
     const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;
-    const normQuadrantHypotenuse = Math.sqrt(
-      Math.pow(0.5, 2) + Math.pow(0.5, 2)
-    );
-    let x, y, z, idx, normGridX, normGridY, normRadialOffset;
+    const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
 
+    let instanceIdx, normGridX, normGridY, x, y, z, normRadialOffset;
     for (let row = 0; row < nGridRows; row++) {
       for (let col = 0; col < nGridCols; col++) {
-        idx = row * nGridCols + col;
+        instanceIdx = row * nGridCols + col;
         normGridX = row / nGridRows;
         normGridY = col / nGridCols;
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);
         normRadialOffset =
-          Math.sqrt(
-            Math.pow(normGridX - 0.5, 2) + Math.pow(normGridY - 0.5, 2)
-          ) / normQuadrantHypotenuse;
+          Math.hypot(normGridX - 0.5, normGridY - 0.5) / normQuadrantHypotenuse;
         z =
           amplitude *
           getValueForNormalizedCoord(dataRef?.current, normRadialOffset);
-        tempObj.position.set(x, y, z);
-        tempObj.updateMatrix();
-        ref.current.setMatrixAt(idx, tempObj.matrix);
-        ref.current.setColorAt(idx, lut.getColor(normRadialOffset));
+        meshRef.current.setMatrixAt(
+          instanceIdx,
+          tmpMatrix.setPosition(x, y, z)
+        );
       }
     }
     // Update the instance
-    ref.current.instanceMatrix.needsUpdate = true;
-    ref.current.instanceColor.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <instancedMesh
-      ref={ref}
+      ref={meshRef}
       castShadow={true}
       receiveShadow={true}
       args={[null, null, nGridRows * nGridCols]}

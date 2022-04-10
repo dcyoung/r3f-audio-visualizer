@@ -29,14 +29,14 @@ function AnaylzerLivestream({ freqDataRef }) {
   });
 
   const updateFreqData = (instance) => {
+    const bars = instance.getBars();
     if (!freqDataRef.current) {
-      freqDataRef.current = new Array(instance.getBars().length);
+      freqDataRef.current = new Array(bars.length);
     }
-    let barIdx = 0;
-    for (const bar of instance.getBars()) {
-      freqDataRef.current[barIdx] = bar.value[0];
-      barIdx++;
-    }
+
+    bars.forEach(({ value }, index) => {
+      freqDataRef.current[index] = value[0];
+    });
   };
 
   useEffect(() => {

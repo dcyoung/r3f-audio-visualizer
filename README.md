@@ -2,7 +2,13 @@
 
 An interactive audio visualizer built with react and THREE.js.
 
-[DEMO](https://dcyoung.github.io/r3f-audio-visualizer/)
+[CLICK HERE FOR A LIVE DEMO](https://dcyoung.github.io/r3f-audio-visualizer/)
+
+---
+
+[![docs/waveform.gif](docs/waveform.gif)](https://dcyoung.github.io/r3f-audio-visualizer/)
+
+---
 
 ## Quickstart
 

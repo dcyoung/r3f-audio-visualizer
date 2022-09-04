@@ -1,11 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, MutableRefObject } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
-import { folder, useControls } from "leva";
 
-function AnalyzerMic({ freqDataRef }) {
-  const audioRef = useRef();
-  const analyzerRef = useRef();
-  const micStream = useRef();
+interface AnaylzerMicProps {
+  freqDataRef: MutableRefObject<any>
+}
+const AnalyzerMic = ({
+  freqDataRef
+}: AnaylzerMicProps): JSX.Element => {
+  const audioRef = useRef<HTMLAudioElement>(null!);
+  const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
+  const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
 
   const disableMic = () => {
     if (micStream?.current) {
@@ -19,7 +23,10 @@ function AnalyzerMic({ freqDataRef }) {
       navigator.mediaDevices
         .getUserMedia({ audio: true, video: false })
         .then((stream) => {
-          audioRef.current.pause();
+          // Disable any audio
+          if (audioRef.current) {
+            audioRef.current.pause();
+          }
           // create stream using audioMotion audio context
           micStream.current =
             analyzerRef.current.audioCtx.createMediaStreamSource(stream);
@@ -36,21 +43,8 @@ function AnalyzerMic({ freqDataRef }) {
     }
   };
 
-  useControls({
-    "🎤 Microphone": folder({
-      micEnabled: {
-        value: true,
-        // imperatively update the world after Leva input changes
-        onChange: (v) => {
-          v ? enableMic() : disableMic();
-        },
-      },
-      render: (get) => get("mode") === "mic",
-    }),
-  });
-
-  const updateFreqData = (instance) => {
-    if (!freqDataRef.current) {
+  const updateFreqData = (instance: AudioMotionAnalyzer): void => {
+    if (!freqDataRef.current || freqDataRef.current === undefined) {
       freqDataRef.current = new Array(instance.getBars().length);
     }
     let barIdx = 0;
@@ -61,13 +55,20 @@ function AnalyzerMic({ freqDataRef }) {
   };
 
   useEffect(() => {
-    analyzerRef.current = new AudioMotionAnalyzer(null, {
+    if (!audioRef.current) {
+      return;
+    }
+    if (analyzerRef.current) {
+      return;
+    }
+    analyzerRef.current = new AudioMotionAnalyzer(undefined, {
       source: audioRef.current,
       mode: 2,
       useCanvas: false, // don't use the canvas
       onCanvasDraw: updateFreqData,
     });
     analyzerRef.current.volume = 0;
+    enableMic();
   }, []);
 
   return <audio ref={audioRef} crossOrigin="anonymous" />;

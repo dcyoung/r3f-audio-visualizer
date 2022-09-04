@@ -1,30 +1,36 @@
 {
   "name": "r3f-audio-visualizer",
   "homepage": "https://dcyoung.github.io/r3f-audio-visualizer/",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
-    "@react-three/drei": "^8.3.1",
-    "@react-three/fiber": "^7.0.24",
-    "@react-three/postprocessing": "^2.1.2",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
+    "@react-three/drei": "^9.25.3",
+    "@react-three/fiber": "^8.6.2",
+    "@react-three/postprocessing": "^2.6.2",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.56",
+    "@types/react": "^18.0.18",
+    "@types/react-dom": "^18.0.6",
+    "@types/three": "^0.144.0",
     "audiomotion-analyzer": "^3.6.0",
-    "leva": "^0.9.18",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "5.0.0",
-    "three": "0.135.0",
-    "web-vitals": "^2.1.2"
+    "leva": "^0.9.31",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "three": "^0.144.0",
+    "typescript": "^4.8.2",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "clean": "rm -rf build/",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run clean && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && gh-pages -d build",
-    "format": "npx prettier --write src/ public/"
+    "deploy": "npm run build && gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -45,8 +51,6 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^3.2.3",
-    "prettier": "2.5.1",
-    "serve": "^13.0.2"
+    "gh-pages": "^4.0.0"
   }
 }

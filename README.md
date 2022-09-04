@@ -1,4 +1,4 @@
-# r3f-audio-visualizer
+# r3f-audio-visualizer ![Release](https://github.com/dcyoung/r3f-audio-visualizer/actions/workflows/publish.yml/badge.svg)
 
 An interactive audio visualizer built with react and THREE.js.
 

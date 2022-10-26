@@ -8,7 +8,8 @@ interface AnaylzerLivestreamProps {
 
 const AnaylzerLivestream = ({
   freqDataRef,
-  url = "https://icecast2.ufpel.edu.br/live"
+  url="http://igor.torontocast.com:1950/stream",
+  // url = "https://icecast2.ufpel.edu.br/live" // dead
 }: AnaylzerLivestreamProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<AudioMotionAnalyzer>(null!);

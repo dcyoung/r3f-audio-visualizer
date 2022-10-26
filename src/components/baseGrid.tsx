@@ -1,10 +1,8 @@
 import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
-import { Matrix4 } from "three";
+import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { folder, useControls } from "leva";
-import * as THREE from "three";
-
 
 interface BaseGridProps {
     getValueForNormalizedCoord: (normGridX: number, normGridY: number, elapsedTimeSec?: number) => number
@@ -45,7 +43,7 @@ const BaseGrid = ({
                 { collapsed: true }
             ),
         });
-    const meshRef = useRef<THREE.InstancedMesh>(null!);
+    const meshRef = useRef<InstancedMesh>(null!);
     const tmpMatrix = useMemo(() => new Matrix4(), []);
 
     useEffect(() => {
@@ -94,7 +92,7 @@ const BaseGrid = ({
             ref={meshRef}
             castShadow={true}
             receiveShadow={true}
-            args={[new THREE.BoxGeometry(), new THREE.MeshBasicMaterial(), nGridRows * nGridCols]}
+            args={[new BoxGeometry(), new MeshBasicMaterial(), nGridRows * nGridCols]}
         >
             <boxGeometry
                 attach="geometry"

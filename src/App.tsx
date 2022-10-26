@@ -6,10 +6,10 @@ import DataReactiveGrid from "./components/dataReactiveGrid";
 import WaveformGrid from "./components/waveformGrid";
 import Ground from "./components/ground";
 import { useControls, Leva } from "leva";
-import * as THREE from "three";
 import { APPLICATION_MODE_LIVE_STREAM, APPLICATION_MODE_MICROPHONE, APPLICATION_MODE_WAVE_FORM, getSupportedApplicationModes, isAudioMode } from './components/application_modes';
 import AnaylzerLivestream from './components/analyzerLivestream';
 import AnalyzerMic from './components/analyzerMic';
+import { Vector3 } from 'three';
 
 const App = (): JSX.Element => {
   const { mode, amplitude } = useControls({
@@ -45,9 +45,7 @@ const App = (): JSX.Element => {
         <ambientLight />
         <fog attach="fog" args={['#191920', 0, 100]} />
         {/* <Environment preset="city" /> */}
-        <Ground
-          position={new THREE.Vector3(0, 0, -2.5 * amplitude)}
-        />
+        <Ground position={new Vector3(0, 0, -2.5 * amplitude)} />
         {
           isAudioMode(mode)
             ? <DataReactiveGrid amplitude={amplitude} dataRef={freqDataRef} />

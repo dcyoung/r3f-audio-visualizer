@@ -1,18 +1,17 @@
 import { MeshReflectorMaterial } from "@react-three/drei";
-import * as THREE from "three";
+import { Vector3 } from "three";
 
 interface GroundProps {
-  position?: THREE.Vector3;
   size?: number;
+  position: Vector3;
 }
 const Ground = ({
-  position = new THREE.Vector3(0, 0, 0),
-  size = 250
+  size = 250,
+  position = new Vector3(0, 0, 0),
+  ...props
 }: GroundProps): JSX.Element => {
   return (
-    <mesh
-      position={position}
-    >
+    <mesh position={position} {...props}>
       <planeGeometry
         args={[size, size]}
       />

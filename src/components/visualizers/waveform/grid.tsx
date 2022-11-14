@@ -31,11 +31,7 @@ const WaveformGrid = ({ amplitude = 1.0 }: WaveformGridProps): JSX.Element => {
     return amplitude * Math.sin(b * normRadialOffset + phaseShift);
   };
 
-  return (
-    <BaseGrid
-      getValueForNormalizedCoord={getValueForNormalizedCoord}
-    ></BaseGrid>
-  );
+  return <BaseGrid getValueForNormalizedCoord={getValueForNormalizedCoord} />;
 };
 
 export default WaveformGrid;

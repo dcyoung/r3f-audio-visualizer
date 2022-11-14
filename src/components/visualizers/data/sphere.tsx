@@ -1,5 +1,8 @@
 import { MutableRefObject } from "react";
-import BaseSphere from "../baseSphere";
+import BaseSphere, {
+  getNorm1DTargetForNorm2DCoord,
+  MAPPING_MODE_POLAR_2D,
+} from "../baseSphere";
 import { interpolateValueForNormalizedCoord } from "../utils";
 
 interface DataReactiveSphereProps {
@@ -11,13 +14,16 @@ const DataReactiveSphere = ({
   dataRef,
   amplitude = 1.0,
 }: DataReactiveSphereProps): JSX.Element => {
-  const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
-
-  const getValueForNormalizedCoord = (theta: number, phi: number): number => {
-    const normTheta = (theta % (2 * Math.PI)) / (2 * Math.PI);
-    const normPhi = (phi % Math.PI) / Math.PI;
-    const normTarget =
-      Math.hypot(normTheta - 0.5, normPhi - 0.5) / normQuadrantHypotenuse;
+  const getValueForNormalizedCoord = (
+    normTheta: number,
+    normPhi: number,
+    mapMode: string = MAPPING_MODE_POLAR_2D
+  ): number => {
+    const normTarget = getNorm1DTargetForNorm2DCoord(
+      normTheta,
+      normPhi,
+      mapMode
+    );
     return (
       amplitude *
       interpolateValueForNormalizedCoord(dataRef?.current, normTarget)

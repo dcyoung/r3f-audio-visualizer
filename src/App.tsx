@@ -5,16 +5,13 @@ import { OrbitControls } from "@react-three/drei";
 import Ground from "./components/ground";
 import { useControls, Leva } from "leva";
 import {
-  APPLICATION_MODE_LIVE_STREAM,
-  APPLICATION_MODE_MICROPHONE,
   APPLICATION_MODE_WAVE_FORM,
   getSupportedApplicationModes,
   isAudioMode,
 } from "./components/application_modes";
-import AnaylzerLivestream from "./components/analyzerLivestream";
-import AnalyzerMic from "./components/analyzerMic";
 import { Vector3 } from "three";
 import ReactiveVisual from "./components/reactiveVisual";
+import AudioAnalyzer from "./components/audioAnalyzer";
 
 const App = (): JSX.Element => {
   const { mode, visualizer, amplitude } = useControls({
@@ -27,19 +24,9 @@ const App = (): JSX.Element => {
   });
   const freqDataRef = useRef<number[]>(null!);
 
-  const getAppropriateAnalyzerComponent = (mode: string): JSX.Element => {
-    switch (mode) {
-      case APPLICATION_MODE_LIVE_STREAM:
-        return <AnaylzerLivestream freqDataRef={freqDataRef} />;
-      case APPLICATION_MODE_MICROPHONE:
-        return <AnalyzerMic freqDataRef={freqDataRef} />;
-      default:
-        return <></>;
-    }
-  };
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {getAppropriateAnalyzerComponent(mode)}
+      {isAudioMode(mode) ? <AudioAnalyzer freqDataRef={freqDataRef} /> : null}
       <Canvas
         camera={{
           fov: 45,
@@ -52,21 +39,20 @@ const App = (): JSX.Element => {
         <color attach="background" args={["#191920"]} />
         <ambientLight />
         <fog attach="fog" args={["#191920", 0, 100]} />
-        <Ground position={new Vector3(0, 0, -2.5 * amplitude)} />
-        {isAudioMode(mode) ? (
-          <ReactiveVisual
-            visual={visualizer}
-            useData={true}
-            amplitude={amplitude}
-            dataRef={freqDataRef}
-          />
-        ) : (
-          <ReactiveVisual
-            visual={visualizer}
-            useData={false}
-            amplitude={amplitude}
-          />
-        )}
+        <Ground
+          position={
+            new Vector3(
+              0,
+              0,
+              visualizer == "grid" ? -2.5 * amplitude : -4 * amplitude
+            )
+          }
+        />
+        <ReactiveVisual
+          visual={visualizer}
+          amplitude={amplitude}
+          dataRef={isAudioMode(mode) ? freqDataRef : null}
+        />
         {/* <Stats /> */}
         <OrbitControls />
       </Canvas>

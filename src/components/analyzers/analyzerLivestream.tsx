@@ -2,14 +2,14 @@ import { useEffect, useRef, MutableRefObject } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
 
 interface AnaylzerLivestreamProps {
-  freqDataRef: MutableRefObject<any>,
-  url?: string,
+  freqDataRef: MutableRefObject<any>;
+  url?: string;
 }
 
 const AnaylzerLivestream = ({
   freqDataRef,
-  url="http://igor.torontocast.com:1950/stream",
   // url = "https://icecast2.ufpel.edu.br/live" // dead
+  url = "http://igor.torontocast.com:1950/stream",
 }: AnaylzerLivestreamProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
@@ -55,6 +55,6 @@ const AnaylzerLivestream = ({
   }, []);
 
   return <audio ref={audioRef} crossOrigin="anonymous" />;
-}
+};
 
 export default AnaylzerLivestream;

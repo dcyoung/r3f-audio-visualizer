@@ -26,7 +26,9 @@ const App = (): JSX.Element => {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {isAudioMode(mode) ? <AudioAnalyzer freqDataRef={freqDataRef} /> : null}
+      {isAudioMode(mode) ? (
+        <AudioAnalyzer freqDataRef={freqDataRef} mode={mode} />
+      ) : null}
       <Canvas
         camera={{
           fov: 45,

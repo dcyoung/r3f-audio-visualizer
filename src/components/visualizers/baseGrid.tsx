@@ -21,13 +21,13 @@ const BaseGrid = ({
         {
           nGridRows: {
             value: 100,
-            min: 1,
+            min: 2,
             max: 500,
             step: 1,
           },
           nGridCols: {
             value: 100,
-            min: 1,
+            min: 2,
             max: 500,
             step: 1,
           },
@@ -57,8 +57,8 @@ const BaseGrid = ({
     for (let row = 0; row < nGridRows; row++) {
       for (let col = 0; col < nGridCols; col++) {
         instanceIdx = row * nGridCols + col;
-        normGridX = row / nGridRows;
-        normGridY = col / nGridCols;
+        normGridX = row / (nGridRows - 1);
+        normGridY = col / (nGridCols - 1);
         normRadialOffset =
           Math.hypot(normGridX - 0.5, normGridY - 0.5) / normQuadrantHypotenuse;
         meshRef.current.setColorAt(instanceIdx, lut.getColor(normRadialOffset));
@@ -82,8 +82,8 @@ const BaseGrid = ({
     for (let row = 0; row < nGridRows; row++) {
       for (let col = 0; col < nGridCols; col++) {
         instanceIdx = row * nGridCols + col;
-        normGridX = row / nGridRows;
-        normGridY = col / nGridCols;
+        normGridX = row / (nGridRows - 1);
+        normGridY = col / (nGridCols - 1);
         z = getValueForNormalizedCoord(normGridX, normGridY, elapsedTimeSec);
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);

@@ -1,1 +1,0 @@
-import{B as s,M as i,g as l}from"./baseSphere.18fadb4d.js";import{i as n}from"./utils.2902ea37.js";import{j as p}from"./index.c6f5d8df.js";import"./Lut.4c9f9cbc.js";const d=({dataRef:r,amplitude:o=1})=>p(s,{getValueForNormalizedCoord:(e,t,m=i)=>{const a=l(e,t,m);return o*n(r==null?void 0:r.current,a)}});export{d as default};

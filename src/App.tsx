@@ -19,7 +19,10 @@ const App = (): JSX.Element => {
       value: APPLICATION_MODE_WAVE_FORM,
       options: getSupportedApplicationModes(),
     },
-    visualizer: { value: "grid", options: ["grid", "sphere", "cube"] },
+    visualizer: {
+      value: "grid",
+      options: ["grid", "sphere", "cube", "diffusedRing"],
+    },
     amplitude: { value: 1.0, min: 0.0, max: 5.0, step: 0.01 },
   });
   const freqDataRef = useRef<number[]>(null!);

@@ -3,6 +3,7 @@ import { folder, useControls } from "leva";
 import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
+import { _2PI } from "./utils";
 
 const MAPPING_MODE_POLAR_2D = "polar_2d";
 const MAPPING_MODE_POLAR_PHI = "polar_phi";
@@ -83,7 +84,7 @@ const BaseSphere = ({
       // range 0:PI
       phi = Math.acos(1 - (2 * k) / nPoints) % Math.PI;
       // range 0:2PI
-      theta = (Math.PI * (1 + Math.sqrt(5)) * k) % (2 * Math.PI);
+      theta = (Math.PI * (1 + Math.sqrt(5)) * k) % _2PI;
       x = Math.cos(theta) * Math.sin(phi);
       y = Math.sin(theta) * Math.sin(phi);
       z = Math.cos(phi);
@@ -93,7 +94,7 @@ const BaseSphere = ({
         0.25 *
           radius *
           getValueForNormalizedCoord(
-            theta / (2 * Math.PI), // normalize
+            theta / _2PI, // normalize
             phi / Math.PI, // normalize
             mapMode,
             elapsedTimeSec

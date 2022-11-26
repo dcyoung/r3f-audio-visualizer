@@ -1,6 +1,6 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject, useMemo } from "react";
 import BaseDiffusedRing from "../baseDiffusedRing";
-import { interpolateValueForNormalizedCoord } from "../utils";
+import { getCoordinateMapper1D } from "../utils";
 
 interface DataReactiveDiffusedRingProps {
   dataRef: MutableRefObject<number[]>;
@@ -11,12 +11,10 @@ const DataReactiveDiffusedRing = ({
   dataRef,
   amplitude = 1.0,
 }: DataReactiveDiffusedRingProps): JSX.Element => {
-  const getValueForNormalizedCoord = (normAngle: number): number => {
-    return (
-      amplitude *
-      interpolateValueForNormalizedCoord(dataRef?.current, normAngle)
-    );
-  };
+  const getValueForNormalizedCoord = useMemo(
+    () => getCoordinateMapper1D(amplitude, { dataRef: dataRef }),
+    [dataRef, amplitude]
+  );
 
   return (
     <BaseDiffusedRing

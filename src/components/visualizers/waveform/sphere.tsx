@@ -3,6 +3,7 @@ import BaseSphere, {
   MAPPING_MODE_POLAR_2D,
   getNorm1DTargetForNorm2DCoord,
 } from "../baseSphere";
+import { _2PI } from "../utils";
 
 interface WaveformSphereProps {
   amplitude?: number;
@@ -22,7 +23,7 @@ const WaveformSphere = ({
     }),
   });
   const periodSec = 1 / frequencyHz;
-  const b = (2 * Math.PI) / periodSec;
+  const b = _2PI / periodSec;
 
   const getValueForNormalizedCoord = (
     normTheta: number,

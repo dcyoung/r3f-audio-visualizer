@@ -3,16 +3,10 @@ import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { folder, useControls } from "leva";
-
-const NORM_QUADRANT_HYPOTENUSE = Math.hypot(0.5, 0.5);
+import { ICoordinateMapper3D, NORM_QUADRANT_HYPOTENUSE_2D } from "./utils";
 
 interface BaseCubeProps {
-  getValueForNormalizedCoord: (
-    normCubeX: number,
-    normCubeY: number,
-    normCubeZ: number,
-    elapsedTimeSec?: number
-  ) => number;
+  getValueForNormalizedCoord: ICoordinateMapper3D;
 }
 
 const BaseCube = ({
@@ -61,15 +55,15 @@ const BaseCube = ({
           if (normCubeX == 0 || normCubeX == 1) {
             normRadialOffset =
               Math.hypot(normCubeY - 0.5, normCubeZ - 0.5) /
-              NORM_QUADRANT_HYPOTENUSE;
+              NORM_QUADRANT_HYPOTENUSE_2D;
           } else if (normCubeY == 0 || normCubeY == 1) {
             normRadialOffset =
               Math.hypot(normCubeX - 0.5, normCubeZ - 0.5) /
-              NORM_QUADRANT_HYPOTENUSE;
+              NORM_QUADRANT_HYPOTENUSE_2D;
           } else if (normCubeZ == 0 || normCubeZ == 1) {
             normRadialOffset =
               Math.hypot(normCubeX - 0.5, normCubeY - 0.5) /
-              NORM_QUADRANT_HYPOTENUSE;
+              NORM_QUADRANT_HYPOTENUSE_2D;
           } else {
             // interior
             normRadialOffset = 0;

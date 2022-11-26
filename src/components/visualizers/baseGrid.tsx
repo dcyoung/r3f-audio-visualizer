@@ -3,13 +3,10 @@ import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { folder, useControls } from "leva";
+import { ICoordinateMapper2D } from "./utils";
 
 interface BaseGridProps {
-  getValueForNormalizedCoord: (
-    normGridX: number,
-    normGridY: number,
-    elapsedTimeSec?: number
-  ) => number;
+  getValueForNormalizedCoord: ICoordinateMapper2D;
 }
 
 const BaseGrid = ({

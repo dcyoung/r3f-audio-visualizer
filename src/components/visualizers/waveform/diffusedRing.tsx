@@ -1,5 +1,6 @@
 import { folder, useControls } from "leva";
 import BaseDiffusedRing from "../baseDiffusedRing";
+import { _2PI } from "../utils";
 
 interface WaveformDiffusedRingProps {
   amplitude?: number;
@@ -25,9 +26,9 @@ const WaveformDiffusedRing = ({
     }),
   });
   const periodSec_1 = 1 / frequencyHz_1;
-  const b_1 = (2 * Math.PI) / periodSec_1;
+  const b_1 = _2PI / periodSec_1;
   const periodSec_2 = 1 / frequencyHz_2;
-  const b_2 = (2 * Math.PI) / periodSec_2;
+  const b_2 = _2PI / periodSec_2;
 
   const getValueForNormalizedCoord = (
     normAngle: number,

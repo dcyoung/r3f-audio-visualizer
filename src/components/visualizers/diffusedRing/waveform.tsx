@@ -1,5 +1,5 @@
 import { folder, useControls } from "leva";
-import BaseDiffusedRing from "../baseDiffusedRing";
+import BaseDiffusedRing from "./base";
 import { _2PI } from "../utils";
 
 interface WaveformDiffusedRingProps {

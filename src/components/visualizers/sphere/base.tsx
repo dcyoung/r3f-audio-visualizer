@@ -1,79 +1,39 @@
 import { useFrame } from "@react-three/fiber";
-import { folder, useControls } from "leva";
 import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
-import { _2PI } from "./utils";
+import { useAppState } from "../../appState";
+import { _2PI } from "../utils";
 
-const MAPPING_MODE_POLAR_2D = "polar_2d";
-const MAPPING_MODE_POLAR_PHI = "polar_phi";
-const MAPPING_MODE_POLAR_THETA = "polar_theta";
-const NORM_QUADRANT_HYPOTENUSE = Math.hypot(0.5, 0.5);
-
-const getNorm1DTargetForNorm2DCoord = (
-  normTheta: number,
-  normPhi: number,
-  mapMode: string = MAPPING_MODE_POLAR_2D
-): number => {
-  switch (mapMode) {
-    case MAPPING_MODE_POLAR_PHI:
-      return normPhi;
-    case MAPPING_MODE_POLAR_THETA:
-      return normTheta;
-    case MAPPING_MODE_POLAR_2D:
-    default:
-      return (
-        Math.hypot(normTheta - 0.5, normPhi - 0.5) / NORM_QUADRANT_HYPOTENUSE
-      );
-  }
-};
+// const MAPPING_MODE_POLAR_2D = "polar_2d";
+// const MAPPING_MODE_POLAR_PHI = "polar_phi";
+// const MAPPING_MODE_POLAR_THETA = "polar_theta";
+// const NORM_QUADRANT_HYPOTENUSE = Math.hypot(0.5, 0.5);
 
 interface BaseSphereProps {
-  getValueForNormalizedCoord: (
-    theta: number,
-    phi: number,
-    mapMode: string,
-    elapsedTimeSec?: number
-  ) => number;
+  radius?: number;
+  nPoints?: number;
+  cubeSideLength?: number;
+  colorLut?: string;
 }
 
 const BaseSphere = ({
-  getValueForNormalizedCoord,
+  radius = 2,
+  nPoints = 800,
+  cubeSideLength = 0.05,
+  colorLut = "cooltowarm",
 }: BaseSphereProps): JSX.Element => {
-  const { radius, nPoints, cubeSideLength, mapMode } = useControls({
-    Sphere: folder(
-      {
-        radius: { value: 2, min: 0.25, max: 3, step: 0.25 },
-        nPoints: { value: 800, min: 100, max: 2000, step: 25 },
-        cubeSideLength: {
-          value: 0.05,
-          min: 0.01,
-          max: 0.5,
-          step: 0.005,
-        },
-        mapMode: {
-          value: MAPPING_MODE_POLAR_2D,
-          options: [
-            MAPPING_MODE_POLAR_2D,
-            MAPPING_MODE_POLAR_PHI,
-            MAPPING_MODE_POLAR_THETA,
-          ],
-        },
-      },
-      { collapsed: true }
-    ),
-  });
-
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
   useEffect(() => {
-    const lut = new Lut("cooltowarm");
+    const lut = new Lut(colorLut);
     for (let i = 0; i < nPoints; i++) {
       meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [nPoints, radius, cubeSideLength, mapMode, getValueForNormalizedCoord]);
+  }, [nPoints, radius, cubeSideLength, colorLut, coordinateMapper]);
 
   useFrame(({ clock }) => {
     // in ms
@@ -93,10 +53,10 @@ const BaseSphere = ({
         radius +
         0.25 *
           radius *
-          getValueForNormalizedCoord(
+          coordinateMapper.map(
             theta / _2PI, // normalize
             phi / Math.PI, // normalize
-            mapMode,
+            0,
             elapsedTimeSec
           );
 
@@ -130,10 +90,4 @@ const BaseSphere = ({
   );
 };
 
-export {
-  BaseSphere as default,
-  MAPPING_MODE_POLAR_2D,
-  MAPPING_MODE_POLAR_PHI,
-  MAPPING_MODE_POLAR_THETA,
-  getNorm1DTargetForNorm2DCoord,
-};
+export default BaseSphere;

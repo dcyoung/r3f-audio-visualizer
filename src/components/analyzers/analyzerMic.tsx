@@ -1,15 +1,14 @@
 import { useEffect, useRef, MutableRefObject } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
+import { useAppState } from "../appState";
 
-interface AnaylzerMicProps {
-  freqDataRef: MutableRefObject<any>
-}
-const AnalyzerMic = ({
-  freqDataRef
-}: AnaylzerMicProps): JSX.Element => {
+interface AnaylzerMicProps {}
+const AnalyzerMic = ({}: AnaylzerMicProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
   const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
+  const freqData = useAppState((state) => state.data);
+  const resizeFreqData = useAppState((state) => state.resizeData);
 
   const disableMic = () => {
     if (micStream?.current) {
@@ -44,11 +43,12 @@ const AnalyzerMic = ({
   };
 
   const updateFreqData = (instance: AudioMotionAnalyzer): void => {
-    if (!freqDataRef.current || freqDataRef.current === undefined) {
-      freqDataRef.current = new Array(instance.getBars().length);
+    const bars = instance.getBars();
+    if (freqData.length != bars.length) {
+      resizeFreqData(bars.length);
     }
     let barIdx = 0;
-    for (const bar of instance.getBars()) {
+    for (const bar of bars) {
       freqDataRef.current[barIdx] = bar.value[0];
       barIdx++;
     }
@@ -72,6 +72,6 @@ const AnalyzerMic = ({
   }, []);
 
   return <audio ref={audioRef} crossOrigin="anonymous" />;
-}
+};
 
 export default AnalyzerMic;

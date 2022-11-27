@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 import { Points } from "three";
-import { gaussianRandom, ICoordinateMapper1D, _2PI } from "./utils";
+import { gaussianRandom, ICoordinateMapper1D, _2PI } from "../utils";
 
 interface BaseDiffusedRingProps {
   getValueForNormalizedCoord: ICoordinateMapper1D;

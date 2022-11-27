@@ -2,53 +2,29 @@ import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { folder, useControls } from "leva";
-import { ICoordinateMapper2D } from "./utils";
+import { useAppState } from "../../appState";
 
 interface BaseGridProps {
-  getValueForNormalizedCoord: ICoordinateMapper2D;
+  nGridRows?: number;
+  nGridCols?: number;
+  cubeSideLength?: number;
+  cubeSpacingScalar?: number;
+  colorLut?: string;
 }
 
 const BaseGrid = ({
-  getValueForNormalizedCoord,
+  nGridRows = 100,
+  nGridCols = 100,
+  cubeSideLength = 0.025,
+  cubeSpacingScalar = 5,
+  colorLut = "cooltowarm",
 }: BaseGridProps): JSX.Element => {
-  const { nGridRows, nGridCols, cubeSideLength, cubeSpacingScalar } =
-    useControls({
-      Grid: folder(
-        {
-          nGridRows: {
-            value: 100,
-            min: 2,
-            max: 500,
-            step: 1,
-          },
-          nGridCols: {
-            value: 100,
-            min: 2,
-            max: 500,
-            step: 1,
-          },
-          cubeSideLength: {
-            value: 0.025,
-            min: 0.01,
-            max: 0.5,
-            step: 0.005,
-          },
-          cubeSpacingScalar: {
-            value: 5,
-            min: 1,
-            max: 10,
-            step: 0.5,
-          },
-        },
-        { collapsed: true }
-      ),
-    });
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
   useEffect(() => {
-    const lut = new Lut("cooltowarm");
+    const lut = new Lut(colorLut);
     const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
     let instanceIdx, normGridX, normGridY, normRadialOffset;
     for (let row = 0; row < nGridRows; row++) {
@@ -62,13 +38,7 @@ const BaseGrid = ({
       }
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [
-    nGridRows,
-    nGridCols,
-    cubeSideLength,
-    cubeSpacingScalar,
-    getValueForNormalizedCoord,
-  ]);
+  }, [nGridRows, nGridCols, cubeSideLength, cubeSpacingScalar, colorLut]);
 
   useFrame(({ clock }) => {
     //in ms
@@ -81,7 +51,7 @@ const BaseGrid = ({
         instanceIdx = row * nGridCols + col;
         normGridX = row / (nGridRows - 1);
         normGridY = col / (nGridCols - 1);
-        z = getValueForNormalizedCoord(normGridX, normGridY, elapsedTimeSec);
+        z = coordinateMapper.map(normGridX, normGridY, 0, elapsedTimeSec);
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);
         meshRef.current.setMatrixAt(

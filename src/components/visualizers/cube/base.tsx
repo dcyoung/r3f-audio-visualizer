@@ -2,46 +2,28 @@ import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { folder, useControls } from "leva";
-import { ICoordinateMapper3D, NORM_QUADRANT_HYPOTENUSE_2D } from "./utils";
+import { NORM_QUADRANT_HYPOTENUSE_2D } from "../utils";
+import { useAppState } from "../../appState";
 
 interface BaseCubeProps {
-  getValueForNormalizedCoord: ICoordinateMapper3D;
+  nPerSide?: number;
+  cubeSideLength?: number;
+  cubeSpacingScalar?: number;
+  colorLut?: string;
 }
 
 const BaseCube = ({
-  getValueForNormalizedCoord,
+  nPerSide = 10,
+  cubeSideLength = 0.5,
+  cubeSpacingScalar = 0.1,
+  colorLut = "cooltowarm",
 }: BaseCubeProps): JSX.Element => {
-  const { nPerSide, cubeSideLength, cubeSpacingScalar } = useControls({
-    Cube: folder(
-      {
-        nPerSide: {
-          value: 10,
-          min: 3,
-          max: 50,
-          step: 1,
-        },
-        cubeSideLength: {
-          value: 0.5,
-          min: 0.1,
-          max: 2.0,
-          step: 0.05,
-        },
-        cubeSpacingScalar: {
-          value: 0.1,
-          min: 0,
-          max: 2,
-          step: 0.1,
-        },
-      },
-      { collapsed: true }
-    ),
-  });
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
   useEffect(() => {
-    const lut = new Lut("cooltowarm");
+    const lut = new Lut(colorLut);
     let instanceIdx, normCubeX, normCubeY, normCubeZ, normRadialOffset;
     // interior
     for (let row = 0; row < nPerSide; row++) {
@@ -76,7 +58,7 @@ const BaseCube = ({
       }
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [nPerSide, cubeSideLength, cubeSpacingScalar, getValueForNormalizedCoord]);
+  }, [nPerSide, cubeSideLength, cubeSpacingScalar, colorLut]);
 
   useFrame(({ clock }) => {
     //in ms
@@ -100,7 +82,7 @@ const BaseCube = ({
           normalizedScale =
             0.1 +
             0.9 *
-              getValueForNormalizedCoord(
+              coordinateMapper.map(
                 normCubeX,
                 normCubeY,
                 normCubeZ,

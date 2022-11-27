@@ -1,9 +1,8 @@
 import React, { Suspense } from "react";
-import { MutableRefObject } from "react";
 import {
   APPLICATION_MODE_LIVE_STREAM,
   APPLICATION_MODE_MICROPHONE,
-} from "./application_modes";
+} from "../applicationModes";
 
 const getImportName = (mode: string): string => {
   switch (mode) {
@@ -17,21 +16,19 @@ const getImportName = (mode: string): string => {
 };
 
 interface AudioAnaylzerProps {
-  freqDataRef: MutableRefObject<any>;
   mode?: string;
 }
 
 const AudioAnaylzer = ({
-  freqDataRef,
   mode = APPLICATION_MODE_LIVE_STREAM,
   ...props
 }: AudioAnaylzerProps): JSX.Element => {
   const AnalyzerComponent = React.lazy(
-    () => import(`./analyzers/${getImportName(mode)}.tsx`)
+    () => import(`./${getImportName(mode)}.tsx`)
   );
   return (
     <Suspense fallback={null}>
-      <AnalyzerComponent freqDataRef={freqDataRef} {...props} />
+      <AnalyzerComponent {...props} />
     </Suspense>
   );
 };

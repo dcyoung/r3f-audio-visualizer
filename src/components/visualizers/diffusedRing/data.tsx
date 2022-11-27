@@ -1,5 +1,5 @@
 import { MutableRefObject, useMemo } from "react";
-import BaseDiffusedRing from "../baseDiffusedRing";
+import BaseDiffusedRing from "./base";
 import { getCoordinateMapper1D } from "../utils";
 
 interface DataReactiveDiffusedRingProps {

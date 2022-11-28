@@ -3,25 +3,28 @@ import { useEffect } from "react";
 import { useAppState } from "../appState";
 
 export interface WaveformControlsProps {
-  waveFrequenciesHz?: number[];
+  nWaves?: number;
 }
 
 const WaveformControls = ({
-  waveFrequenciesHz = [2.0],
+  nWaves = 1,
 }: WaveformControlsProps): JSX.Element => {
-  const updateWaveformCount = useAppState((state) => state.updateWaveformCount);
+  const waveFrequenciesHz = useAppState((state) => state.waveFrequenciesHz);
+  const updateNumberActiveWaves = useAppState(
+    (state) => state.updateNumberActiveWaves
+  );
   const updateAmplitude = useAppState((state) => state.updateAmplitude);
   const updateFrequencyHzAt = useAppState((state) => state.updateFrequencyHzAt);
   const [, set] = useControls(
     "Wave Generator",
     () => ({
       nWaves: {
-        value: Math.max(1, Math.min(3, waveFrequenciesHz.length)),
+        value: Math.min(3, Math.max(1, nWaves)),
         min: 1,
         max: 3,
         step: 1,
         onChange: (v) => {
-          updateWaveformCount(v);
+          updateNumberActiveWaves(v);
         },
       },
       amplitude: {
@@ -34,7 +37,7 @@ const WaveformControls = ({
         },
       },
       frequencyHz_1: {
-        value: waveFrequenciesHz[0],
+        value: waveFrequenciesHz.length > 0 ? waveFrequenciesHz[0] : 0.0,
         min: 0.0,
         max: 30,
         step: 0.05,
@@ -43,7 +46,7 @@ const WaveformControls = ({
         },
       },
       frequencyHz_2: {
-        value: waveFrequenciesHz.length > 1 ? waveFrequenciesHz[1] : 0,
+        value: waveFrequenciesHz.length > 1 ? waveFrequenciesHz[1] : 0.0,
         min: 0.0,
         max: 30,
         step: 0.05,
@@ -53,7 +56,7 @@ const WaveformControls = ({
         },
       },
       frequencyHz_3: {
-        value: waveFrequenciesHz.length > 2 ? waveFrequenciesHz[1] : 0,
+        value: waveFrequenciesHz.length > 2 ? waveFrequenciesHz[2] : 0.0,
         min: 0.0,
         max: 30,
         step: 0.05,
@@ -65,7 +68,8 @@ const WaveformControls = ({
     }),
     { collapsed: true },
     [
-      updateWaveformCount,
+      nWaves,
+      updateNumberActiveWaves,
       updateAmplitude,
       updateFrequencyHzAt,
       waveFrequenciesHz,
@@ -73,7 +77,11 @@ const WaveformControls = ({
   );
 
   useEffect(() => {
-    set({ nWaves: waveFrequenciesHz.length });
+    set({ nWaves: nWaves });
+    updateNumberActiveWaves(nWaves);
+  }, [nWaves]);
+
+  useEffect(() => {
     if (waveFrequenciesHz.length > 0) {
       set({ frequencyHz_1: waveFrequenciesHz[0] });
     }

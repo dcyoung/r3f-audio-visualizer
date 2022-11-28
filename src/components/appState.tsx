@@ -11,7 +11,7 @@ interface IAppState {
   updateCoordinateType: (value: ECoordinateType) => void;
   amplitude: number;
   updateAmplitude: (value: number) => void;
-  updateWaveformCount: (n: number) => void;
+  updateNumberActiveWaves: (n: number) => void;
   waveFrequenciesHz: number[];
   updateFrequencyHzAt: (i: number, value: number) => void;
   data: number[];
@@ -44,19 +44,25 @@ export const useAppState = create<IAppState>((set, get) => ({
   waveFrequenciesHz: defaultCoordinateMapperParams.waveFrequenciesHz,
   updateFrequencyHzAt: (i: number, value: number) => {
     set(() => {
-      const update = [...get().coordinateMapper.waveFrequenciesHz];
+      if (i >= get().waveFrequenciesHz.length) {
+        return {};
+      }
+      const update = [...get().waveFrequenciesHz];
       update[i] = value;
       get().coordinateMapper.waveFrequenciesHz = update;
       return { waveFrequenciesHz: get().coordinateMapper.waveFrequenciesHz };
     });
   },
-  updateWaveformCount: (n: number) => {
-    const prev = get().coordinateMapper.waveFrequenciesHz;
-    const update = [
-      ...prev.slice(0, n),
-      ...new Array(Math.max(0, n - prev.length)).fill(0),
-    ];
-    get().coordinateMapper.waveFrequenciesHz = update;
+  updateNumberActiveWaves: (n: number) => {
+    set(() => {
+      const reference = [2.0, 10.0, 20.0];
+      const update = [
+        ...reference.slice(0, n),
+        ...new Array(Math.max(0, n - reference.length)).fill(0),
+      ];
+      get().coordinateMapper.waveFrequenciesHz = update;
+      return { waveFrequenciesHz: get().coordinateMapper.waveFrequenciesHz };
+    });
   },
   data: defaultCoordinateMapperParams.data,
   resizeData: (n: number) =>

@@ -18,9 +18,7 @@ const AudioVisual = ({ visual }: WaveformVisualizerProps): JSX.Element => {
   const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
   return (
     <>
-      <WaveformControls
-        waveFrequenciesHz={visual == "diffusedRing" ? [2.0, 10.0] : [2.0]}
-      />
+      <WaveformControls nWaves={visual == "diffusedRing" ? 2 : 1} />
       <Suspense fallback={null}>
         <VisualComponent />
       </Suspense>

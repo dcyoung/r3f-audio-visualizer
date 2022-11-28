@@ -1,47 +1,33 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { folder, useControls } from "leva";
 import { Points } from "three";
+import { ICoordinateMapper, _2PI } from "../../coordinateMapper";
 
 interface BaseDiffusedRingProps {
-  getValueForNormalizedCoord: (
-    normAngle: number,
-    elapsedTimeSec?: number
-  ) => number;
+  coordinateMapper: ICoordinateMapper;
+  radius?: number;
+  nPoints?: number;
+  pointSize?: number;
 }
 
-const randn_bm = (): number => {
+const gaussianRandom = (): number => {
   let u = 0,
     v = 0;
   while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
   while (v === 0) v = Math.random();
-  let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(_2PI * v);
   num = num / 10.0 + 0.5; // Translate to 0 -> 1
-  if (num > 1 || num < 0) return randn_bm(); // resample between 0 and 1
+  if (num > 1 || num < 0) return gaussianRandom(); // resample between 0 and 1
   return num;
 };
 
 const BaseDiffusedRing = ({
-  getValueForNormalizedCoord,
+  coordinateMapper,
+  radius = 2.0,
+  pointSize = 0.2,
+  nPoints = 1000,
 }: BaseDiffusedRingProps): JSX.Element => {
-  const nPoints = 1000;
-  const noise = [...Array(nPoints)].map(randn_bm);
-  const { radius, pointSize } = useControls({
-    Ring: folder(
-      {
-        radius: { value: 2, min: 0.25, max: 3, step: 0.25 },
-        pointSize: { value: 0.2, min: 0.01, max: 2, step: 0.01 },
-        // noise: {
-        //   value: 0,
-        //   min: 0,
-        //   max: 1,
-        //   step: 0.05,
-        // },
-      },
-      { collapsed: true }
-    ),
-  });
-
+  const noise = [...Array(nPoints)].map(gaussianRandom);
   const refPoints = useRef<Points>(null!);
 
   useFrame(({ clock }) => {
@@ -51,10 +37,10 @@ const BaseDiffusedRing = ({
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
       angNorm = i / (nPoints - 1);
-      angRad = angNorm * 2 * Math.PI;
+      angRad = angNorm * _2PI;
       effectiveRadius =
         radius *
-        (1 + noise[i] * getValueForNormalizedCoord(angNorm, elapsedTimeSec));
+        (1 + noise[i] * coordinateMapper.map(angNorm, 0, 0, elapsedTimeSec));
 
       positionsBuffer.setXYZ(
         i,

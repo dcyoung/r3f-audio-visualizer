@@ -1,18 +1,19 @@
-import { useEffect, useRef, MutableRefObject } from "react";
+import { useEffect, useRef } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
+import { useAppState } from "../../appState";
 
-interface AnaylzerLivestreamProps {
-  freqDataRef: MutableRefObject<any>;
+interface LivestreamAnalyzerProps {
   url?: string;
 }
 
-const AnaylzerLivestream = ({
-  freqDataRef,
+const LivestreamAnalyzer = ({
   // url = "https://icecast2.ufpel.edu.br/live" // dead
   url = "http://igor.torontocast.com:1950/stream",
-}: AnaylzerLivestreamProps): JSX.Element => {
+}: LivestreamAnalyzerProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
+  const freqData = useAppState((state) => state.data);
+  const resizeFreqData = useAppState((state) => state.resizeData);
 
   const playAudio = () => {
     console.log("Play Audio...");
@@ -26,12 +27,14 @@ const AnaylzerLivestream = ({
 
   const updateFreqData = (instance: AudioMotionAnalyzer): void => {
     const bars = instance.getBars();
-    if (!freqDataRef.current || freqDataRef.current === undefined) {
-      freqDataRef.current = new Array(bars.length);
+
+    if (freqData.length != bars.length) {
+      resizeFreqData(bars.length);
+      console.log(`Resizing ${bars.length}`);
     }
 
     bars.forEach(({ value }, index) => {
-      freqDataRef.current[index] = value[0];
+      freqData[index] = value[0];
     });
   };
 
@@ -57,4 +60,4 @@ const AnaylzerLivestream = ({
   return <audio ref={audioRef} crossOrigin="anonymous" />;
 };
 
-export default AnaylzerLivestream;
+export default LivestreamAnalyzer;

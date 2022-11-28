@@ -12,9 +12,7 @@ const Ground = ({
 }: GroundProps): JSX.Element => {
   return (
     <mesh position={position} {...props}>
-      <planeGeometry
-        args={[size, size]}
-      />
+      <planeGeometry args={[size, size]} />
       <MeshReflectorMaterial
         mirror={1}
         blur={[500, 100]}
@@ -28,6 +26,6 @@ const Ground = ({
       />
     </mesh>
   );
-}
+};
 
 export default Ground;

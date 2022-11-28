@@ -1,1 +1,0 @@
-import{B as m}from"./baseGrid.be8850c3.js";import{i as n}from"./utils.2902ea37.js";import{j as s}from"./index.3df260d0.js";import"./Lut.3763d62a.js";const h=({dataRef:o,amplitude:r=1})=>{const t=Math.hypot(.5,.5);return s(m,{getValueForNormalizedCoord:(e,a)=>{const i=Math.hypot(e-.5,a-.5)/t;return r*n(o==null?void 0:o.current,i)}})};export{h as default};

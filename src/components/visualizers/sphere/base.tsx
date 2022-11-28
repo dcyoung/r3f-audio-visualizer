@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
-import { useAppState } from "../../appState";
+import { ICoordinateMapper } from "../../coordinateMapper";
 import { _2PI } from "../utils";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
@@ -11,6 +11,7 @@ import { _2PI } from "../utils";
 // const NORM_QUADRANT_HYPOTENUSE = Math.hypot(0.5, 0.5);
 
 interface BaseSphereProps {
+  coordinateMapper: ICoordinateMapper;
   radius?: number;
   nPoints?: number;
   cubeSideLength?: number;
@@ -18,6 +19,7 @@ interface BaseSphereProps {
 }
 
 const BaseSphere = ({
+  coordinateMapper,
   radius = 2,
   nPoints = 800,
   cubeSideLength = 0.05,
@@ -25,15 +27,15 @@ const BaseSphere = ({
 }: BaseSphereProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
+  // Recolor
   useEffect(() => {
     const lut = new Lut(colorLut);
     for (let i = 0; i < nPoints; i++) {
       meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [nPoints, radius, cubeSideLength, colorLut, coordinateMapper]);
+  });
 
   useFrame(({ clock }) => {
     // in ms

@@ -6,9 +6,9 @@ import Ground from "../../ground";
 import { useAppState } from "../../appState";
 import BaseSphere from "./base";
 
-interface SpherVisualProps {}
+interface SphereVisualProps {}
 
-const SphereVisual = ({}: SpherVisualProps): JSX.Element => {
+const SphereVisual = ({}: SphereVisualProps): JSX.Element => {
   const {
     radius,
     nPoints,
@@ -41,6 +41,7 @@ const SphereVisual = ({}: SpherVisualProps): JSX.Element => {
   const updateCoordinateType = useAppState(
     (state) => state.updateCoordinateType
   );
+  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
   useEffect(() => {
     updateCoordinateType(ECoordinateType.Polar);
@@ -49,11 +50,12 @@ const SphereVisual = ({}: SpherVisualProps): JSX.Element => {
   return (
     <>
       <BaseSphere
+        coordinateMapper={coordinateMapper}
         radius={radius}
         nPoints={nPoints}
         cubeSideLength={cubeSideLength}
       />
-      <Ground position={new Vector3(0, 0, -4 * amplitude)} />
+      <Ground position={new Vector3(0, 0, -radius * (1 + 0.25 * amplitude))} />
     </>
   );
 };

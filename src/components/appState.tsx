@@ -11,14 +11,24 @@ interface IAppState {
   updateCoordinateType: (value: ECoordinateType) => void;
   amplitude: number;
   updateAmplitude: (value: number) => void;
-  updateFrequencyHz: (value: number) => void;
+  updateWaveformCount: (n: number) => void;
+  waveFrequenciesHz: number[];
+  updateFrequencyHzAt: (i: number, value: number) => void;
   data: number[];
   resizeData: (n: number) => void;
 }
 
-export const useAppState = create<IAppState>((set, get) => ({
-  coordinateMapper: new CoordinateMapper_Multi(),
+const defaultCoordinateMapperParams = {
+  mappingType: EMappingSourceType.Waveform,
+  inputCoordinateType: ECoordinateType.Cartesian_2D,
   amplitude: 1.0,
+  waveFrequenciesHz: [2.0],
+  data: new Array<number>(121),
+};
+
+export const useAppState = create<IAppState>((set, get) => ({
+  coordinateMapper: new CoordinateMapper_Multi(defaultCoordinateMapperParams),
+  amplitude: defaultCoordinateMapperParams.amplitude,
   updateMappingType: (value: EMappingSourceType) => {
     get().coordinateMapper.mappingType = value;
   },
@@ -31,13 +41,27 @@ export const useAppState = create<IAppState>((set, get) => ({
       return { amplitude: get().coordinateMapper.amplitude };
     });
   },
-  updateFrequencyHz: (value: number) => {
-    get().coordinateMapper.frequencyHz = value;
+  waveFrequenciesHz: defaultCoordinateMapperParams.waveFrequenciesHz,
+  updateFrequencyHzAt: (i: number, value: number) => {
+    set(() => {
+      const update = [...get().coordinateMapper.waveFrequenciesHz];
+      update[i] = value;
+      get().coordinateMapper.waveFrequenciesHz = update;
+      return { waveFrequenciesHz: get().coordinateMapper.waveFrequenciesHz };
+    });
   },
-  data: [],
+  updateWaveformCount: (n: number) => {
+    const prev = get().coordinateMapper.waveFrequenciesHz;
+    const update = [
+      ...prev.slice(0, n),
+      ...new Array(Math.max(0, n - prev.length)).fill(0),
+    ];
+    get().coordinateMapper.waveFrequenciesHz = update;
+  },
+  data: defaultCoordinateMapperParams.data,
   resizeData: (n: number) =>
     set(() => {
-      get().coordinateMapper.data = new Array(n);
+      get().coordinateMapper.data = new Array<number>(n);
       return { data: get().coordinateMapper.data };
     }),
 }));

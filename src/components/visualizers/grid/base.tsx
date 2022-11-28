@@ -2,9 +2,10 @@ import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { useAppState } from "../../appState";
+import { ICoordinateMapper } from "../../coordinateMapper";
 
 interface BaseGridProps {
+  coordinateMapper: ICoordinateMapper;
   nGridRows?: number;
   nGridCols?: number;
   cubeSideLength?: number;
@@ -13,6 +14,7 @@ interface BaseGridProps {
 }
 
 const BaseGrid = ({
+  coordinateMapper,
   nGridRows = 100,
   nGridCols = 100,
   cubeSideLength = 0.025,
@@ -21,8 +23,8 @@ const BaseGrid = ({
 }: BaseGridProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
+  // Recolor
   useEffect(() => {
     const lut = new Lut(colorLut);
     const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
@@ -38,7 +40,7 @@ const BaseGrid = ({
       }
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [nGridRows, nGridCols, cubeSideLength, cubeSpacingScalar, colorLut]);
+  });
 
   useFrame(({ clock }) => {
     //in ms

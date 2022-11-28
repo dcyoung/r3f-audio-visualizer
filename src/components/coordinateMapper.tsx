@@ -28,8 +28,7 @@ const cubeFaceCenterRadialOffset = (
 
 export enum EMappingSourceType {
   Data_1D,
-  Waveform_Single,
-  // Waveform_Multi
+  Waveform,
 }
 
 export enum ECoordinateType {
@@ -219,6 +218,59 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
   }
 }
 
+export class CoordinateMapper_WaveformSuperposition
+  implements ICoordinateMapper
+{
+  private mappers: CoordinateMapper_Waveform[];
+
+  // take 3/4 of remainder + remaining if no next...
+  constructor(
+    srcType: ECoordinateType,
+    waveformFrequenciesHz: number[],
+    maxAmplitude: number = 1.0,
+    amplitudeSplitRatio: number = 0.75
+  ) {
+    const mappers = [];
+    for (let i = 0; i < waveformFrequenciesHz.length; i++) {
+      const amplitude =
+        i >= waveformFrequenciesHz.length - 1
+          ? maxAmplitude
+          : amplitudeSplitRatio * maxAmplitude;
+      maxAmplitude -= amplitude;
+
+      mappers.push(
+        new CoordinateMapper_Waveform(
+          srcType,
+          amplitude,
+          waveformFrequenciesHz[i]
+        )
+      );
+    }
+    this.mappers = mappers;
+  }
+
+  public map(
+    xNorm: number,
+    yNorm: number = 0.0,
+    zNorm: number = 0.0,
+    elapsedTimeSec: number = 0.0
+  ) {
+    let superposition = 0;
+    for (const mapper of this.mappers) {
+      superposition += mapper.map(xNorm, yNorm, zNorm, elapsedTimeSec);
+    }
+    return superposition;
+  }
+}
+
+export interface CoordinateMapper_Multi_Args {
+  mappingType?: EMappingSourceType;
+  inputCoordinateType?: ECoordinateType;
+  amplitude?: number;
+  waveFrequenciesHz?: number[];
+  data?: number[];
+}
+
 export class CoordinateMapper_Multi implements ICoordinateMapper {
   public mappingType: EMappingSourceType;
 
@@ -230,12 +282,15 @@ export class CoordinateMapper_Multi implements ICoordinateMapper {
     this.updateMapper();
   }
 
-  private _frequencyHz: number = 2.0;
-  get frequencyHz(): number {
-    return this._frequencyHz;
+  private _waveFrequenciesHz: number[] = [2.0];
+  get waveFrequenciesHz(): number[] {
+    return this._waveFrequenciesHz;
   }
-  set frequencyHz(value: number) {
-    this._frequencyHz = value;
+  set waveFrequenciesHz(value: number[]) {
+    if (!value || value.length < 1) {
+      throw new Error("Invalid value");
+    }
+    this._waveFrequenciesHz = value;
     this.updateMapper();
   }
 
@@ -257,29 +312,39 @@ export class CoordinateMapper_Multi implements ICoordinateMapper {
     this.updateMapper();
   }
 
-  constructor(
-    mappingType: EMappingSourceType = EMappingSourceType.Waveform_Single,
-    inputCoordinateType: ECoordinateType = ECoordinateType.Cartesian_2D,
-    amplitude: number = 1.0,
-    frequencyHz: number = 2.0,
-    data: number[] = []
-  ) {
+  constructor({
+    mappingType = EMappingSourceType.Waveform,
+    inputCoordinateType = ECoordinateType.Cartesian_2D,
+    amplitude = 1.0,
+    waveFrequenciesHz = [2.0],
+    data = [],
+  }: CoordinateMapper_Multi_Args) {
     this.mappingType = mappingType;
     this._inputCoordinateType = inputCoordinateType;
     this._amplitude = amplitude;
-    this._frequencyHz = frequencyHz;
+    if (!waveFrequenciesHz || waveFrequenciesHz.length < 1) {
+      throw new Error("Invalid value");
+    }
+    this._waveFrequenciesHz = waveFrequenciesHz;
     this._data = data;
     this._mapper = this.updateMapper();
   }
 
   private updateMapper(): ICoordinateMapper {
     switch (this.mappingType) {
-      case EMappingSourceType.Waveform_Single:
-        this._mapper = new CoordinateMapper_Waveform(
-          this._inputCoordinateType,
-          this.amplitude,
-          this.frequencyHz
-        );
+      case EMappingSourceType.Waveform:
+        this._mapper =
+          this.waveFrequenciesHz.length == 1
+            ? new CoordinateMapper_Waveform(
+                this._inputCoordinateType,
+                this.amplitude,
+                this.waveFrequenciesHz[0]
+              )
+            : new CoordinateMapper_WaveformSuperposition(
+                this._inputCoordinateType,
+                this.waveFrequenciesHz,
+                this.amplitude
+              );
         return this._mapper;
       case EMappingSourceType.Data_1D:
         this._mapper = new CoordinateMapper_Data(

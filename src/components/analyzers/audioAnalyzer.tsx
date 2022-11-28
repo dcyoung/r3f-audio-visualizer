@@ -7,30 +7,32 @@ import {
 const getImportName = (mode: string): string => {
   switch (mode) {
     case APPLICATION_MODE_LIVE_STREAM:
-      return "analyzerLivestream";
+      return "livestream";
     case APPLICATION_MODE_MICROPHONE:
-      return "analyzerMic";
+      return "mic";
     default:
       throw Error(`Unsupported application mode: ${mode}`);
   }
 };
 
-interface AudioAnaylzerProps {
+interface AudioAnalyzerProps {
   mode?: string;
 }
 
-const AudioAnaylzer = ({
+const AudioAnalyzer = ({
   mode = APPLICATION_MODE_LIVE_STREAM,
   ...props
-}: AudioAnaylzerProps): JSX.Element => {
+}: AudioAnalyzerProps): JSX.Element => {
   const AnalyzerComponent = React.lazy(
-    () => import(`./${getImportName(mode)}.tsx`)
+    () => import(`./source/${getImportName(mode)}.tsx`)
   );
   return (
-    <Suspense fallback={null}>
-      <AnalyzerComponent {...props} />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <AnalyzerComponent {...props} />
+      </Suspense>
+    </>
   );
 };
 
-export default AudioAnaylzer;
+export default AudioAnalyzer;

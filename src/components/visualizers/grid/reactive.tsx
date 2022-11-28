@@ -42,6 +42,7 @@ const GridVisual = ({}: GridVisualProps): JSX.Element => {
       ),
     });
   const amplitude = useAppState((state) => state.amplitude);
+  const coordinateMapper = useAppState((state) => state.coordinateMapper);
   const updateCoordinateType = useAppState(
     (state) => state.updateCoordinateType
   );
@@ -53,6 +54,7 @@ const GridVisual = ({}: GridVisualProps): JSX.Element => {
   return (
     <>
       <BaseGrid
+        coordinateMapper={coordinateMapper}
         nGridRows={nGridRows}
         nGridCols={nGridCols}
         cubeSideLength={gridUnitSideLength}

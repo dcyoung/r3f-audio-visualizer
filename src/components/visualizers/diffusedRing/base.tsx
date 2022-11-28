@@ -1,28 +1,23 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { folder, useControls } from "leva";
 import { Points } from "three";
-import { gaussianRandom, ICoordinateMapper1D, _2PI } from "../utils";
+import { gaussianRandom, _2PI } from "../utils";
+import { ICoordinateMapper } from "../../coordinateMapper";
 
 interface BaseDiffusedRingProps {
-  getValueForNormalizedCoord: ICoordinateMapper1D;
+  coordinateMapper: ICoordinateMapper;
+  radius?: number;
+  nPoints?: number;
+  pointSize?: number;
 }
 
 const BaseDiffusedRing = ({
-  getValueForNormalizedCoord,
+  coordinateMapper,
+  radius = 2.0,
+  pointSize = 0.2,
+  nPoints = 1000,
 }: BaseDiffusedRingProps): JSX.Element => {
-  const nPoints = 1000;
   const noise = [...Array(nPoints)].map(gaussianRandom);
-  const { radius, pointSize } = useControls({
-    Ring: folder(
-      {
-        radius: { value: 2, min: 0.25, max: 3, step: 0.25 },
-        pointSize: { value: 0.2, min: 0.01, max: 2, step: 0.01 },
-      },
-      { collapsed: true }
-    ),
-  });
-
   const refPoints = useRef<Points>(null!);
 
   useFrame(({ clock }) => {
@@ -35,7 +30,7 @@ const BaseDiffusedRing = ({
       angRad = angNorm * _2PI;
       effectiveRadius =
         radius *
-        (1 + noise[i] * getValueForNormalizedCoord(angNorm, elapsedTimeSec));
+        (1 + noise[i] * coordinateMapper.map(angNorm, 0, 0, elapsedTimeSec));
 
       positionsBuffer.setXYZ(
         i,

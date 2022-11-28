@@ -9,6 +9,7 @@ import BaseCube from "./base";
 interface CubeVisualProps {}
 
 const CubeVisual = ({}: CubeVisualProps): JSX.Element => {
+  const coordinateMapper = useAppState((state) => state.coordinateMapper);
   const updateCoordinateType = useAppState(
     (state) => state.updateCoordinateType
   );
@@ -52,6 +53,7 @@ const CubeVisual = ({}: CubeVisualProps): JSX.Element => {
   return (
     <>
       <BaseCube
+        coordinateMapper={coordinateMapper}
         nPerSide={nPerSide}
         cubeSideLength={cubeUnitSideLength}
         cubeSpacingScalar={cubeUnitSpacingScalar}

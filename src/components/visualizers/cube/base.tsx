@@ -3,9 +3,10 @@ import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { NORM_QUADRANT_HYPOTENUSE_2D } from "../utils";
-import { useAppState } from "../../appState";
+import { ICoordinateMapper } from "../../coordinateMapper";
 
 interface BaseCubeProps {
+  coordinateMapper: ICoordinateMapper;
   nPerSide?: number;
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
@@ -13,6 +14,7 @@ interface BaseCubeProps {
 }
 
 const BaseCube = ({
+  coordinateMapper,
   nPerSide = 10,
   cubeSideLength = 0.5,
   cubeSpacingScalar = 0.1,
@@ -20,8 +22,8 @@ const BaseCube = ({
 }: BaseCubeProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
 
+  // Recolor
   useEffect(() => {
     const lut = new Lut(colorLut);
     let instanceIdx, normCubeX, normCubeY, normCubeZ, normRadialOffset;
@@ -58,7 +60,7 @@ const BaseCube = ({
       }
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [nPerSide, cubeSideLength, cubeSpacingScalar, colorLut]);
+  });
 
   useFrame(({ clock }) => {
     //in ms

@@ -1,15 +1,15 @@
 import { useEffect, useRef } from "react";
 import AudioMotionAnalyzer from "audiomotion-analyzer";
-import { useAppState } from "../appState";
+import { useAppState } from "../../appState";
 
-interface AnaylzerLivestreamProps {
+interface LivestreamAnalyzerProps {
   url?: string;
 }
 
-const AnaylzerLivestream = ({
+const LivestreamAnalyzer = ({
   // url = "https://icecast2.ufpel.edu.br/live" // dead
   url = "http://igor.torontocast.com:1950/stream",
-}: AnaylzerLivestreamProps): JSX.Element => {
+}: LivestreamAnalyzerProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
   const freqData = useAppState((state) => state.data);
@@ -30,6 +30,7 @@ const AnaylzerLivestream = ({
 
     if (freqData.length != bars.length) {
       resizeFreqData(bars.length);
+      console.log(`Resizing ${bars.length}`);
     }
 
     bars.forEach(({ value }, index) => {
@@ -59,4 +60,4 @@ const AnaylzerLivestream = ({
   return <audio ref={audioRef} crossOrigin="anonymous" />;
 };
 
-export default AnaylzerLivestream;
+export default LivestreamAnalyzer;

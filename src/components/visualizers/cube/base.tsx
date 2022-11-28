@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import {
+  ECoordinateType,
   ICoordinateMapper,
   NORM_QUADRANT_HYPOTENUSE_2D,
 } from "../../coordinateMapper";
@@ -12,6 +13,7 @@ interface BaseCubeProps {
   nPerSide?: number;
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
+  volume?: boolean;
   colorLut?: string;
 }
 
@@ -20,10 +22,14 @@ const BaseCube = ({
   nPerSide = 10,
   cubeSideLength = 0.5,
   cubeSpacingScalar = 0.1,
+  volume = true,
   colorLut = "cooltowarm",
 }: BaseCubeProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const inputCoordinateType = volume
+    ? ECoordinateType.Cartesian_3D
+    : ECoordinateType.Cartesian_CubeFaces;
 
   // Recolor
   useEffect(() => {
@@ -87,6 +93,7 @@ const BaseCube = ({
             0.1 +
             0.9 *
               coordinateMapper.map(
+                inputCoordinateType,
                 normCubeX,
                 normCubeY,
                 normCubeZ,

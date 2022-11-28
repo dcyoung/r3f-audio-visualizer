@@ -1,14 +1,10 @@
 import { folder, useControls } from "leva";
-import { useEffect } from "react";
 import { Vector3 } from "three";
-import { ECoordinateType } from "../../coordinateMapper";
 import Ground from "../../ground";
-import { useAppState } from "../../appState";
 import BaseSphere from "./base";
+import { VisualProps } from "../common";
 
-interface SphereVisualProps {}
-
-const SphereVisual = ({}: SphereVisualProps): JSX.Element => {
+const SphereVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const {
     radius,
     nPoints,
@@ -37,15 +33,6 @@ const SphereVisual = ({}: SphereVisualProps): JSX.Element => {
       { collapsed: true }
     ),
   });
-  const amplitude = useAppState((state) => state.amplitude);
-  const updateCoordinateType = useAppState(
-    (state) => state.updateCoordinateType
-  );
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
-
-  useEffect(() => {
-    updateCoordinateType(ECoordinateType.Polar);
-  }, []);
 
   return (
     <>
@@ -55,7 +42,11 @@ const SphereVisual = ({}: SphereVisualProps): JSX.Element => {
         nPoints={nPoints}
         cubeSideLength={cubeSideLength}
       />
-      <Ground position={new Vector3(0, 0, -radius * (1 + 0.25 * amplitude))} />
+      <Ground
+        position={
+          new Vector3(0, 0, -radius * (1 + 0.25 * coordinateMapper.amplitude))
+        }
+      />
     </>
   );
 };

@@ -2,7 +2,7 @@ import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { ICoordinateMapper } from "../../coordinateMapper";
+import { ECoordinateType, ICoordinateMapper } from "../../coordinateMapper";
 
 interface BaseGridProps {
   coordinateMapper: ICoordinateMapper;
@@ -53,7 +53,13 @@ const BaseGrid = ({
         instanceIdx = row * nGridCols + col;
         normGridX = row / (nGridRows - 1);
         normGridY = col / (nGridCols - 1);
-        z = coordinateMapper.map(normGridX, normGridY, 0, elapsedTimeSec);
+        z = coordinateMapper.map(
+          ECoordinateType.Cartesian_2D,
+          normGridX,
+          normGridY,
+          0,
+          elapsedTimeSec
+        );
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);
         meshRef.current.setMatrixAt(

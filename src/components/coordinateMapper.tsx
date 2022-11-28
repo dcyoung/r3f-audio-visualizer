@@ -38,7 +38,9 @@ export enum ECoordinateType {
 }
 
 export interface ICoordinateMapper {
+  amplitude: number;
   map: (
+    inputCoordinateType: ECoordinateType,
     xNorm: number,
     yNorm?: number,
     zNorm?: number,
@@ -47,21 +49,20 @@ export interface ICoordinateMapper {
 }
 
 abstract class CoordinateMapperBase implements ICoordinateMapper {
-  protected srcType: ECoordinateType;
-  protected amplitude: number;
+  public amplitude: number;
 
-  constructor(srcType: ECoordinateType, amplitude: number = 1.0) {
-    this.srcType = srcType;
+  constructor(amplitude: number = 1.0) {
     this.amplitude = amplitude;
   }
 
   public map(
+    inputCoordinateType: ECoordinateType,
     xNorm: number,
     yNorm: number = 0.0,
     zNorm: number = 0.0,
     elapsedTimeSec: number = 0.0
   ) {
-    switch (this.srcType) {
+    switch (inputCoordinateType) {
       case ECoordinateType.Cartesian_1D:
         return this.map_1D(xNorm, elapsedTimeSec);
       case ECoordinateType.Cartesian_2D:
@@ -72,7 +73,7 @@ abstract class CoordinateMapperBase implements ICoordinateMapper {
       case ECoordinateType.Cartesian_CubeFaces:
         return this.map_3DFaces(xNorm, yNorm, zNorm, elapsedTimeSec);
       default:
-        throw Error(`Unsupported coordinate type: ${this.srcType}`);
+        throw Error(`Unsupported coordinate type: ${inputCoordinateType}`);
     }
   }
 
@@ -93,14 +94,12 @@ abstract class CoordinateMapperBase implements ICoordinateMapper {
 }
 
 export class CoordinateMapper_Waveform extends CoordinateMapperBase {
+  public readonly frequencyHz: number;
   protected periodSec: number;
   protected b: number;
-  constructor(
-    srcType: ECoordinateType,
-    amplitude: number = 1.0,
-    frequencyHz: number
-  ) {
-    super(srcType, amplitude);
+  constructor(amplitude: number = 1.0, frequencyHz: number) {
+    super(amplitude);
+    this.frequencyHz = frequencyHz;
     this.periodSec = 1 / frequencyHz;
     this.b = _2PI / this.periodSec;
   }
@@ -150,14 +149,10 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
 }
 
 export class CoordinateMapper_Data extends CoordinateMapperBase {
-  protected data: number[];
+  public data: number[];
 
-  constructor(
-    srcType: ECoordinateType,
-    amplitude: number = 1.0,
-    data: number[]
-  ) {
-    super(srcType, amplitude);
+  constructor(amplitude: number = 1.0, data: number[]) {
+    super(amplitude);
     this.data = data;
   }
 
@@ -220,16 +215,64 @@ export class CoordinateMapper_WaveformSuperposition
   implements ICoordinateMapper
 {
   private mappers: CoordinateMapper_Waveform[];
+  private _amplitudeSplitRatio: number;
+  get amplitudeSplitRatio(): number {
+    return this._amplitudeSplitRatio;
+  }
+  set amplitudeSplitRatio(value: number) {
+    this._amplitudeSplitRatio = value;
+    this.mappers = this.buildMappers(
+      this.waveFrequenciesHz,
+      this._maxAmplitude,
+      this._amplitudeSplitRatio
+    );
+  }
+  private _maxAmplitude: number;
+  get amplitude(): number {
+    return this._maxAmplitude;
+  }
+  set amplitude(value: number) {
+    this._maxAmplitude = value;
+    this.mappers = this.buildMappers(
+      this.waveFrequenciesHz,
+      this._maxAmplitude,
+      this._amplitudeSplitRatio
+    );
+  }
 
-  // take 3/4 of remainder + remaining if no next...
+  get waveFrequenciesHz(): number[] {
+    return this.mappers.map((m) => m.frequencyHz);
+  }
+  set waveFrequenciesHz(waveFrequenciesHz: number[]) {
+    this.mappers = this.buildMappers(
+      waveFrequenciesHz,
+      this._maxAmplitude,
+      this._amplitudeSplitRatio
+    );
+  }
+
   constructor(
-    srcType: ECoordinateType,
     waveformFrequenciesHz: number[],
     maxAmplitude: number = 1.0,
     amplitudeSplitRatio: number = 0.75
   ) {
+    this._maxAmplitude = maxAmplitude;
+    this._amplitudeSplitRatio = amplitudeSplitRatio;
+    this.mappers = this.buildMappers(
+      waveformFrequenciesHz,
+      maxAmplitude,
+      amplitudeSplitRatio
+    );
+  }
+
+  private buildMappers(
+    waveformFrequenciesHz: number[],
+    maxAmplitude: number,
+    amplitudeSplitRatio: number
+  ): CoordinateMapper_Waveform[] {
     const mappers = [];
     for (let i = 0; i < waveformFrequenciesHz.length; i++) {
+      // Split the total amplitude among the various waves
       const amplitude =
         i >= waveformFrequenciesHz.length - 1
           ? maxAmplitude
@@ -237,17 +280,14 @@ export class CoordinateMapper_WaveformSuperposition
       maxAmplitude -= amplitude;
 
       mappers.push(
-        new CoordinateMapper_Waveform(
-          srcType,
-          amplitude,
-          waveformFrequenciesHz[i]
-        )
+        new CoordinateMapper_Waveform(amplitude, waveformFrequenciesHz[i])
       );
     }
-    this.mappers = mappers;
+    return mappers;
   }
 
   public map(
+    inputCoordinateType: ECoordinateType,
     xNorm: number,
     yNorm: number = 0.0,
     zNorm: number = 0.0,
@@ -255,113 +295,14 @@ export class CoordinateMapper_WaveformSuperposition
   ) {
     let superposition = 0;
     for (const mapper of this.mappers) {
-      superposition += mapper.map(xNorm, yNorm, zNorm, elapsedTimeSec);
+      superposition += mapper.map(
+        inputCoordinateType,
+        xNorm,
+        yNorm,
+        zNorm,
+        elapsedTimeSec
+      );
     }
     return superposition;
-  }
-}
-
-export interface CoordinateMapper_Multi_Args {
-  mappingType?: EMappingSourceType;
-  inputCoordinateType?: ECoordinateType;
-  amplitude?: number;
-  waveFrequenciesHz?: number[];
-  data?: number[];
-}
-
-export class CoordinateMapper_Multi implements ICoordinateMapper {
-  public mappingType: EMappingSourceType;
-
-  private _mapper: ICoordinateMapper;
-
-  private _inputCoordinateType: ECoordinateType = ECoordinateType.Cartesian_2D;
-  set inputCoordinateType(value: ECoordinateType) {
-    this._inputCoordinateType = value;
-    this.updateMapper();
-  }
-
-  private _waveFrequenciesHz: number[] = [2.0];
-  get waveFrequenciesHz(): number[] {
-    return this._waveFrequenciesHz;
-  }
-  set waveFrequenciesHz(value: number[]) {
-    if (!value || value.length < 1) {
-      throw new Error("Invalid value");
-    }
-    this._waveFrequenciesHz = value;
-    this.updateMapper();
-  }
-
-  private _amplitude: number = 1.0;
-  get amplitude(): number {
-    return this._amplitude;
-  }
-  set amplitude(value: number) {
-    this._amplitude = value;
-    this.updateMapper();
-  }
-
-  private _data: number[] = [];
-  get data(): number[] {
-    return this._data;
-  }
-  set data(value: number[]) {
-    this._data = value;
-    this.updateMapper();
-  }
-
-  constructor({
-    mappingType = EMappingSourceType.Waveform,
-    inputCoordinateType = ECoordinateType.Cartesian_2D,
-    amplitude = 1.0,
-    waveFrequenciesHz = [2.0],
-    data = [],
-  }: CoordinateMapper_Multi_Args) {
-    this.mappingType = mappingType;
-    this._inputCoordinateType = inputCoordinateType;
-    this._amplitude = amplitude;
-    if (!waveFrequenciesHz || waveFrequenciesHz.length < 1) {
-      throw new Error("Invalid value");
-    }
-    this._waveFrequenciesHz = waveFrequenciesHz;
-    this._data = data;
-    this._mapper = this.updateMapper();
-  }
-
-  private updateMapper(): ICoordinateMapper {
-    switch (this.mappingType) {
-      case EMappingSourceType.Waveform:
-        this._mapper =
-          this.waveFrequenciesHz.length == 1
-            ? new CoordinateMapper_Waveform(
-                this._inputCoordinateType,
-                this.amplitude,
-                this.waveFrequenciesHz[0]
-              )
-            : new CoordinateMapper_WaveformSuperposition(
-                this._inputCoordinateType,
-                this.waveFrequenciesHz,
-                this.amplitude
-              );
-        return this._mapper;
-      case EMappingSourceType.Data_1D:
-        this._mapper = new CoordinateMapper_Data(
-          this._inputCoordinateType,
-          this.amplitude,
-          this.data
-        );
-        return this._mapper;
-      default:
-        throw `Not supported: ${this.mappingType}`;
-    }
-  }
-
-  public map(
-    xNorm: number,
-    yNorm: number = 0.0,
-    zNorm: number = 0.0,
-    elapsedTimeSec: number = 0.0
-  ) {
-    return this._mapper.map(xNorm, yNorm, zNorm, elapsedTimeSec);
   }
 }

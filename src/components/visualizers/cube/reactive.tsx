@@ -1,19 +1,10 @@
 import { folder, useControls } from "leva";
-import { useEffect } from "react";
 import { Vector3 } from "three";
-import { ECoordinateType } from "../../coordinateMapper";
 import Ground from "../../ground";
-import { useAppState } from "../../appState";
 import BaseCube from "./base";
+import { VisualProps } from "../common";
 
-interface CubeVisualProps {}
-
-const CubeVisual = ({}: CubeVisualProps): JSX.Element => {
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
-  const updateCoordinateType = useAppState(
-    (state) => state.updateCoordinateType
-  );
-
+const CubeVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const { nPerSide, cubeUnitSideLength, cubeUnitSpacingScalar, volume } =
     useControls({
       Cube: folder(
@@ -42,14 +33,6 @@ const CubeVisual = ({}: CubeVisualProps): JSX.Element => {
       ),
     });
 
-  useEffect(() => {
-    updateCoordinateType(
-      volume
-        ? ECoordinateType.Cartesian_3D
-        : ECoordinateType.Cartesian_CubeFaces
-    );
-  }, [volume]);
-
   return (
     <>
       <BaseCube
@@ -57,6 +40,7 @@ const CubeVisual = ({}: CubeVisualProps): JSX.Element => {
         nPerSide={nPerSide}
         cubeSideLength={cubeUnitSideLength}
         cubeSpacingScalar={cubeUnitSpacingScalar}
+        volume={volume}
       />
       <Ground
         position={

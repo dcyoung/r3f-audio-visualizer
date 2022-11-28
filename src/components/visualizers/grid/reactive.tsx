@@ -1,14 +1,10 @@
 import { folder, useControls } from "leva";
-import { useEffect } from "react";
 import { Vector3 } from "three";
-import { ECoordinateType } from "../../coordinateMapper";
 import Ground from "../../ground";
-import { useAppState } from "../../appState";
 import BaseGrid from "./base";
+import { VisualProps } from "../common";
 
-interface GridVisualProps {}
-
-const GridVisual = ({}: GridVisualProps): JSX.Element => {
+const GridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const { nGridRows, nGridCols, gridUnitSideLength, gridUnitSpacingScalar } =
     useControls({
       Grid: folder(
@@ -41,15 +37,6 @@ const GridVisual = ({}: GridVisualProps): JSX.Element => {
         { collapsed: true }
       ),
     });
-  const amplitude = useAppState((state) => state.amplitude);
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
-  const updateCoordinateType = useAppState(
-    (state) => state.updateCoordinateType
-  );
-
-  useEffect(() => {
-    updateCoordinateType(ECoordinateType.Cartesian_2D);
-  }, []);
 
   return (
     <>
@@ -60,7 +47,7 @@ const GridVisual = ({}: GridVisualProps): JSX.Element => {
         cubeSideLength={gridUnitSideLength}
         cubeSpacingScalar={gridUnitSpacingScalar}
       />
-      <Ground position={new Vector3(0, 0, -2.5 * amplitude)} />
+      <Ground position={new Vector3(0, 0, -2.5 * coordinateMapper.amplitude)} />
     </>
   );
 };

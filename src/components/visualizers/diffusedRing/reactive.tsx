@@ -1,14 +1,10 @@
 import { folder, useControls } from "leva";
 import BaseDiffusedRing from "./base";
-import { useAppState } from "../../appState";
-import { ECoordinateType, _2PI } from "../../coordinateMapper";
-import { useEffect } from "react";
 import Ground from "../../ground";
 import { Vector3 } from "three";
+import { VisualProps } from "../common";
 
-interface DiffusedRingVisualProps {}
-
-const DiffusedRingVisual = ({}: DiffusedRingVisualProps): JSX.Element => {
+const DiffusedRingVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const { radius, pointSize } = useControls({
     Ring: folder(
       {
@@ -18,15 +14,6 @@ const DiffusedRingVisual = ({}: DiffusedRingVisualProps): JSX.Element => {
       { collapsed: true }
     ),
   });
-  const amplitude = useAppState((state) => state.amplitude);
-  const coordinateMapper = useAppState((state) => state.coordinateMapper);
-  const updateCoordinateType = useAppState(
-    (state) => state.updateCoordinateType
-  );
-
-  useEffect(() => {
-    updateCoordinateType(ECoordinateType.Cartesian_1D);
-  }, []);
 
   return (
     <>
@@ -35,7 +22,7 @@ const DiffusedRingVisual = ({}: DiffusedRingVisualProps): JSX.Element => {
         radius={radius}
         pointSize={pointSize}
       />
-      <Ground position={new Vector3(0, 0, -1.5 * amplitude)} />
+      <Ground position={new Vector3(0, 0, -1.5 * coordinateMapper.amplitude)} />
     </>
   );
 };

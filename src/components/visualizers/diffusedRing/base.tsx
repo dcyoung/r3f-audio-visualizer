@@ -1,7 +1,11 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Points } from "three";
-import { ICoordinateMapper, _2PI } from "../../coordinateMapper";
+import {
+  ECoordinateType,
+  ICoordinateMapper,
+  _2PI,
+} from "../../coordinateMapper";
 
 interface BaseDiffusedRingProps {
   coordinateMapper: ICoordinateMapper;
@@ -40,7 +44,15 @@ const BaseDiffusedRing = ({
       angRad = angNorm * _2PI;
       effectiveRadius =
         radius *
-        (1 + noise[i] * coordinateMapper.map(angNorm, 0, 0, elapsedTimeSec));
+        (1 +
+          noise[i] *
+            coordinateMapper.map(
+              ECoordinateType.Cartesian_1D,
+              angNorm,
+              0,
+              0,
+              elapsedTimeSec
+            ));
 
       positionsBuffer.setXYZ(
         i,

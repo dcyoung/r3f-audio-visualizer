@@ -1,8 +1,6 @@
-import {
-  NORM_QUADRANT_HYPOTENUSE_2D,
-  NORM_QUADRANT_HYPOTENUSE_3D,
-  _2PI,
-} from "./visualizers/utils";
+export const _2PI = 2 * Math.PI;
+export const NORM_QUADRANT_HYPOTENUSE_2D = Math.hypot(0.5, 0.5);
+export const NORM_QUADRANT_HYPOTENUSE_3D = Math.hypot(0.5, 0.5, 0.5);
 
 const cubeFaceCenterRadialOffset = (
   xNorm: number,

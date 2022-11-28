@@ -1,8 +1,7 @@
 import { folder, useControls } from "leva";
 import BaseDiffusedRing from "./base";
-import { _2PI } from "../utils";
 import { useAppState } from "../../appState";
-import { ECoordinateType } from "../../coordinateMapper";
+import { ECoordinateType, _2PI } from "../../coordinateMapper";
 import { useEffect } from "react";
 import Ground from "../../ground";
 import { Vector3 } from "three";

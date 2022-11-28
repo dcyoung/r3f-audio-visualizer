@@ -2,8 +2,10 @@ import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { NORM_QUADRANT_HYPOTENUSE_2D } from "../utils";
-import { ICoordinateMapper } from "../../coordinateMapper";
+import {
+  ICoordinateMapper,
+  NORM_QUADRANT_HYPOTENUSE_2D,
+} from "../../coordinateMapper";
 
 interface BaseCubeProps {
   coordinateMapper: ICoordinateMapper;

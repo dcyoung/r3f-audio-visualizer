@@ -2,13 +2,11 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
-import { ICoordinateMapper } from "../../coordinateMapper";
-import { _2PI } from "../utils";
+import { ICoordinateMapper, _2PI } from "../../coordinateMapper";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
 // const MAPPING_MODE_POLAR_PHI = "polar_phi";
 // const MAPPING_MODE_POLAR_THETA = "polar_theta";
-// const NORM_QUADRANT_HYPOTENUSE = Math.hypot(0.5, 0.5);
 
 interface BaseSphereProps {
   coordinateMapper: ICoordinateMapper;

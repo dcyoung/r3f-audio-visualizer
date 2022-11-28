@@ -1,8 +1,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Points } from "three";
-import { gaussianRandom, _2PI } from "../utils";
-import { ICoordinateMapper } from "../../coordinateMapper";
+import { ICoordinateMapper, _2PI } from "../../coordinateMapper";
 
 interface BaseDiffusedRingProps {
   coordinateMapper: ICoordinateMapper;
@@ -10,6 +9,17 @@ interface BaseDiffusedRingProps {
   nPoints?: number;
   pointSize?: number;
 }
+
+const gaussianRandom = (): number => {
+  let u = 0,
+    v = 0;
+  while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+  while (v === 0) v = Math.random();
+  let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(_2PI * v);
+  num = num / 10.0 + 0.5; // Translate to 0 -> 1
+  if (num > 1 || num < 0) return gaussianRandom(); // resample between 0 and 1
+  return num;
+};
 
 const BaseDiffusedRing = ({
   coordinateMapper,

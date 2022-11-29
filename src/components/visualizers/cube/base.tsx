@@ -5,7 +5,7 @@ import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import {
   ECoordinateType,
   ICoordinateMapper,
-  NORM_QUADRANT_HYPOTENUSE_2D,
+  HALF_DIAGONAL_UNIT_SQUARE,
 } from "../../coordinateMapper";
 
 interface BaseCubeProps {
@@ -47,15 +47,15 @@ const BaseCube = ({
           if (normCubeX == 0 || normCubeX == 1) {
             normRadialOffset =
               Math.hypot(normCubeY - 0.5, normCubeZ - 0.5) /
-              NORM_QUADRANT_HYPOTENUSE_2D;
+              HALF_DIAGONAL_UNIT_SQUARE;
           } else if (normCubeY == 0 || normCubeY == 1) {
             normRadialOffset =
               Math.hypot(normCubeX - 0.5, normCubeZ - 0.5) /
-              NORM_QUADRANT_HYPOTENUSE_2D;
+              HALF_DIAGONAL_UNIT_SQUARE;
           } else if (normCubeZ == 0 || normCubeZ == 1) {
             normRadialOffset =
               Math.hypot(normCubeX - 0.5, normCubeY - 0.5) /
-              NORM_QUADRANT_HYPOTENUSE_2D;
+              HALF_DIAGONAL_UNIT_SQUARE;
           } else {
             // interior
             normRadialOffset = 0;

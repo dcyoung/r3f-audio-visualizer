@@ -14,14 +14,23 @@ interface BaseDiffusedRingProps {
   pointSize?: number;
 }
 
+/**
+ * Generates random numbers from a normalized gaussian distribution.
+ * @returns - a random normalized value from a gaussian distribution.
+ */
 const gaussianRandom = (): number => {
   let u = 0,
     v = 0;
-  while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-  while (v === 0) v = Math.random();
-  let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(_2PI * v);
-  num = num / 10.0 + 0.5; // Translate to 0 -> 1
-  if (num > 1 || num < 0) return gaussianRandom(); // resample between 0 and 1
+  while (u === 0) {
+    u = Math.random(); //Converting [0,1) to (0,1)
+  }
+  while (v === 0) {
+    v = Math.random();
+  }
+  const num = (Math.sqrt(-2.0 * Math.log(u)) * Math.cos(_2PI * v)) / 10.0 + 0.5; // Translate to 0 -> 1
+  if (num > 1 || num < 0) {
+    return gaussianRandom(); // resample between 0 and 1
+  }
   return num;
 };
 

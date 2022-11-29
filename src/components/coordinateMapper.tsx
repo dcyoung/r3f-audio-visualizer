@@ -49,7 +49,7 @@ export interface ICoordinateMapper {
 }
 
 abstract class CoordinateMapperBase implements ICoordinateMapper {
-  public amplitude: number;
+  public readonly amplitude: number;
 
   constructor(amplitude: number = 1.0) {
     this.amplitude = amplitude;
@@ -94,12 +94,10 @@ abstract class CoordinateMapperBase implements ICoordinateMapper {
 }
 
 export class CoordinateMapper_Waveform extends CoordinateMapperBase {
-  public readonly frequencyHz: number;
   protected periodSec: number;
   protected b: number;
   constructor(amplitude: number = 1.0, frequencyHz: number) {
     super(amplitude);
-    this.frequencyHz = frequencyHz;
     this.periodSec = 1 / frequencyHz;
     this.b = _2PI / this.periodSec;
   }
@@ -215,62 +213,15 @@ export class CoordinateMapper_WaveformSuperposition
   implements ICoordinateMapper
 {
   private mappers: CoordinateMapper_Waveform[];
-  private _amplitudeSplitRatio: number;
-  get amplitudeSplitRatio(): number {
-    return this._amplitudeSplitRatio;
-  }
-  set amplitudeSplitRatio(value: number) {
-    this._amplitudeSplitRatio = value;
-    this.mappers = this.buildMappers(
-      this.waveFrequenciesHz,
-      this._maxAmplitude,
-      this._amplitudeSplitRatio
-    );
-  }
-  private _maxAmplitude: number;
-  get amplitude(): number {
-    return this._maxAmplitude;
-  }
-  set amplitude(value: number) {
-    this._maxAmplitude = value;
-    this.mappers = this.buildMappers(
-      this.waveFrequenciesHz,
-      this._maxAmplitude,
-      this._amplitudeSplitRatio
-    );
-  }
-
-  get waveFrequenciesHz(): number[] {
-    return this.mappers.map((m) => m.frequencyHz);
-  }
-  set waveFrequenciesHz(waveFrequenciesHz: number[]) {
-    this.mappers = this.buildMappers(
-      waveFrequenciesHz,
-      this._maxAmplitude,
-      this._amplitudeSplitRatio
-    );
-  }
+  public readonly amplitude: number;
 
   constructor(
     waveformFrequenciesHz: number[],
     maxAmplitude: number = 1.0,
     amplitudeSplitRatio: number = 0.75
   ) {
-    this._maxAmplitude = maxAmplitude;
-    this._amplitudeSplitRatio = amplitudeSplitRatio;
-    this.mappers = this.buildMappers(
-      waveformFrequenciesHz,
-      maxAmplitude,
-      amplitudeSplitRatio
-    );
-  }
-
-  private buildMappers(
-    waveformFrequenciesHz: number[],
-    maxAmplitude: number,
-    amplitudeSplitRatio: number
-  ): CoordinateMapper_Waveform[] {
-    const mappers = [];
+    this.amplitude = maxAmplitude;
+    this.mappers = [];
     for (let i = 0; i < waveformFrequenciesHz.length; i++) {
       // Split the total amplitude among the various waves
       const amplitude =
@@ -279,11 +230,10 @@ export class CoordinateMapper_WaveformSuperposition
           : amplitudeSplitRatio * maxAmplitude;
       maxAmplitude -= amplitude;
 
-      mappers.push(
+      this.mappers.push(
         new CoordinateMapper_Waveform(amplitude, waveformFrequenciesHz[i])
       );
     }
-    return mappers;
   }
 
   public map(

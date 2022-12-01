@@ -1,37 +1,19 @@
-import React, { Suspense } from "react";
-import {
-  APPLICATION_MODE_LIVE_STREAM,
-  APPLICATION_MODE_MICROPHONE,
-} from "../applicationModes";
-
-const getImportName = (mode: string): string => {
-  switch (mode) {
-    case APPLICATION_MODE_LIVE_STREAM:
-      return "livestream";
-    case APPLICATION_MODE_MICROPHONE:
-      return "mic";
-    default:
-      throw Error(`Unsupported application mode: ${mode}`);
-  }
-};
+import { EApplicationMode } from "../applicationModes";
+import LivestreamAnalyzer from "./source/livestream";
+import MicAnalyzer from "./source/mic";
 
 interface AudioAnalyzerProps {
-  mode?: string;
+  mode?: EApplicationMode;
 }
 
 const AudioAnalyzer = ({
-  mode = APPLICATION_MODE_LIVE_STREAM,
+  mode = EApplicationMode.LIVE_STREAM,
   ...props
 }: AudioAnalyzerProps): JSX.Element => {
-  const AnalyzerComponent = React.lazy(
-    () => import(`./source/${getImportName(mode)}.tsx`)
-  );
-  return (
-    <>
-      <Suspense fallback={null}>
-        <AnalyzerComponent {...props} />
-      </Suspense>
-    </>
+  return mode === EApplicationMode.LIVE_STREAM ? (
+    <LivestreamAnalyzer {...props} />
+  ) : (
+    <MicAnalyzer {...props} />
   );
 };
 

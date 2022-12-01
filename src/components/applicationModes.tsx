@@ -1,30 +1,42 @@
-const APPLICATION_MODE_WAVE_FORM = "∿ waveform";
-const APPLICATION_MODE_LIVE_STREAM = "🎧 livestream";
-const APPLICATION_MODE_MICROPHONE = "🎤 Microphone";
+export enum EApplicationMode {
+  WAVE_FORM,
+  LIVE_STREAM,
+  MICROPHONE,
+}
 
-const getSupportedApplicationModes = (): string[] => {
+export const getAppModeDisplayName = (mode: EApplicationMode): string => {
+  switch (mode) {
+    case EApplicationMode.WAVE_FORM:
+      return "~ waveform";
+    case EApplicationMode.LIVE_STREAM:
+      return "🎧 livestream";
+    case EApplicationMode.MICROPHONE:
+      return "🎤 Microphone";
+    default:
+      throw new Error(`Unknown mode ${mode}`);
+  }
+};
+
+export const getPlatformSupportedApplicationModes = (): EApplicationMode[] => {
   // Apple devices/browsers using WebKit do NOT support CrossOrigin Audio
   // see: https://bugs.webkit.org/show_bug.cgi?id=195043
   return navigator.platform.toLowerCase().startsWith("ip")
-    ? [APPLICATION_MODE_WAVE_FORM, APPLICATION_MODE_MICROPHONE]
+    ? [EApplicationMode.WAVE_FORM, EApplicationMode.MICROPHONE]
     : [
-        APPLICATION_MODE_WAVE_FORM,
-        APPLICATION_MODE_LIVE_STREAM,
-        APPLICATION_MODE_MICROPHONE,
+        EApplicationMode.WAVE_FORM,
+        EApplicationMode.LIVE_STREAM,
+        EApplicationMode.MICROPHONE,
       ];
 };
 
-const isAudioMode = (mode: string): boolean => {
-  return (
-    mode === APPLICATION_MODE_LIVE_STREAM ||
-    mode === APPLICATION_MODE_MICROPHONE
-  );
-};
-
-export {
-  APPLICATION_MODE_WAVE_FORM,
-  APPLICATION_MODE_LIVE_STREAM,
-  APPLICATION_MODE_MICROPHONE,
-  getSupportedApplicationModes,
-  isAudioMode,
+export const isAudioMode = (mode: EApplicationMode): boolean => {
+  switch (mode) {
+    case EApplicationMode.WAVE_FORM:
+      return false;
+    case EApplicationMode.LIVE_STREAM:
+    case EApplicationMode.MICROPHONE:
+      return true;
+    default:
+      throw new Error(`Unknown mode ${mode}`);
+  }
 };

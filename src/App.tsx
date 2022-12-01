@@ -1,11 +1,12 @@
 import "./App.css";
-import { Suspense, useRef } from "react";
+import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useControls, Leva } from "leva";
 import {
-  APPLICATION_MODE_WAVE_FORM,
-  getSupportedApplicationModes,
+  EApplicationMode,
+  getAppModeDisplayName,
+  getPlatformSupportedApplicationModes,
   isAudioMode,
 } from "./components/applicationModes";
 import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
@@ -15,8 +16,12 @@ import WaveformVisual from "./components/visualizers/visualizerWaveform";
 const App = (): JSX.Element => {
   const { mode, visualizer } = useControls({
     mode: {
-      value: APPLICATION_MODE_WAVE_FORM,
-      options: getSupportedApplicationModes(),
+      value: EApplicationMode.WAVE_FORM,
+      options: getPlatformSupportedApplicationModes().reduce(
+        (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
+        {}
+      ),
+      order: -100,
     },
     visualizer: {
       value: "grid",
@@ -24,9 +29,13 @@ const App = (): JSX.Element => {
     },
   });
 
+  const backgroundColor = "#010204";
+
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {isAudioMode(mode) ? <AudioAnalyzer mode={mode} /> : null}
+      {isAudioMode(mode as EApplicationMode) ? (
+        <AudioAnalyzer mode={mode as EApplicationMode} />
+      ) : null}
       <Canvas
         camera={{
           fov: 45,
@@ -36,10 +45,10 @@ const App = (): JSX.Element => {
           up: [0, 0, 1],
         }}
       >
-        <color attach="background" args={["#191920"]} />
+        <color attach="background" args={[backgroundColor]} />
         <ambientLight />
-        <fog attach="fog" args={["#191920", 0, 100]} />
-        {isAudioMode(mode) ? (
+        <fog attach="fog" args={[backgroundColor, 0, 100]} />
+        {isAudioMode(mode as EApplicationMode) ? (
           <AudioVisual visual={visualizer} />
         ) : (
           <WaveformVisual visual={visualizer} />

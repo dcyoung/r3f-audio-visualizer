@@ -1,5 +1,5 @@
 import { useControls } from "leva";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 import { CoordinateMapper_Data } from "../coordinateMapper";
 import { useAppState } from "../appState";
 

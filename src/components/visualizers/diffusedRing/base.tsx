@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Points } from "three";
 import {
-  ECoordinateType,
+  COORDINATE_TYPE,
   ICoordinateMapper,
   _2PI,
 } from "../../coordinateMapper";
@@ -56,7 +56,7 @@ const BaseDiffusedRing = ({
         (1 +
           noise[i] *
             coordinateMapper.map(
-              ECoordinateType.Cartesian_1D,
+              COORDINATE_TYPE.CARTESIAN_1D,
               angNorm,
               0,
               0,

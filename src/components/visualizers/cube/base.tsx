@@ -3,9 +3,9 @@ import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import {
-  ECoordinateType,
   ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
+  COORDINATE_TYPE,
 } from "../../coordinateMapper";
 
 interface BaseCubeProps {
@@ -28,8 +28,8 @@ const BaseCube = ({
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const inputCoordinateType = volume
-    ? ECoordinateType.Cartesian_3D
-    : ECoordinateType.Cartesian_CubeFaces;
+    ? COORDINATE_TYPE.CARTESIAN_3D
+    : COORDINATE_TYPE.CARTESIAN_CUBE_FACES;
 
   // Recolor
   useEffect(() => {

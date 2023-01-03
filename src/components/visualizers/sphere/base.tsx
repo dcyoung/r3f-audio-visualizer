@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
 import {
-  ECoordinateType,
+  COORDINATE_TYPE,
   ICoordinateMapper,
   _2PI,
 } from "../../coordinateMapper";
@@ -58,7 +58,7 @@ const BaseSphere = ({
         0.25 *
           radius *
           coordinateMapper.map(
-            ECoordinateType.Polar,
+            COORDINATE_TYPE.POLAR,
             theta / _2PI, // normalize
             phi / Math.PI, // normalize
             0,

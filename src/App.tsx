@@ -4,7 +4,8 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useControls, Leva } from "leva";
 import {
-  EApplicationMode,
+  ApplicationMode,
+  APPLICATION_MODE,
   getAppModeDisplayName,
   getPlatformSupportedApplicationModes,
   isAudioMode,
@@ -16,7 +17,7 @@ import WaveformVisual from "./components/visualizers/visualizerWaveform";
 const App = (): JSX.Element => {
   const { mode, visualizer } = useControls({
     mode: {
-      value: EApplicationMode.WAVE_FORM,
+      value: APPLICATION_MODE.WAVE_FORM,
       options: getPlatformSupportedApplicationModes().reduce(
         (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
         {}
@@ -33,8 +34,8 @@ const App = (): JSX.Element => {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {isAudioMode(mode as EApplicationMode) ? (
-        <AudioAnalyzer mode={mode as EApplicationMode} />
+      {isAudioMode(mode as ApplicationMode) ? (
+        <AudioAnalyzer mode={mode as ApplicationMode} />
       ) : null}
       <Canvas
         camera={{
@@ -48,7 +49,7 @@ const App = (): JSX.Element => {
         <color attach="background" args={[backgroundColor]} />
         <ambientLight />
         <fog attach="fog" args={[backgroundColor, 0, 100]} />
-        {isAudioMode(mode as EApplicationMode) ? (
+        {isAudioMode(mode as ApplicationMode) ? (
           <AudioVisual visual={visualizer} />
         ) : (
           <WaveformVisual visual={visualizer} />

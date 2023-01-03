@@ -1,16 +1,16 @@
-import { EApplicationMode } from "../applicationModes";
+import { ApplicationMode, APPLICATION_MODE } from "../applicationModes";
 import LivestreamAnalyzer from "./source/livestream";
 import MicAnalyzer from "./source/mic";
 
 interface AudioAnalyzerProps {
-  mode?: EApplicationMode;
+  mode?: ApplicationMode;
 }
 
 const AudioAnalyzer = ({
-  mode = EApplicationMode.LIVE_STREAM,
+  mode = APPLICATION_MODE.LIVE_STREAM,
   ...props
 }: AudioAnalyzerProps): JSX.Element => {
-  return mode === EApplicationMode.LIVE_STREAM ? (
+  return mode === APPLICATION_MODE.LIVE_STREAM ? (
     <LivestreamAnalyzer {...props} />
   ) : (
     <MicAnalyzer {...props} />

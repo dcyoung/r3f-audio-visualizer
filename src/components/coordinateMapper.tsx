@@ -41,13 +41,16 @@ const cubeFaceCenterRadialOffset = (
 /**
  * Describes a coordinate type.
  */
-export enum ECoordinateType {
-  Cartesian_1D,
-  Cartesian_2D,
-  Cartesian_3D,
-  Cartesian_CubeFaces,
-  Polar,
-}
+export const COORDINATE_TYPE = {
+  CARTESIAN_1D: "Cartesian_1D",
+  CARTESIAN_2D: "Cartesian_2D",
+  CARTESIAN_3D: "Cartesian_3D",
+  CARTESIAN_CUBE_FACES: "Cartesian_CubeFaces",
+  POLAR: "Polar",
+} as const;
+
+type ObjectValues<T> = T[keyof T];
+export type CoordinateType = ObjectValues<typeof COORDINATE_TYPE>;
 
 /**
  * Maps normalized input coordinates to scalar output values.
@@ -68,7 +71,7 @@ export interface ICoordinateMapper {
    * @returns - A scalar value corresponding to the input coordinate.
    */
   map: (
-    inputCoordinateType: ECoordinateType,
+    inputCoordinateType: CoordinateType,
     xNorm: number,
     yNorm?: number,
     zNorm?: number,
@@ -91,21 +94,21 @@ abstract class CoordinateMapperBase implements ICoordinateMapper {
   }
 
   public map(
-    inputCoordinateType: ECoordinateType,
+    inputCoordinateType: CoordinateType,
     xNorm: number,
     yNorm: number = 0.0,
     zNorm: number = 0.0,
     elapsedTimeSec: number = 0.0
   ) {
     switch (inputCoordinateType) {
-      case ECoordinateType.Cartesian_1D:
+      case COORDINATE_TYPE.CARTESIAN_1D:
         return this.map_1D(xNorm, elapsedTimeSec);
-      case ECoordinateType.Cartesian_2D:
-      case ECoordinateType.Polar:
+      case COORDINATE_TYPE.CARTESIAN_2D:
+      case COORDINATE_TYPE.POLAR:
         return this.map_2D(xNorm, yNorm, elapsedTimeSec);
-      case ECoordinateType.Cartesian_3D:
+      case COORDINATE_TYPE.CARTESIAN_3D:
         return this.map_3D(xNorm, yNorm, zNorm, elapsedTimeSec);
-      case ECoordinateType.Cartesian_CubeFaces:
+      case COORDINATE_TYPE.CARTESIAN_CUBE_FACES:
         return this.map_3DFaces(xNorm, yNorm, zNorm, elapsedTimeSec);
       default:
         throw Error(`Unsupported coordinate type: ${inputCoordinateType}`);
@@ -298,7 +301,7 @@ export class CoordinateMapper_WaveformSuperposition
   }
 
   public map(
-    inputCoordinateType: ECoordinateType,
+    inputCoordinateType: CoordinateType,
     xNorm: number,
     yNorm: number = 0.0,
     zNorm: number = 0.0,

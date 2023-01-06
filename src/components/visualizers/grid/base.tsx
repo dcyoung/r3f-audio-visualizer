@@ -11,6 +11,7 @@ interface BaseGridProps {
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
   colorLut?: string;
+  pinStyle?: boolean;
 }
 
 const BaseGrid = ({
@@ -20,12 +21,16 @@ const BaseGrid = ({
   cubeSideLength = 0.025,
   cubeSpacingScalar = 5,
   colorLut = "cooltowarm",
+  pinStyle = false,
 }: BaseGridProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
 
   // Recolor
   useEffect(() => {
+    if (!colorLut) {
+      return;
+    }
     const lut = new Lut(colorLut);
     const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
     let instanceIdx, normGridX, normGridY, normRadialOffset;
@@ -47,6 +52,7 @@ const BaseGrid = ({
     const elapsedTimeSec = clock.getElapsedTime();
     const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
     const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;
+    const baseHeight = cubeSideLength + coordinateMapper.amplitude;
     let instanceIdx, normGridX, normGridY, x, y, z;
     for (let row = 0; row < nGridRows; row++) {
       for (let col = 0; col < nGridCols; col++) {
@@ -62,10 +68,16 @@ const BaseGrid = ({
         );
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);
-        meshRef.current.setMatrixAt(
-          instanceIdx,
-          tmpMatrix.setPosition(x, y, z)
-        );
+
+        if (pinStyle) {
+          // adjust the position and scale of each cube
+          tmpMatrix.setPosition(x, y, (baseHeight + z) / 2);
+          tmpMatrix.elements[10] = (baseHeight + z) / cubeSideLength;
+        } else {
+          // adjust position of each cube
+          tmpMatrix.setPosition(x, y, z);
+        }
+        meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
       }
     }
     // Update the instance
@@ -83,7 +95,7 @@ const BaseGrid = ({
         attach="geometry"
         args={[cubeSideLength, cubeSideLength, cubeSideLength, 1]}
       />
-      <meshBasicMaterial attach="material" color={"white"} toneMapped={false} />
+      <meshPhongMaterial attach="material" color={"white"} toneMapped={false} />
     </instancedMesh>
   );
 };

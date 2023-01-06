@@ -26,7 +26,7 @@ const App = (): JSX.Element => {
     },
     visualizer: {
       value: "grid",
-      options: ["grid", "sphere", "cube", "diffusedRing"],
+      options: ["grid", "sphere", "cube", "diffusedRing", "pinGrid"],
     },
   });
 
@@ -55,7 +55,7 @@ const App = (): JSX.Element => {
           <WaveformVisual visual={visualizer} />
         )}
         {/* <Stats /> */}
-        <OrbitControls />
+        <OrbitControls makeDefault />
       </Canvas>
       <Leva collapsed={true} />
     </Suspense>

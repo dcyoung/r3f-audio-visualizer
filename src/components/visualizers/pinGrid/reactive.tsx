@@ -12,13 +12,13 @@ const PinGridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
         nPinGridRows: {
           value: 50,
           min: 2,
-          max: 500,
+          max: 150,
           step: 1,
         },
         nPinGridCols: {
           value: 50,
           min: 2,
-          max: 500,
+          max: 150,
           step: 1,
         },
         pinGridUnitSideLength: {

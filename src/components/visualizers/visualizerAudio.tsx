@@ -1,7 +1,7 @@
 import { useControls } from "leva";
 import React, { Suspense } from "react";
-import { CoordinateMapper_Data } from "../coordinateMapper";
 import { useAppState } from "../appState";
+import { CoordinateMapper_Data } from "../coordinateMappers/data";
 
 interface AudioVisualProps {
   visual: string;

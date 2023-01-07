@@ -13,6 +13,24 @@ import {
 import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
 import AudioVisual from "./components/visualizers/visualizerAudio";
 import WaveformVisual from "./components/visualizers/visualizerWaveform";
+import NoiseVisual from "./components/visualizers/visualizerNoise";
+
+const getVisualizerComponent = (
+  mode: ApplicationMode,
+  visual: string
+): JSX.Element => {
+  switch (mode) {
+    case APPLICATION_MODE.WAVE_FORM:
+      return <WaveformVisual visual={visual} />;
+    case APPLICATION_MODE.NOISE:
+      return <NoiseVisual visual={visual} />;
+    case APPLICATION_MODE.LIVE_STREAM:
+    case APPLICATION_MODE.MICROPHONE:
+      return <AudioVisual visual={visual} />;
+    default:
+      throw new Error(`Unknown mode ${mode}`);
+  }
+};
 
 const App = (): JSX.Element => {
   const { mode, visualizer } = useControls({
@@ -49,11 +67,7 @@ const App = (): JSX.Element => {
         <color attach="background" args={[backgroundColor]} />
         <ambientLight />
         <fog attach="fog" args={[backgroundColor, 0, 100]} />
-        {isAudioMode(mode as ApplicationMode) ? (
-          <AudioVisual visual={visualizer} />
-        ) : (
-          <WaveformVisual visual={visualizer} />
-        )}
+        {getVisualizerComponent(mode as ApplicationMode, visualizer)}
         {/* <Stats /> */}
         <OrbitControls makeDefault />
       </Canvas>

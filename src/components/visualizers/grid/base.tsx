@@ -2,7 +2,10 @@ import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { COORDINATE_TYPE, ICoordinateMapper } from "../../coordinateMapper";
+import {
+  COORDINATE_TYPE,
+  ICoordinateMapper,
+} from "../../coordinateMappers/common";
 
 interface BaseGridProps {
   coordinateMapper: ICoordinateMapper;
@@ -12,6 +15,7 @@ interface BaseGridProps {
   cubeSpacingScalar?: number;
   colorLut?: string;
   pinStyle?: boolean;
+  color?: string;
 }
 
 const BaseGrid = ({
@@ -22,6 +26,7 @@ const BaseGrid = ({
   cubeSpacingScalar = 5,
   colorLut = "cooltowarm",
   pinStyle = false,
+  color = "white",
 }: BaseGridProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
@@ -95,7 +100,7 @@ const BaseGrid = ({
         attach="geometry"
         args={[cubeSideLength, cubeSideLength, cubeSideLength, 1]}
       />
-      <meshPhongMaterial attach="material" color={"white"} toneMapped={false} />
+      <meshPhongMaterial attach="material" color={color} toneMapped={false} />
     </instancedMesh>
   );
 };

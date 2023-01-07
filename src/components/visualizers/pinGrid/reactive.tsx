@@ -34,36 +34,38 @@ const PinGridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
 
   const radius =
     Math.max(nPinGridCols, nPinGridRows) * 1.1 * pinGridUnitSideLength;
-  // const transform = useRef<Group>(null!);
   const lightRef = useRef<PointLight>(null!);
   useFrame(({ clock }) => {
     if (lightRef?.current) {
       const t = clock.getElapsedTime() * 0.1;
-      lightRef.current.position.x = (radius / 2) * Math.sin(t * 7);
-      lightRef.current.position.y = (radius / 2) * Math.cos(t * 5);
-      lightRef.current.position.z = Math.abs((radius / 2) * Math.cos(t * 3));
+      const halfR = radius / 2;
+      lightRef.current.position.x = halfR * Math.sin(t * 7);
+      lightRef.current.position.y = halfR * Math.cos(t * 5);
+      lightRef.current.position.z = Math.abs(halfR * Math.cos(t * 3));
     }
   });
 
   return (
     <>
-      <BaseGrid
-        coordinateMapper={coordinateMapper}
-        nGridCols={nPinGridCols}
-        nGridRows={nPinGridRows}
-        cubeSideLength={pinGridUnitSideLength}
-        cubeSpacingScalar={1.1}
-        pinStyle={true}
-        // colorLut={""}
-      />
-      <pointLight
-        ref={lightRef}
-        intensity={1}
-        distance={2 * radius}
-        decay={1.0}
-      />
-      {/* <TransformControls object={transform} mode="translate" /> */}
-      {/* <Ground position={new Vector3(0, 0, -2.5 * coordinateMapper.amplitude)} /> */}
+      <group>
+        <BaseGrid
+          coordinateMapper={coordinateMapper}
+          nGridCols={nPinGridCols}
+          nGridRows={nPinGridRows}
+          cubeSideLength={pinGridUnitSideLength}
+          cubeSpacingScalar={1.1}
+          pinStyle={true}
+          colorLut={""}
+          color={"black"}
+        />
+        <pointLight position={[0, 0, 5 * radius]} intensity={5.0} />
+        <pointLight
+          ref={lightRef}
+          intensity={5}
+          distance={3 * radius}
+          decay={1.0}
+        />
+      </group>
     </>
   );
 };

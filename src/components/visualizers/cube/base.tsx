@@ -6,7 +6,7 @@ import {
   ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
-} from "../../coordinateMapper";
+} from "../../coordinateMappers/common";
 
 interface BaseCubeProps {
   coordinateMapper: ICoordinateMapper;

@@ -6,7 +6,7 @@ import {
   COORDINATE_TYPE,
   ICoordinateMapper,
   _2PI,
-} from "../../coordinateMapper";
+} from "../../coordinateMappers/common";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
 // const MAPPING_MODE_POLAR_PHI = "polar_phi";

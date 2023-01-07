@@ -5,7 +5,7 @@ import {
   COORDINATE_TYPE,
   ICoordinateMapper,
   _2PI,
-} from "../../coordinateMapper";
+} from "../../coordinateMappers/common";
 
 interface BaseDiffusedRingProps {
   coordinateMapper: ICoordinateMapper;

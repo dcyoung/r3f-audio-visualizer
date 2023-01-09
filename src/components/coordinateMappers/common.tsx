@@ -1,4 +1,4 @@
-export const _2PI = 2 * Math.PI;
+export const TWO_PI = 2 * Math.PI;
 /**
  * "Hypotenuse" for the quadrant of a unit square.
  */
@@ -99,7 +99,7 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
     yNorm: number = 0.0,
     zNorm: number = 0.0,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     switch (inputCoordinateType) {
       case COORDINATE_TYPE.CARTESIAN_1D:
         return this.map_1D(xNorm, elapsedTimeSec);
@@ -115,18 +115,22 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
     }
   }
 
-  abstract map_1D(xNorm: number, elapsedTimeSec: number): number;
-  abstract map_2D(xNorm: number, yNorm: number, elapsedTimeSec: number): number;
+  abstract map_1D(xNorm: number, elapsedTimeSec?: number): number;
+  abstract map_2D(
+    xNorm: number,
+    yNorm: number,
+    elapsedTimeSec?: number
+  ): number;
   abstract map_3D(
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec: number
+    elapsedTimeSec?: number
   ): number;
   abstract map_3DFaces(
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec: number
+    elapsedTimeSec?: number
   ): number;
 }

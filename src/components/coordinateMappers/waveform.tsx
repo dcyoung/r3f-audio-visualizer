@@ -5,7 +5,7 @@ import {
   HALF_DIAGONAL_UNIT_CUBE,
   HALF_DIAGONAL_UNIT_SQUARE,
   ICoordinateMapper,
-  _2PI,
+  TWO_PI,
 } from "./common";
 
 /**
@@ -23,14 +23,18 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
   constructor(amplitude: number = 1.0, frequencyHz: number) {
     super(amplitude);
     this.periodSec = 1 / frequencyHz;
-    this.b = _2PI / this.periodSec;
+    this.b = TWO_PI / this.periodSec;
   }
 
-  public map_1D(xNorm: number, elapsedTimeSec: number = 0.0) {
+  public map_1D(xNorm: number, elapsedTimeSec: number = 0.0): number {
     return this.amplitude * Math.sin(this.b * xNorm + elapsedTimeSec);
   }
 
-  public map_2D(xNorm: number, yNorm: number, elapsedTimeSec: number = 0.0) {
+  public map_2D(
+    xNorm: number,
+    yNorm: number,
+    elapsedTimeSec: number = 0.0
+  ): number {
     const normRadialOffset =
       Math.hypot(xNorm - 0.5, yNorm - 0.5) / HALF_DIAGONAL_UNIT_SQUARE;
     return (
@@ -43,7 +47,7 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
     yNorm: number,
     zNorm: number,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     const normRadialOffset =
       Math.hypot(xNorm - 0.5, yNorm - 0.5, zNorm - 0.5) /
       HALF_DIAGONAL_UNIT_CUBE;
@@ -57,7 +61,7 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
     yNorm: number,
     zNorm: number,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     const normRadialOffset = cubeFaceCenterRadialOffset(
       xNorm,
       yNorm,
@@ -111,7 +115,7 @@ export class CoordinateMapper_WaveformSuperposition
     yNorm: number = 0.0,
     zNorm: number = 0.0,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     let superposition = 0;
     for (const mapper of this.mappers) {
       superposition += mapper.map(

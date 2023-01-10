@@ -41,7 +41,8 @@ const App = (): JSX.Element => {
   const { mode, visualizer } = useControls({
     mode: {
       // value: APPLICATION_MODE.WAVE_FORM,
-      value: APPLICATION_MODE.NOISE,
+      // value: APPLICATION_MODE.NOISE,
+      value: APPLICATION_MODE.LIVE_STREAM,
       options: getPlatformSupportedApplicationModes().reduce(
         (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
         {}
@@ -49,8 +50,8 @@ const App = (): JSX.Element => {
       order: -100,
     },
     visualizer: {
-      // value: "grid",
-      value: "particleSwarm",
+      value: "grid",
+      // value: "particleSwarm",
       options: [
         "grid",
         "sphere",

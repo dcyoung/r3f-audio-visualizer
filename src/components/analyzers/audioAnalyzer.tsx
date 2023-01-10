@@ -26,11 +26,15 @@ const AudioAnalyzer = ({
       },
     },
   });
-  return mode === APPLICATION_MODE.LIVE_STREAM ? (
-    <LivestreamAnalyzer analyzerMode={octaveBands} {...props} />
-  ) : (
-    <MicAnalyzer analyzerMode={octaveBands} {...props} />
-  );
+
+  switch (mode) {
+    case APPLICATION_MODE.LIVE_STREAM:
+      return <LivestreamAnalyzer analyzerMode={octaveBands} {...props} />;
+    case APPLICATION_MODE.MICROPHONE:
+      return <MicAnalyzer analyzerMode={octaveBands} {...props} />;
+    default:
+      throw new Error(`Unsupported model: ${mode}`);
+  }
 };
 
 export default AudioAnalyzer;

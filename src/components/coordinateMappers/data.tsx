@@ -22,7 +22,7 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
     this.data = data;
   }
 
-  private interpolateValueForNormalizedCoord(normalizedCoord: number) {
+  private interpolateValueForNormalizedCoord(normalizedCoord: number): number {
     if (this.data === undefined || !this.data || this.data.length === 0) {
       return 0;
     }
@@ -33,11 +33,15 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
     return valueBelow + (rawIdx % 1) * (valueAbove - valueBelow);
   }
 
-  public map_1D(xNorm: number, elapsedTimeSec: number = 0.0) {
+  public map_1D(xNorm: number, elapsedTimeSec: number = 0.0): number {
     return this.amplitude * this.interpolateValueForNormalizedCoord(xNorm);
   }
 
-  public map_2D(xNorm: number, yNorm: number, elapsedTimeSec: number = 0.0) {
+  public map_2D(
+    xNorm: number,
+    yNorm: number,
+    elapsedTimeSec: number = 0.0
+  ): number {
     const normRadialOffset =
       Math.hypot(xNorm - 0.5, yNorm - 0.5) / HALF_DIAGONAL_UNIT_SQUARE;
     return this.map_1D(normRadialOffset, elapsedTimeSec);
@@ -48,7 +52,7 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
     yNorm: number,
     zNorm: number,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     const normRadialOffset =
       Math.hypot(xNorm - 0.5, yNorm - 0.5, zNorm - 0.5) /
       HALF_DIAGONAL_UNIT_CUBE;
@@ -60,7 +64,7 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
     yNorm: number,
     zNorm: number,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     const normRadialOffset = cubeFaceCenterRadialOffset(
       xNorm,
       yNorm,

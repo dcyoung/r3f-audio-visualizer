@@ -1,19 +1,22 @@
 import { useEffect, useRef } from "react";
-import AudioMotionAnalyzer from "audiomotion-analyzer";
 import { useAppState } from "../../appState";
+import FFTAnalyzer from "../fft";
 
-interface MicAnalyzerProps {}
+interface MicAnalyzerProps {
+  analyzerMode?: number;
+}
 
-const MicAnalyzer = ({}: MicAnalyzerProps): JSX.Element => {
+const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
   const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
   const freqData = useAppState((state) => state.data);
   const resizeFreqData = useAppState((state) => state.resizeData);
+  const requestRef = useRef<number>(null!);
 
   const disableMic = () => {
     if (micStream?.current) {
-      analyzerRef.current.disconnectInput(micStream.current);
+      analyzerRef.current.disconnectInputs();
       micStream.current = null;
     }
   };
@@ -29,7 +32,7 @@ const MicAnalyzer = ({}: MicAnalyzerProps): JSX.Element => {
           }
           // create stream using audioMotion audio context
           micStream.current =
-            analyzerRef.current.audioCtx.createMediaStreamSource(stream);
+            analyzerRef.current._audioCtx.createMediaStreamSource(stream);
           // connect microphone stream to analyzer
           analyzerRef.current.connectInput(micStream.current);
           // mute output to prevent feedback loops from the speakers
@@ -43,35 +46,46 @@ const MicAnalyzer = ({}: MicAnalyzerProps): JSX.Element => {
     }
   };
 
-  const updateFreqData = (instance: AudioMotionAnalyzer): void => {
-    const bars = instance.getBars();
+  const animate = (): void => {
+    if (!analyzerRef.current) {
+      return;
+    }
+    const bars = analyzerRef.current.getBars();
+
     if (freqData.length != bars.length) {
       console.log(`Resizing ${bars.length}`);
       resizeFreqData(bars.length);
+      return;
     }
-    let barIdx = 0;
-    for (const bar of bars) {
-      freqData[barIdx] = bar.value[0];
-      barIdx++;
-    }
+
+    bars.forEach(({ value }, index) => {
+      freqData[index] = value;
+    });
+    requestRef.current = requestAnimationFrame(animate);
   };
+
+  useEffect(() => {
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+    }
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [freqData]); // Make sure the effect runs only once
 
   useEffect(() => {
     if (!audioRef.current) {
       return;
     }
+
     if (analyzerRef.current) {
+      analyzerRef.current.mode = analyzerMode;
       return;
     }
-    analyzerRef.current = new AudioMotionAnalyzer(undefined, {
-      source: audioRef.current,
-      mode: 2,
-      useCanvas: false, // don't use the canvas
-      onCanvasDraw: updateFreqData,
-    });
+
+    analyzerRef.current = new FFTAnalyzer(audioRef.current);
     analyzerRef.current.volume = 0;
     enableMic();
-  }, []);
+  }, [analyzerMode]);
 
   return <audio ref={audioRef} crossOrigin="anonymous" />;
 };

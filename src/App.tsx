@@ -10,10 +10,11 @@ import {
   getPlatformSupportedApplicationModes,
   isAudioMode,
 } from "./components/applicationModes";
-import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
 import AudioVisual from "./components/visualizers/visualizerAudio";
 import WaveformVisual from "./components/visualizers/visualizerWaveform";
 import NoiseVisual from "./components/visualizers/visualizerNoise";
+import CurlVisual from "./components/visualizers/visualizerParticleNoise";
+import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
 
 const getVisualizerComponent = (
   mode: ApplicationMode,
@@ -23,7 +24,11 @@ const getVisualizerComponent = (
     case APPLICATION_MODE.WAVE_FORM:
       return <WaveformVisual visual={visual} />;
     case APPLICATION_MODE.NOISE:
-      return <NoiseVisual visual={visual} />;
+      return visual === "particleSwarm" ? (
+        <CurlVisual />
+      ) : (
+        <NoiseVisual visual={visual} />
+      );
     case APPLICATION_MODE.LIVE_STREAM:
     case APPLICATION_MODE.MICROPHONE:
       return <AudioVisual visual={visual} />;
@@ -44,7 +49,14 @@ const App = (): JSX.Element => {
     },
     visualizer: {
       value: "grid",
-      options: ["grid", "sphere", "cube", "diffusedRing", "pinGrid"],
+      options: [
+        "grid",
+        "sphere",
+        "cube",
+        "diffusedRing",
+        "pinGrid",
+        // "particleSwarm",
+      ],
     },
   });
 

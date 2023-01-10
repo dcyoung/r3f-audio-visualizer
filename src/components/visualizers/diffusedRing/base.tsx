@@ -4,7 +4,7 @@ import { Points } from "three";
 import {
   COORDINATE_TYPE,
   ICoordinateMapper,
-  _2PI,
+  TWO_PI,
 } from "../../coordinateMappers/common";
 
 interface BaseDiffusedRingProps {
@@ -27,7 +27,8 @@ const gaussianRandom = (): number => {
   while (v === 0) {
     v = Math.random();
   }
-  const num = (Math.sqrt(-2.0 * Math.log(u)) * Math.cos(_2PI * v)) / 10.0 + 0.5; // Translate to 0 -> 1
+  const num =
+    (Math.sqrt(-2.0 * Math.log(u)) * Math.cos(TWO_PI * v)) / 10.0 + 0.5; // Translate to 0 -> 1
   if (num > 1 || num < 0) {
     return gaussianRandom(); // resample between 0 and 1
   }
@@ -50,7 +51,7 @@ const BaseDiffusedRing = ({
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
       angNorm = i / (nPoints - 1);
-      angRad = angNorm * _2PI;
+      angRad = angNorm * TWO_PI;
       effectiveRadius =
         radius *
         (1 +

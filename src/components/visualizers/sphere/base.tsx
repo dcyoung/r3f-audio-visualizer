@@ -5,7 +5,7 @@ import { Lut } from "three/examples/jsm/math/Lut";
 import {
   COORDINATE_TYPE,
   ICoordinateMapper,
-  _2PI,
+  TWO_PI,
 } from "../../coordinateMappers/common";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
@@ -48,7 +48,7 @@ const BaseSphere = ({
       // range 0:PI
       phi = Math.acos(1 - (2 * k) / nPoints) % Math.PI;
       // range 0:2PI
-      theta = (Math.PI * (1 + Math.sqrt(5)) * k) % _2PI;
+      theta = (Math.PI * (1 + Math.sqrt(5)) * k) % TWO_PI;
       x = Math.cos(theta) * Math.sin(phi);
       y = Math.sin(theta) * Math.sin(phi);
       z = Math.cos(phi);
@@ -59,7 +59,7 @@ const BaseSphere = ({
           radius *
           coordinateMapper.map(
             COORDINATE_TYPE.POLAR,
-            theta / _2PI, // normalize
+            theta / TWO_PI, // normalize
             phi / Math.PI, // normalize
             0,
             elapsedTimeSec

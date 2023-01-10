@@ -6,12 +6,7 @@ import {
   NoiseFunction3D,
   NoiseFunction4D,
 } from "simplex-noise";
-import {
-  CoordinateMapperBase,
-  cubeFaceCenterRadialOffset,
-  HALF_DIAGONAL_UNIT_CUBE,
-  HALF_DIAGONAL_UNIT_SQUARE,
-} from "./common";
+import { CoordinateMapperBase, cubeFaceCenterRadialOffset } from "./common";
 
 /**
  * Maps input coordinates to output values based on the noise functions.
@@ -46,7 +41,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     this.noise4D = createNoise4D();
   }
 
-  public map_1D(xNorm: number, elapsedTimeSec: number = 0.0) {
+  public map_1D(xNorm: number, elapsedTimeSec: number = 0.0): number {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
@@ -64,7 +59,11 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     return this.nIterations > 1 ? noise / maxAmp : noise;
   }
 
-  public map_2D(xNorm: number, yNorm: number, elapsedTimeSec: number = 0.0) {
+  public map_2D(
+    xNorm: number,
+    yNorm: number,
+    elapsedTimeSec: number = 0.0
+  ): number {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
@@ -92,7 +91,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     yNorm: number,
     zNorm: number,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
@@ -121,7 +120,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     yNorm: number,
     zNorm: number,
     elapsedTimeSec: number = 0.0
-  ) {
+  ): number {
     const normRadialOffset = cubeFaceCenterRadialOffset(
       xNorm,
       yNorm,

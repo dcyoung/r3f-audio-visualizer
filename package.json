@@ -13,7 +13,6 @@
     "@react-three/fiber": "^8.8.10",
     "@react-three/postprocessing": "^2.6.2",
     "@types/three": "^0.144.0",
-    "audiomotion-analyzer": "^3.6.0",
     "leva": "^0.9.34",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

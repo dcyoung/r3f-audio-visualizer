@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import AudioMotionAnalyzer from "audiomotion-analyzer";
 import { useAppState } from "../../appState";
+import FFTAnalyzer from "../fft";
 
 interface LivestreamAnalyzerProps {
   url?: string;
@@ -13,7 +13,7 @@ const LivestreamAnalyzer = ({
   analyzerMode = 2,
 }: LivestreamAnalyzerProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
   const freqData = useAppState((state) => state.data);
   const resizeFreqData = useAppState((state) => state.resizeData);
   const requestRef = useRef<number>(null!);
@@ -31,7 +31,7 @@ const LivestreamAnalyzer = ({
     }
 
     bars.forEach(({ value }, index) => {
-      freqData[index] = value[0];
+      freqData[index] = value;
     });
     requestRef.current = requestAnimationFrame(animate);
   };
@@ -54,13 +54,7 @@ const LivestreamAnalyzer = ({
       return;
     }
 
-    analyzerRef.current = new AudioMotionAnalyzer(undefined, {
-      source: audioRef.current,
-      useCanvas: false,
-      stereo: false,
-      mode: analyzerMode,
-      volume: 1.0,
-    });
+    analyzerRef.current = new FFTAnalyzer(audioRef.current);
     audioRef.current.src = url;
     audioRef.current.play();
   }, [analyzerMode]);

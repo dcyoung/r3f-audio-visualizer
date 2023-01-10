@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import AudioMotionAnalyzer from "audiomotion-analyzer";
 import { useAppState } from "../../appState";
+import FFTAnalyzer from "../fft";
 
 interface MicAnalyzerProps {
   analyzerMode?: number;
@@ -8,7 +8,7 @@ interface MicAnalyzerProps {
 
 const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<AudioMotionAnalyzer>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
   const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
   const freqData = useAppState((state) => state.data);
   const resizeFreqData = useAppState((state) => state.resizeData);
@@ -16,7 +16,7 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
 
   const disableMic = () => {
     if (micStream?.current) {
-      analyzerRef.current.disconnectInput(micStream.current);
+      analyzerRef.current.disconnectInputs();
       micStream.current = null;
     }
   };
@@ -32,7 +32,7 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
           }
           // create stream using audioMotion audio context
           micStream.current =
-            analyzerRef.current.audioCtx.createMediaStreamSource(stream);
+            analyzerRef.current._audioCtx.createMediaStreamSource(stream);
           // connect microphone stream to analyzer
           analyzerRef.current.connectInput(micStream.current);
           // mute output to prevent feedback loops from the speakers
@@ -59,7 +59,7 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
     }
 
     bars.forEach(({ value }, index) => {
-      freqData[index] = value[0];
+      freqData[index] = value;
     });
     requestRef.current = requestAnimationFrame(animate);
   };
@@ -82,13 +82,7 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
       return;
     }
 
-    analyzerRef.current = new AudioMotionAnalyzer(undefined, {
-      source: audioRef.current,
-      useCanvas: false,
-      stereo: false,
-      mode: analyzerMode,
-      volume: 0.0,
-    });
+    analyzerRef.current = new FFTAnalyzer(audioRef.current);
     analyzerRef.current.volume = 0;
     enableMic();
   }, [analyzerMode]);

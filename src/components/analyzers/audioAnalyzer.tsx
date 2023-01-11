@@ -1,39 +1,126 @@
-import { useControls } from "leva";
-import { ApplicationMode, APPLICATION_MODE } from "../applicationModes";
-import LivestreamAnalyzer from "./source/livestream";
-import MicAnalyzer from "./source/mic";
+import { folder, useControls } from "leva";
+import { useEffect, useRef } from "react";
+import { useAppState } from "../appState";
+import FFTAnalyzer from "./fft";
+import {
+  AudioAnalyzerSource,
+  AUDIO_ANALYZER_SOURCE,
+  getAnalyzerSourceDisplayName,
+  getPlatformSupportedAnalyzerSources,
+} from "./sourceControls/common";
+import LivestreamSourceControls from "./sourceControls/livestream";
+import MicrophoneSourceControls from "./sourceControls/mic";
 
-interface AudioAnalyzerProps {
-  mode?: ApplicationMode;
-}
-
-const AudioAnalyzer = ({
-  mode = APPLICATION_MODE.LIVE_STREAM,
-  ...props
-}: AudioAnalyzerProps): JSX.Element => {
-  const { octaveBands } = useControls({
-    octaveBands: {
-      value: 2,
-      options: {
-        "1/24th octave bands": 1,
-        "1/12th octave bands": 2,
-        "1/8th octave bands": 3,
-        "1/6th octave bands": 4,
-        "1/4th octave bands": 5,
-        "1/3rd octave bands": 6,
-        "Half octave bands": 7,
-        "Full octave bands": 8,
+const AVAILABLE_SOURCES = getPlatformSupportedAnalyzerSources();
+interface AudioAnalyzerProps {}
+const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
+  const { audioSource, octaveBands } = useControls({
+    Audio: folder({
+      audioSource: {
+        value: AVAILABLE_SOURCES[0],
+        options: AVAILABLE_SOURCES.reduce(
+          (o, source) => ({
+            ...o,
+            [getAnalyzerSourceDisplayName(source)]: source,
+          }),
+          {}
+        ),
       },
-    },
+      octaveBands: {
+        value: 2,
+        options: {
+          "1/24th octave bands": 1,
+          "1/12th octave bands": 2,
+          "1/8th octave bands": 3,
+          "1/6th octave bands": 4,
+          "1/4th octave bands": 5,
+          "1/3rd octave bands": 6,
+          "Half octave bands": 7,
+          "Full octave bands": 8,
+        },
+      },
+    }),
   });
+  const audioRef = useRef<HTMLAudioElement>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
+  const freqData = useAppState((state) => state.data);
+  const resizeFreqData = useAppState((state) => state.resizeData);
+  const animationRequestRef = useRef<number>(null!);
 
-  switch (mode) {
-    case APPLICATION_MODE.LIVE_STREAM:
-      return <LivestreamAnalyzer analyzerMode={octaveBands} {...props} />;
-    case APPLICATION_MODE.MICROPHONE:
-      return <MicAnalyzer analyzerMode={octaveBands} {...props} />;
+  /**
+   * Transfers data from the analyzer to the target array
+   */
+  const animate = (): void => {
+    if (!analyzerRef.current) {
+      return;
+    }
+    const bars = analyzerRef.current.getBars();
+
+    if (freqData.length != bars.length) {
+      console.log(`Resizing ${bars.length}`);
+      resizeFreqData(bars.length);
+      return;
+    }
+
+    bars.forEach(({ value }, index) => {
+      freqData[index] = value;
+    });
+    animationRequestRef.current = requestAnimationFrame(animate);
+  };
+
+  /**
+   * Re-Synchronize the animation loop if the target data destination changes.
+   */
+  useEffect(() => {
+    if (animationRequestRef.current) {
+      cancelAnimationFrame(animationRequestRef.current);
+    }
+    animationRequestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationRequestRef.current);
+  }, [freqData]);
+
+  /**
+   * Make sure an analyzer exists with the correct mode
+   */
+  useEffect(() => {
+    if (!audioRef.current) {
+      return;
+    }
+
+    if (analyzerRef.current) {
+      analyzerRef.current.mode = octaveBands;
+      return;
+    }
+
+    analyzerRef.current = new FFTAnalyzer(audioRef.current);
+    analyzerRef.current.mode = octaveBands;
+  }, [octaveBands]);
+
+  switch (audioSource as unknown as AudioAnalyzerSource) {
+    case AUDIO_ANALYZER_SOURCE.LIVE_STREAM:
+      return (
+        <>
+          <audio ref={audioRef} crossOrigin="anonymous" />
+          <LivestreamSourceControls
+            audioRef={audioRef}
+            analyzerRef={analyzerRef}
+            {...props}
+          />
+        </>
+      );
+    case AUDIO_ANALYZER_SOURCE.MICROPHONE:
+      return (
+        <>
+          <audio ref={audioRef} crossOrigin="anonymous" />
+          <MicrophoneSourceControls
+            audioRef={audioRef}
+            analyzerRef={analyzerRef}
+            {...props}
+          />
+        </>
+      );
     default:
-      throw new Error(`Unsupported model: ${mode}`);
+      throw new Error(`Unsupported source: ${audioSource}`);
   }
 };
 

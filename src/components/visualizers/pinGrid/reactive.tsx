@@ -7,7 +7,7 @@ import { useRef } from "react";
 
 const PinGridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const { nPinGridRows, nPinGridCols, pinGridUnitSideLength } = useControls({
-    Grid: folder(
+    "Visual - Grid": folder(
       {
         nPinGridRows: {
           value: 50,

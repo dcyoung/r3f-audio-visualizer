@@ -7,7 +7,7 @@ import { VisualProps } from "../common";
 const CubeVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const { nPerSide, cubeUnitSideLength, cubeUnitSpacingScalar, volume } =
     useControls({
-      Cube: folder(
+      "Visual - Cube": folder(
         {
           nPerSide: {
             value: 10,

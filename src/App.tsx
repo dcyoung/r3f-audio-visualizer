@@ -7,8 +7,6 @@ import {
   ApplicationMode,
   APPLICATION_MODE,
   getAppModeDisplayName,
-  getPlatformSupportedApplicationModes,
-  isAudioMode,
 } from "./components/applicationModes";
 import AudioVisual from "./components/visualizers/visualizerAudio";
 import WaveformVisual from "./components/visualizers/visualizerWaveform";
@@ -29,8 +27,7 @@ const getVisualizerComponent = (
       ) : (
         <NoiseVisual visual={visual} />
       );
-    case APPLICATION_MODE.LIVE_STREAM:
-    case APPLICATION_MODE.MICROPHONE:
+    case APPLICATION_MODE.AUDIO:
       return <AudioVisual visual={visual} />;
     default:
       throw new Error(`Unknown mode ${mode}`);
@@ -41,7 +38,11 @@ const App = (): JSX.Element => {
   const { mode, visualizer } = useControls({
     mode: {
       value: APPLICATION_MODE.WAVE_FORM,
-      options: getPlatformSupportedApplicationModes().reduce(
+      options: [
+        APPLICATION_MODE.WAVE_FORM,
+        APPLICATION_MODE.NOISE,
+        APPLICATION_MODE.AUDIO,
+      ].reduce(
         (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
         {}
       ),
@@ -64,9 +65,7 @@ const App = (): JSX.Element => {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {isAudioMode(mode as ApplicationMode) ? (
-        <AudioAnalyzer mode={mode as ApplicationMode} />
-      ) : null}
+      {mode == APPLICATION_MODE.AUDIO ? <AudioAnalyzer /> : null}
       <Canvas
         camera={{
           fov: 45,

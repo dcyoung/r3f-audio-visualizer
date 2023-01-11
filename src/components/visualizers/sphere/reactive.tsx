@@ -11,7 +11,7 @@ const SphereVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
     cubeSideLength,
     // mapMode
   } = useControls({
-    Sphere: folder(
+    "Visual - Sphere": folder(
       {
         radius: { value: 2, min: 0.25, max: 3, step: 0.25 },
         nPoints: { value: 800, min: 100, max: 2000, step: 25 },

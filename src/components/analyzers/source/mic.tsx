@@ -20,6 +20,7 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
       micStream.current = null;
     }
   };
+
   const enableMic = () => {
     disableMic();
     if (navigator.mediaDevices) {
@@ -46,6 +47,9 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
     }
   };
 
+  /**
+   * Transfers data from the analyzer to the target array
+   */
   const animate = (): void => {
     if (!analyzerRef.current) {
       return;
@@ -64,6 +68,9 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
     requestRef.current = requestAnimationFrame(animate);
   };
 
+  /**
+   * Re-Synchronize the animation loop if the target data destination changes.
+   */
   useEffect(() => {
     if (requestRef.current) {
       cancelAnimationFrame(requestRef.current);
@@ -72,6 +79,9 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [freqData]); // Make sure the effect runs only once
 
+  /**
+   * Make sure an analyzer exists with the correct mode
+   */
   useEffect(() => {
     if (!audioRef.current) {
       return;
@@ -83,6 +93,7 @@ const MicAnalyzer = ({ analyzerMode = 2 }: MicAnalyzerProps): JSX.Element => {
     }
 
     analyzerRef.current = new FFTAnalyzer(audioRef.current);
+    analyzerRef.current.mode = analyzerMode;
     analyzerRef.current.volume = 0;
     enableMic();
   }, [analyzerMode]);

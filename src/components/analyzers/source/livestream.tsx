@@ -38,6 +38,9 @@ const LivestreamAnalyzer = ({
   const resizeFreqData = useAppState((state) => state.resizeData);
   const requestRef = useRef<number>(null!);
 
+  /**
+   * Transfers data from the analyzer to the target array
+   */
   const animate = (): void => {
     if (!analyzerRef.current) {
       return;
@@ -56,6 +59,9 @@ const LivestreamAnalyzer = ({
     requestRef.current = requestAnimationFrame(animate);
   };
 
+  /**
+   * Re-Synchronize the animation loop if the target data destination changes.
+   */
   useEffect(() => {
     if (requestRef.current) {
       cancelAnimationFrame(requestRef.current);
@@ -64,6 +70,9 @@ const LivestreamAnalyzer = ({
     return () => cancelAnimationFrame(requestRef.current);
   }, [freqData]); // Make sure the effect runs only once
 
+  /**
+   * Make sure an analyzer exists with the correct mode
+   */
   useEffect(() => {
     if (!audioRef.current) {
       return;
@@ -75,10 +84,12 @@ const LivestreamAnalyzer = ({
     }
 
     analyzerRef.current = new FFTAnalyzer(audioRef.current);
-    // audioRef.current.src = url;
-    // audioRef.current.play();
+    analyzerRef.current.mode = analyzerMode;
   }, [analyzerMode]);
 
+  /**
+   * Make sure we're playing the correct streams
+   */
   useEffect(() => {
     if (!audioRef.current) {
       return;

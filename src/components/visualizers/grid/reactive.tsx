@@ -7,7 +7,7 @@ import { VisualProps } from "../common";
 const GridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const { nGridRows, nGridCols, gridUnitSideLength, gridUnitSpacingScalar } =
     useControls({
-      Grid: folder(
+      "Visual - Grid": folder(
         {
           nGridRows: {
             value: 100,

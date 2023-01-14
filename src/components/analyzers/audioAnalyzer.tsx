@@ -1,7 +1,7 @@
 import { folder, useControls } from "leva";
 import { useEffect, useRef } from "react";
-import { useAppState } from "../appState";
-import FFTAnalyzer from "./fft";
+import { useAppStateActions, useEnergyInfo, useFreqData } from "../appState";
+import FFTAnalyzer, { EnergyMeasure } from "./fft";
 import {
   AudioAnalyzerSource,
   AUDIO_ANALYZER_SOURCE,
@@ -14,7 +14,7 @@ import MicrophoneSourceControls from "./sourceControls/mic";
 const AVAILABLE_SOURCES = getPlatformSupportedAnalyzerSources();
 interface AudioAnalyzerProps {}
 const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
-  const { audioSource, octaveBands } = useControls({
+  const { audioSource, octaveBands, energyMeasure } = useControls({
     Audio: folder({
       audioSource: {
         value: AVAILABLE_SOURCES[0],
@@ -39,12 +39,25 @@ const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
           "Full octave bands": 8,
         },
       },
+      energyMeasure: {
+        value: "overall",
+        options: [
+          "overall",
+          "peak",
+          "bass",
+          "lowMid",
+          "mid",
+          "highMid",
+          "treble",
+        ],
+      },
     }),
   });
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<FFTAnalyzer>(null!);
-  const freqData = useAppState((state) => state.data);
-  const resizeFreqData = useAppState((state) => state.resizeData);
+  const freqData = useFreqData();
+  const energyInfo = useEnergyInfo();
+  const { resizeFreqData } = useAppStateActions();
   const animationRequestRef = useRef<number>(null!);
 
   /**
@@ -62,6 +75,11 @@ const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
       return;
     }
 
+    energyInfo.current = analyzerRef.current.getEnergy(
+      energyMeasure as EnergyMeasure
+    );
+    // console.log(energyInfo.current);
+
     bars.forEach(({ value }, index) => {
       freqData[index] = value;
     });
@@ -77,7 +95,7 @@ const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
     }
     animationRequestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRequestRef.current);
-  }, [freqData]);
+  }, [freqData, energyMeasure]);
 
   /**
    * Make sure an analyzer exists with the correct mode

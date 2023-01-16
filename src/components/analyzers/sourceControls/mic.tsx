@@ -1,3 +1,4 @@
+import { folder, useControls } from "leva";
 import { useEffect, useRef } from "react";
 import { AnalyzerSourceControlsProps } from "./common";
 
@@ -6,10 +7,14 @@ const MicrophoneSourceControls = ({
   analyzerRef,
 }: AnalyzerSourceControlsProps): JSX.Element => {
   const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
-
+  const { micEnabled } = useControls({
+    Audio: folder({
+      micEnabled: false,
+    }),
+  });
   const disableMic = () => {
+    analyzerRef.current.disconnectInputs();
     if (micStream?.current) {
-      analyzerRef.current.disconnectInputs();
       micStream.current = null;
     }
   };
@@ -52,8 +57,13 @@ const MicrophoneSourceControls = ({
       return;
     }
     analyzerRef.current.volume = 0;
-    enableMic();
-  }, [analyzerRef]);
+
+    if (micEnabled) {
+      enableMic();
+    } else {
+      disableMic();
+    }
+  }, [analyzerRef, micEnabled]);
 
   return <></>;
 };

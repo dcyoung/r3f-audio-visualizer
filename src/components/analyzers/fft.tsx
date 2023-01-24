@@ -48,7 +48,7 @@ export default class FFTAnalyzer {
   private _input: GainNode;
   private _output: GainNode;
   public readonly _audioCtx: AudioContext;
-  private _sources: AudioNode[];
+  public readonly _sources: AudioNode[];
   private _outNodes: AudioDestinationNode[];
   private _fftData: Uint8Array;
   private _freqBinInfos: FreqBinInfo[] = [];
@@ -337,7 +337,7 @@ export default class FFTAnalyzer {
     }
   }
 
-  disconnectInputs() {
+  disconnectInputs(): void {
     for (const node of Array.from(this._sources)) {
       const idx = this._sources.indexOf(node);
       if (idx >= 0) {

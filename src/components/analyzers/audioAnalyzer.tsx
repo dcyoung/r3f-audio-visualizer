@@ -3,29 +3,21 @@ import { useEffect, useRef } from "react";
 import { useAppStateActions, useEnergyInfo, useFreqData } from "../appState";
 import FFTAnalyzer, { EnergyMeasure } from "./fft";
 import {
+  AnalyzerSourceControlsProps,
   AudioAnalyzerSource,
   AUDIO_ANALYZER_SOURCE,
-  getAnalyzerSourceDisplayName,
-  getPlatformSupportedAnalyzerSources,
 } from "./sourceControls/common";
 import LivestreamSourceControls from "./sourceControls/livestream";
 import MicrophoneSourceControls from "./sourceControls/mic";
 
-const AVAILABLE_SOURCES = getPlatformSupportedAnalyzerSources();
-interface AudioAnalyzerProps {}
-const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
-  const { audioSource, octaveBands, energyMeasure } = useControls({
+function useAnalyzerControls({
+  audioRef,
+  analyzerRef,
+}: AnalyzerSourceControlsProps) {
+  // const audioRef = useRef<HTMLAudioElement>(null!);
+  // const analyzerRef = useRef<FFTAnalyzer>(null!);
+  const { octaveBands, energyMeasure } = useControls({
     Audio: folder({
-      audioSource: {
-        value: AVAILABLE_SOURCES[0],
-        options: AVAILABLE_SOURCES.reduce(
-          (o, source) => ({
-            ...o,
-            [getAnalyzerSourceDisplayName(source)]: source,
-          }),
-          {}
-        ),
-      },
       octaveBands: {
         value: 2,
         options: {
@@ -53,8 +45,6 @@ const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
       },
     }),
   });
-  const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<FFTAnalyzer>(null!);
   const freqData = useFreqData();
   const energyInfo = useEnergyInfo();
   const { resizeFreqData } = useAppStateActions();
@@ -114,29 +104,59 @@ const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
     analyzerRef.current.mode = octaveBands;
   }, [octaveBands]);
 
-  switch (audioSource as unknown as AudioAnalyzerSource) {
+  // useEffect(() => {
+  //   analyzerRef.current = new FFTAnalyzer(audioRef.current);
+  //   analyzerRef.current.mode = octaveBands;
+  // }, [audioSource]);
+
+  // return [audioRef, analyzerRef] as const;
+}
+
+const AudioAnalyzerMicrophone = ({ ...props }): JSX.Element => {
+  const audioRef = useRef<HTMLAudioElement>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
+  useAnalyzerControls({ audioRef, analyzerRef });
+  return (
+    <>
+      <audio ref={audioRef} crossOrigin="anonymous" />
+      <MicrophoneSourceControls
+        audioRef={audioRef}
+        analyzerRef={analyzerRef}
+        {...props}
+      />
+    </>
+  );
+};
+
+const AudioAnalyzerLivestream = ({ ...props }): JSX.Element => {
+  const audioRef = useRef<HTMLAudioElement>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
+  useAnalyzerControls({ audioRef, analyzerRef });
+
+  return (
+    <>
+      <audio ref={audioRef} crossOrigin="anonymous" />
+      <LivestreamSourceControls
+        audioRef={audioRef}
+        analyzerRef={analyzerRef}
+        {...props}
+      />
+    </>
+  );
+};
+
+export interface AudioAnalyzerProps {
+  audioSource?: AudioAnalyzerSource;
+}
+const AudioAnalyzer = ({
+  audioSource = AUDIO_ANALYZER_SOURCE.LIVE_STREAM,
+  ...props
+}: AudioAnalyzerProps): JSX.Element => {
+  switch (audioSource) {
     case AUDIO_ANALYZER_SOURCE.LIVE_STREAM:
-      return (
-        <>
-          <audio ref={audioRef} crossOrigin="anonymous" />
-          <LivestreamSourceControls
-            audioRef={audioRef}
-            analyzerRef={analyzerRef}
-            {...props}
-          />
-        </>
-      );
+      return <AudioAnalyzerLivestream {...props} />;
     case AUDIO_ANALYZER_SOURCE.MICROPHONE:
-      return (
-        <>
-          <audio ref={audioRef} crossOrigin="anonymous" />
-          <MicrophoneSourceControls
-            audioRef={audioRef}
-            analyzerRef={analyzerRef}
-            {...props}
-          />
-        </>
-      );
+      return <AudioAnalyzerMicrophone {...props} />;
     default:
       throw new Error(`Unsupported source: ${audioSource}`);
   }

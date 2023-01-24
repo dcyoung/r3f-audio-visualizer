@@ -7,12 +7,25 @@ import {
   ApplicationMode,
   APPLICATION_MODE,
   getAppModeDisplayName,
+  getPlatformSupportedApplicationModes,
 } from "./components/applicationModes";
 import AudioVisual from "./components/visualizers/visualizerAudio";
 import WaveformVisual from "./components/visualizers/visualizerWaveform";
 import NoiseVisual from "./components/visualizers/visualizerNoise";
 import CurlVisual from "./components/visualizers/visualizerParticleNoise";
 import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
+import { AUDIO_ANALYZER_SOURCE } from "./components/analyzers/sourceControls/common";
+
+const getAnalyzerComponent = (mode: ApplicationMode): JSX.Element | null => {
+  switch (mode) {
+    case APPLICATION_MODE.AUDIO_MICROPHONE:
+      return <AudioAnalyzer audioSource={AUDIO_ANALYZER_SOURCE.MICROPHONE} />;
+    case APPLICATION_MODE.AUDIO_LIVE_STREAM:
+      return <AudioAnalyzer audioSource={AUDIO_ANALYZER_SOURCE.LIVE_STREAM} />;
+    default:
+      return null;
+  }
+};
 
 const getVisualizerComponent = (
   mode: ApplicationMode,
@@ -27,22 +40,21 @@ const getVisualizerComponent = (
       ) : (
         <NoiseVisual visual={visual} />
       );
-    case APPLICATION_MODE.AUDIO:
+    case APPLICATION_MODE.AUDIO_LIVE_STREAM:
+    case APPLICATION_MODE.AUDIO_MICROPHONE:
       return <AudioVisual visual={visual} />;
     default:
       throw new Error(`Unknown mode ${mode}`);
   }
 };
 
+const AVAILABLE_MODES = getPlatformSupportedApplicationModes();
+
 const App = (): JSX.Element => {
   const { mode, visualizer } = useControls({
     mode: {
-      value: APPLICATION_MODE.WAVE_FORM,
-      options: [
-        APPLICATION_MODE.WAVE_FORM,
-        APPLICATION_MODE.NOISE,
-        APPLICATION_MODE.AUDIO,
-      ].reduce(
+      value: AVAILABLE_MODES[0],
+      options: AVAILABLE_MODES.reduce(
         (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
         {}
       ),
@@ -65,7 +77,7 @@ const App = (): JSX.Element => {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {mode == APPLICATION_MODE.AUDIO ? <AudioAnalyzer /> : null}
+      {getAnalyzerComponent(mode as ApplicationMode)}
       <Canvas
         camera={{
           fov: 45,

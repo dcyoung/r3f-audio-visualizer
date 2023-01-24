@@ -5,6 +5,7 @@ import { AnalyzerSourceControlsProps } from "./common";
 const LivestreamSourceControls = ({
   audioRef,
   analyzerRef,
+  dirtyFlip = false,
 }: AnalyzerSourceControlsProps): JSX.Element => {
   const { streamUrl } = useControls({
     Audio: folder({
@@ -57,7 +58,7 @@ const LivestreamSourceControls = ({
           console.error(`Error playing ${streamUrl}`);
         });
     }
-  }, [audioRef, streamUrl]);
+  }, [audioRef, streamUrl, dirtyFlip]);
 
   return <></>;
 };

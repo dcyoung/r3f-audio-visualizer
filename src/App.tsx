@@ -14,18 +14,6 @@ import WaveformVisual from "./components/visualizers/visualizerWaveform";
 import NoiseVisual from "./components/visualizers/visualizerNoise";
 import CurlVisual from "./components/visualizers/visualizerParticleNoise";
 import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
-import { AUDIO_ANALYZER_SOURCE } from "./components/analyzers/sourceControls/common";
-
-const getAnalyzerComponent = (mode: ApplicationMode): JSX.Element | null => {
-  switch (mode) {
-    case APPLICATION_MODE.AUDIO_MICROPHONE:
-      return <AudioAnalyzer audioSource={AUDIO_ANALYZER_SOURCE.MICROPHONE} />;
-    case APPLICATION_MODE.AUDIO_LIVE_STREAM:
-      return <AudioAnalyzer audioSource={AUDIO_ANALYZER_SOURCE.LIVE_STREAM} />;
-    default:
-      return null;
-  }
-};
 
 const getVisualizerComponent = (
   mode: ApplicationMode,
@@ -40,8 +28,7 @@ const getVisualizerComponent = (
       ) : (
         <NoiseVisual visual={visual} />
       );
-    case APPLICATION_MODE.AUDIO_LIVE_STREAM:
-    case APPLICATION_MODE.AUDIO_MICROPHONE:
+    case APPLICATION_MODE.AUDIO:
       return <AudioVisual visual={visual} />;
     default:
       throw new Error(`Unknown mode ${mode}`);
@@ -77,7 +64,9 @@ const App = (): JSX.Element => {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {getAnalyzerComponent(mode as ApplicationMode)}
+      {(mode as ApplicationMode) === APPLICATION_MODE.AUDIO ? (
+        <AudioAnalyzer />
+      ) : null}
       <Canvas
         camera={{
           fov: 45,

@@ -19,6 +19,26 @@ interface FreqBandInfo {
   ratio: number;
 }
 
+interface EnergyInfo {
+  val: number;
+  peak: number;
+  hold: number;
+}
+
+export interface FreqRange {
+  start: number;
+  end: number;
+}
+
+export type EnergyMeasure =
+  | "overall"
+  | "peak"
+  | "bass"
+  | "lowMid"
+  | "mid"
+  | "highMid"
+  | "treble";
+
 // internal constants
 const ROOT24 = 2 ** (1 / 24), // 24th root of 2
   C0 = 440 * ROOT24 ** -114; // ~16.35 Hz
@@ -28,13 +48,14 @@ export default class FFTAnalyzer {
   private _input: GainNode;
   private _output: GainNode;
   public readonly _audioCtx: AudioContext;
-  private _sources: AudioNode[];
+  public readonly _sources: AudioNode[];
   private _outNodes: AudioDestinationNode[];
   private _fftData: Uint8Array;
   private _freqBinInfos: FreqBinInfo[] = [];
   public getBars(): FreqBinInfo[] {
     return this._freqBinInfos;
   }
+  private _energy: EnergyInfo = { val: 0, peak: 0, hold: 0 };
   private readonly _minFreq: number = 20;
   private readonly _maxFreq: number = 22000;
   private _mode: number = 2;
@@ -226,6 +247,7 @@ export default class FFTAnalyzer {
     const interpolate = (bin: number, ratio: number) =>
       fftData[bin] + (fftData[bin + 1] - fftData[bin]) * ratio;
 
+    let currentEnergy = 0;
     for (let i = 0; i < n; i++) {
       const binInfo = this._freqBinInfos[i],
         { binLo, binHi, ratioLo, ratioHi } = binInfo;
@@ -239,8 +261,23 @@ export default class FFTAnalyzer {
           v = fftData[j];
         }
       }
+
       // Normalize
-      binInfo.value = v / 255;
+      v /= 255;
+      // Note
+      binInfo.value = v;
+      currentEnergy += v;
+    }
+
+    // Update energy
+    this._energy.val = currentEnergy / n;
+    if (this._energy.val >= this._energy.peak) {
+      this._energy.peak = this._energy.val;
+      this._energy.hold = 30;
+    } else {
+      if (this._energy.hold > 0) this._energy.hold--;
+      else if (this._energy.peak > 0)
+        this._energy.peak *= (30 + this._energy.hold--) / 30; // decay (drops to zero in 30 frames)
     }
 
     // schedule next update
@@ -261,6 +298,34 @@ export default class FFTAnalyzer {
     return this.isOn;
   }
 
+  public getEnergy(freqRange: EnergyMeasure = "overall"): number {
+    if (freqRange === "overall") {
+      return this._energy.val;
+    }
+    if (freqRange == "peak") {
+      return this._energy.peak;
+    }
+    const presets = {
+      bass: [20, 250],
+      lowMid: [250, 500],
+      mid: [500, 2e3],
+      highMid: [2e3, 4e3],
+      treble: [4e3, 16e3],
+    };
+
+    const [startFreq, endFreq] = presets[freqRange];
+
+    const startBin = this._freqToBin(startFreq),
+      endBin = endFreq ? this._freqToBin(endFreq) : startBin;
+
+    let energy = 0;
+    for (let i = startBin; i <= endBin; i++) {
+      energy += this._fftData[i];
+    }
+
+    return energy / (endBin - startBin + 1) / 1 / 255;
+  }
+
   connectInput(source: AudioNode): void {
     if (!source.connect) {
       throw new Error("Audio source must be an instance of AudioNode");
@@ -272,7 +337,7 @@ export default class FFTAnalyzer {
     }
   }
 
-  disconnectInputs() {
+  disconnectInputs(): void {
     for (const node of Array.from(this._sources)) {
       const idx = this._sources.indexOf(node);
       if (idx >= 0) {

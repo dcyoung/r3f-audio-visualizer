@@ -75,16 +75,18 @@ const BaseGrid = ({
         y = gridSizeY * (normGridY - 0.5);
 
         if (pinStyle) {
-          // adjust the position and scale of each cube
+          // adjust the position and z-scale of each cube
           tmpMatrix.setPosition(x, y, (baseHeight + z) / 2);
           tmpMatrix.elements[10] = (baseHeight + z) / cubeSideLength;
         } else {
           // adjust position of each cube
           tmpMatrix.setPosition(x, y, z);
         }
+
         meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
       }
     }
+
     // Update the instance
     meshRef.current.instanceMatrix!.needsUpdate = true;
   });

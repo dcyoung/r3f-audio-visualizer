@@ -1,14 +1,16 @@
 import { folder, useControls } from "leva";
 import React, { Suspense } from "react";
-import { useAppState } from "../appState";
+import { useEnergyInfo, useFreqData } from "../appState";
 import { CoordinateMapper_Data } from "../coordinateMappers/data";
+import { EnergyTracker } from "../valueTracker/energyTracker";
 
 interface AudioVisualProps {
   visual: string;
 }
 
 const AudioVisual = ({ visual }: AudioVisualProps): JSX.Element => {
-  const data = useAppState((state) => state.data);
+  const freqData = useFreqData();
+  const energyInfo = useEnergyInfo();
 
   const { amplitude } = useControls({
     Audio: folder({
@@ -21,12 +23,16 @@ const AudioVisual = ({ visual }: AudioVisualProps): JSX.Element => {
     }),
   });
 
-  const coordinateMapper = new CoordinateMapper_Data(amplitude, data);
+  const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
+  const energyTracker = new EnergyTracker(energyInfo);
   const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
 
   return (
     <Suspense fallback={null}>
-      <VisualComponent coordinateMapper={coordinateMapper} />
+      <VisualComponent
+        coordinateMapper={coordinateMapper}
+        scalarTracker={energyTracker}
+      />
     </Suspense>
   );
 };

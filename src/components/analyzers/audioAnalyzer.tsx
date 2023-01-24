@@ -1,12 +1,15 @@
 import { folder, useControls } from "leva";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppStateActions, useEnergyInfo, useFreqData } from "../appState";
 import FFTAnalyzer, { EnergyMeasure } from "./fft";
 import {
   AnalyzerSourceControlsProps,
   AudioAnalyzerSource,
   AUDIO_ANALYZER_SOURCE,
+  getAnalyzerSourceDisplayName,
+  getPlatformSupportedAnalyzerSources,
 } from "./sourceControls/common";
+import FileSourceControls from "./sourceControls/file";
 import LivestreamSourceControls from "./sourceControls/livestream";
 import MicrophoneSourceControls from "./sourceControls/mic";
 
@@ -14,8 +17,7 @@ function useAnalyzerControls({
   audioRef,
   analyzerRef,
 }: AnalyzerSourceControlsProps) {
-  // const audioRef = useRef<HTMLAudioElement>(null!);
-  // const analyzerRef = useRef<FFTAnalyzer>(null!);
+  const [dirtyFlip, setDirtyFlip] = useState(true);
   const { octaveBands, energyMeasure } = useControls({
     Audio: folder({
       octaveBands: {
@@ -102,26 +104,41 @@ function useAnalyzerControls({
 
     analyzerRef.current = new FFTAnalyzer(audioRef.current);
     analyzerRef.current.mode = octaveBands;
+    setDirtyFlip(!dirtyFlip);
   }, [octaveBands]);
 
-  // useEffect(() => {
-  //   analyzerRef.current = new FFTAnalyzer(audioRef.current);
-  //   analyzerRef.current.mode = octaveBands;
-  // }, [audioSource]);
-
-  // return [audioRef, analyzerRef] as const;
+  return dirtyFlip;
 }
 
 const AudioAnalyzerMicrophone = ({ ...props }): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<FFTAnalyzer>(null!);
-  useAnalyzerControls({ audioRef, analyzerRef });
+  const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
   return (
     <>
       <audio ref={audioRef} crossOrigin="anonymous" />
       <MicrophoneSourceControls
         audioRef={audioRef}
         analyzerRef={analyzerRef}
+        dirtyFlip={dirtyFlip}
+        {...props}
+      />
+    </>
+  );
+};
+
+const AudioAnalyzerFileUpload = ({ ...props }): JSX.Element => {
+  const audioRef = useRef<HTMLAudioElement>(null!);
+  const analyzerRef = useRef<FFTAnalyzer>(null!);
+  const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
+
+  return (
+    <>
+      <audio ref={audioRef} crossOrigin="anonymous" />
+      <FileSourceControls
+        audioRef={audioRef}
+        analyzerRef={analyzerRef}
+        dirtyFlip={dirtyFlip}
         {...props}
       />
     </>
@@ -131,7 +148,7 @@ const AudioAnalyzerMicrophone = ({ ...props }): JSX.Element => {
 const AudioAnalyzerLivestream = ({ ...props }): JSX.Element => {
   const audioRef = useRef<HTMLAudioElement>(null!);
   const analyzerRef = useRef<FFTAnalyzer>(null!);
-  useAnalyzerControls({ audioRef, analyzerRef });
+  const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
 
   return (
     <>
@@ -139,26 +156,38 @@ const AudioAnalyzerLivestream = ({ ...props }): JSX.Element => {
       <LivestreamSourceControls
         audioRef={audioRef}
         analyzerRef={analyzerRef}
+        dirtyFlip={dirtyFlip}
         {...props}
       />
     </>
   );
 };
 
-export interface AudioAnalyzerProps {
-  audioSource?: AudioAnalyzerSource;
-}
-const AudioAnalyzer = ({
-  audioSource = AUDIO_ANALYZER_SOURCE.LIVE_STREAM,
-  ...props
-}: AudioAnalyzerProps): JSX.Element => {
-  switch (audioSource) {
+const AVAILABLE_SOURCES = getPlatformSupportedAnalyzerSources();
+export interface AudioAnalyzerProps {}
+const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
+  const { audioMode } = useControls({
+    Audio: folder({
+      audioMode: {
+        value: AVAILABLE_SOURCES[0],
+        options: AVAILABLE_SOURCES.reduce(
+          (o, src) => ({ ...o, [getAnalyzerSourceDisplayName(src)]: src }),
+          {}
+        ),
+        order: -100,
+      },
+    }),
+  });
+
+  switch (audioMode as unknown as AudioAnalyzerSource) {
     case AUDIO_ANALYZER_SOURCE.LIVE_STREAM:
       return <AudioAnalyzerLivestream {...props} />;
     case AUDIO_ANALYZER_SOURCE.MICROPHONE:
       return <AudioAnalyzerMicrophone {...props} />;
+    case AUDIO_ANALYZER_SOURCE.FILE_UPLOAD:
+      return <AudioAnalyzerFileUpload {...props} />;
     default:
-      throw new Error(`Unsupported source: ${audioSource}`);
+      throw new Error(`Unsupported source: ${audioMode}`);
   }
 };
 

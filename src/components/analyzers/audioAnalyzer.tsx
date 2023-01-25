@@ -1,14 +1,19 @@
 import { folder, useControls } from "leva";
 import { useEffect, useRef, useState } from "react";
-import { useAppStateActions, useEnergyInfo, useFreqData } from "../appState";
-import FFTAnalyzer, { EnergyMeasure } from "./fft";
 import {
-  AnalyzerSourceControlsProps,
-  AudioAnalyzerSource,
-  AUDIO_ANALYZER_SOURCE,
+  useAppStateActions,
+  useEnergyInfo,
+  useVisualSourceDataX,
+} from "../appState";
+import AudioSourceComponent from "../audio/audioSource";
+import {
+  AudioSource,
+  AUDIO_SOURCE,
   getAnalyzerSourceDisplayName,
-  getPlatformSupportedAnalyzerSources,
-} from "./sourceControls/common";
+  getPlatformSupportedAudioSources,
+} from "../audio/sourceControls/common";
+import FFTAnalyzer, { EnergyMeasure } from "./fft";
+import { AnalyzerSourceControlsProps } from "./sourceControls/common";
 import FileSourceControls from "./sourceControls/file";
 import LivestreamSourceControls from "./sourceControls/livestream";
 import MicrophoneSourceControls from "./sourceControls/mic";
@@ -47,9 +52,9 @@ function useAnalyzerControls({
       },
     }),
   });
-  const freqData = useFreqData();
+  const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
-  const { resizeFreqData } = useAppStateActions();
+  const { resizeVisualSourceData } = useAppStateActions();
   const animationRequestRef = useRef<number>(null!);
 
   /**
@@ -63,7 +68,7 @@ function useAnalyzerControls({
 
     if (freqData.length != bars.length) {
       console.log(`Resizing ${bars.length}`);
-      resizeFreqData(bars.length);
+      resizeVisualSourceData(bars.length);
       return;
     }
 
@@ -116,7 +121,7 @@ const AudioAnalyzerMicrophone = ({ ...props }): JSX.Element => {
   const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
   return (
     <>
-      <audio ref={audioRef} crossOrigin="anonymous" />
+      <audio ref={audioRef} />
       <MicrophoneSourceControls
         audioRef={audioRef}
         analyzerRef={analyzerRef}
@@ -134,7 +139,7 @@ const AudioAnalyzerFileUpload = ({ ...props }): JSX.Element => {
 
   return (
     <>
-      <audio ref={audioRef} crossOrigin="anonymous" />
+      <audio ref={audioRef} />
       <FileSourceControls
         audioRef={audioRef}
         analyzerRef={analyzerRef}
@@ -163,12 +168,12 @@ const AudioAnalyzerLivestream = ({ ...props }): JSX.Element => {
   );
 };
 
-const AVAILABLE_SOURCES = getPlatformSupportedAnalyzerSources();
 export interface AudioAnalyzerProps {}
-const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
-  const { audioMode } = useControls({
+const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();
+const AudioAnalyzer = ({}: AudioAnalyzerProps): JSX.Element => {
+  const { audioSource } = useControls({
     Audio: folder({
-      audioMode: {
+      audioSource: {
         value: AVAILABLE_SOURCES[0],
         options: AVAILABLE_SOURCES.reduce(
           (o, src) => ({ ...o, [getAnalyzerSourceDisplayName(src)]: src }),
@@ -179,15 +184,36 @@ const AudioAnalyzer = ({ ...props }: AudioAnalyzerProps): JSX.Element => {
     }),
   });
 
-  switch (audioMode as unknown as AudioAnalyzerSource) {
-    case AUDIO_ANALYZER_SOURCE.LIVE_STREAM:
-      return <AudioAnalyzerLivestream {...props} />;
-    case AUDIO_ANALYZER_SOURCE.MICROPHONE:
-      return <AudioAnalyzerMicrophone {...props} />;
-    case AUDIO_ANALYZER_SOURCE.FILE_UPLOAD:
-      return <AudioAnalyzerFileUpload {...props} />;
+  switch (audioSource as unknown as AudioSource) {
+    case AUDIO_SOURCE.LIVE_STREAM:
+      return (
+        <>
+          <AudioSourceComponent
+            audioSource={audioSource as unknown as AudioSource}
+          />
+          ;{/* <AudioAnalyzerLivestream />; */}
+        </>
+      );
+    case AUDIO_SOURCE.MICROPHONE:
+      return (
+        <>
+          <AudioSourceComponent
+            audioSource={audioSource as unknown as AudioSource}
+          />
+          ;{/* <AudioAnalyzerMicrophone />; */}
+        </>
+      );
+    case AUDIO_SOURCE.FILE_UPLOAD:
+      return (
+        <>
+          <AudioSourceComponent
+            audioSource={audioSource as unknown as AudioSource}
+          />
+          ;{/* <AudioAnalyzerFileUpload />; */}
+        </>
+      );
     default:
-      throw new Error(`Unsupported source: ${audioMode}`);
+      throw new Error(`Unsupported source: ${audioSource}`);
   }
 };
 

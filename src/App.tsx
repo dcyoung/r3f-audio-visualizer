@@ -2,7 +2,7 @@ import "./App.css";
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useControls, Leva } from "leva";
+import { useControls } from "leva";
 import {
   ApplicationMode,
   APPLICATION_MODE,
@@ -83,7 +83,6 @@ const App = (): JSX.Element => {
         {/* <Stats /> */}
         <OrbitControls makeDefault />
       </Canvas>
-      <Leva collapsed={true} />
     </Suspense>
   );
 };

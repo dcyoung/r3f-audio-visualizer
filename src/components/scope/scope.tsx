@@ -178,8 +178,7 @@ const AudioScope = ({ ...props }): JSX.Element => {
     <>
       <audio ref={audioRef} crossOrigin="anonymous" />
       <Canvas>
-        {/* <color attach="background" args={["black"]} /> */}
-
+        <color attach="background" args={["black"]} />
         <VizCanvas scopeRef={scopeRef} />
       </Canvas>
     </>

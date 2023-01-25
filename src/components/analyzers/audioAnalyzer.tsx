@@ -9,7 +9,7 @@ import {
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
 import AnalyzerControls from "./controls";
-import FFTAnalyzer from "./fft";
+import FFTAnalyzer from "./analyzers/fft";
 
 interface InternalAudioAnalyzerProps {
   audioSource: AudioSource;

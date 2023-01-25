@@ -14,6 +14,7 @@ import WaveformVisual from "./components/visualizers/visualizerWaveform";
 import NoiseVisual from "./components/visualizers/visualizerNoise";
 import CurlVisual from "./components/visualizers/visualizerParticleNoise";
 import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
+import AudioScope from "./components/scope/scope";
 
 const getVisualizerComponent = (
   mode: ApplicationMode,
@@ -61,7 +62,7 @@ const App = (): JSX.Element => {
   });
 
   const backgroundColor = "#010204";
-
+  return <AudioScope></AudioScope>;
   return (
     <Suspense fallback={<span>loading...</span>}>
       {(mode as ApplicationMode) === APPLICATION_MODE.AUDIO ? (

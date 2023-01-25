@@ -1,6 +1,6 @@
 import { folder, useControls } from "leva";
 import React, { Suspense } from "react";
-import { useEnergyInfo, useVisualSourceDataX } from "../appState";
+import { useEnergyInfo, useVisualSourceDataX } from "../../appState";
 import { CoordinateMapper_Data } from "../coordinateMappers/data";
 import { EnergyTracker } from "../valueTracker/energyTracker";
 

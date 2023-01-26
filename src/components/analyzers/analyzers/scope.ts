@@ -49,16 +49,24 @@ export default class ScopeAnalyzer {
   public readonly _audioCtx: AudioContext;
   public readonly timeSamples: Float32Array;
   public readonly quadSamples: Float32Array;
+  private _sources: AudioNode[];
+  private _inputs: AudioNode[];
 
   constructor(
     source: HTMLAudioElement,
     n: number = 512,
-    fftSize: number = 1024
+    fftSize: number = 1024,
+    audioContext: AudioContext | undefined = undefined
   ) {
-    this._audioCtx = new window.AudioContext();
+    if (audioContext === undefined) {
+      this._audioCtx = new window.AudioContext();
+    } else {
+      this._audioCtx = audioContext;
+    }
     this.timeSamples = new Float32Array(n);
     this.quadSamples = new Float32Array(n);
     const [delay, hilbert] = createHilbertFilter(this._audioCtx, fftSize - n);
+    this._inputs = [delay, hilbert];
     const time = createBufferCopy(this._audioCtx, this.timeSamples);
     const quad = createBufferCopy(this._audioCtx, this.quadSamples);
 
@@ -66,13 +74,38 @@ export default class ScopeAnalyzer {
     // (source) -->  hilbert --> time --> (destination)
     //          -->  delay   --> quad --> (destination)
     //          --> (destination)
-    const input = this._audioCtx.createMediaElementSource(source);
-    input.connect(delay);
-    input.connect(hilbert);
+    const sourceNode = this._audioCtx.createMediaElementSource(source);
+    this._sources = [];
+    this.connectInput(sourceNode);
     hilbert.connect(time);
     delay.connect(quad);
     time.connect(this._audioCtx.destination);
     quad.connect(this._audioCtx.destination);
-    input.connect(this._audioCtx.destination);
+    sourceNode.connect(this._audioCtx.destination);
+  }
+
+  disconnectInputs(): void {
+    for (const node of Array.from(this._sources)) {
+      const idx = this._sources.indexOf(node);
+      if (idx >= 0) {
+        for (const inputNode of this._inputs) {
+          node.disconnect(inputNode);
+        }
+        this._sources.splice(idx, 1);
+      }
+    }
+  }
+
+  connectInput(source: AudioNode): void {
+    if (!source.connect) {
+      throw new Error("Audio source must be an instance of AudioNode");
+    }
+
+    if (!this._sources.includes(source)) {
+      for (const input of this._inputs) {
+        source.connect(input);
+      }
+      this._sources.push(source);
+    }
   }
 }

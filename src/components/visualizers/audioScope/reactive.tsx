@@ -1,5 +1,5 @@
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { MutableRefObject, useEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import {
   Vector2,
   ShaderMaterial,
@@ -8,7 +8,6 @@ import {
   Points,
 } from "three";
 
-import ScopeAnalyzer from "../analyzers/analyzers/scope";
 import vertexShader from "./shader/vertex";
 import fragmentShader from "./shader/fragment";
 
@@ -17,36 +16,48 @@ const maxAmplitude = 4.0;
 const B = (1 << 16) - 1;
 const M = 4;
 
-function updateTextureData(
-  data: Uint8Array,
-  samplesX: Float32Array,
-  samplesY: Float32Array
-) {
-  let j, x, y;
-  for (let i = 0; i < N; i++) {
-    x = Math.max(
-      0,
-      Math.min(2 * maxAmplitude, 0.5 + (0.5 * samplesX[i]) / maxAmplitude)
-    );
-    y = Math.max(
-      0,
-      Math.min(2 * maxAmplitude, 0.5 + (0.5 * samplesY[i]) / maxAmplitude)
-    );
+export class TextureMapper {
+  public samplesX: Float32Array;
+  public samplesY: Float32Array;
 
-    x = (x * B) | 0;
-    y = (y * B) | 0;
-    j = i * M;
-    data[j + 0] = x >> 8;
-    data[j + 1] = x & 0xff;
-    data[j + 2] = y >> 8;
-    data[j + 3] = y & 0xff;
+  constructor(samplesX: Float32Array, samplesY: Float32Array) {
+    this.samplesX = samplesX;
+    this.samplesY = samplesY;
+  }
+
+  public updateTextureData(data: Uint8Array): void {
+    let j, x, y;
+    for (let i = 0; i < N; i++) {
+      x = Math.max(
+        0,
+        Math.min(
+          2 * maxAmplitude,
+          0.5 + (0.5 * this.samplesX[i]) / maxAmplitude
+        )
+      );
+      y = Math.max(
+        0,
+        Math.min(
+          2 * maxAmplitude,
+          0.5 + (0.5 * this.samplesY[i]) / maxAmplitude
+        )
+      );
+
+      x = (x * B) | 0;
+      y = (y * B) | 0;
+      j = i * M;
+      data[j + 0] = x >> 8;
+      data[j + 1] = x & 0xff;
+      data[j + 2] = y >> 8;
+      data[j + 3] = y & 0xff;
+    }
   }
 }
 
-interface VizCanvasProps {
-  scopeRef: MutableRefObject<ScopeAnalyzer>;
+interface AudioScopeVisualProps {
+  textureMapper: TextureMapper;
 }
-const VizCanvas = ({ scopeRef }: VizCanvasProps): JSX.Element => {
+const ScopeVisual = ({ textureMapper }: AudioScopeVisualProps): JSX.Element => {
   const textureData = new Uint8Array(N * M);
   const tex = new DataTexture(textureData, N, 1, RGBAFormat);
   tex.needsUpdate = true;
@@ -89,15 +100,8 @@ const VizCanvas = ({ scopeRef }: VizCanvasProps): JSX.Element => {
   );
 
   useFrame(({ clock }) => {
-    if (!scopeRef.current || !matRef.current?.uniforms) {
-      return;
-    }
     // update the texture data
-    updateTextureData(
-      textureData,
-      scopeRef.current.timeSamples,
-      scopeRef.current.quadSamples
-    );
+    textureMapper.updateTextureData(textureData);
     tex.needsUpdate = true;
     // update the uniforms
     matRef.current.uniforms.time.value = clock.elapsedTime;
@@ -144,45 +148,4 @@ const VizCanvas = ({ scopeRef }: VizCanvasProps): JSX.Element => {
   );
 };
 
-const AudioScope = ({ ...props }): JSX.Element => {
-  const streamUrl = "http://igor.torontocast.com:1950/stream";
-  const audioRef = useRef<HTMLAudioElement>(null!);
-  const scopeRef = useRef<ScopeAnalyzer>(null!);
-
-  /**
-   * Make sure the correct stream is playing
-   */
-  useEffect(() => {
-    if (!audioRef.current) {
-      return;
-    }
-
-    if (!scopeRef.current) {
-      scopeRef.current = new ScopeAnalyzer(audioRef.current);
-    }
-
-    audioRef.current.pause();
-    audioRef.current.src = streamUrl;
-    const promise = audioRef.current.play();
-    if (promise !== undefined) {
-      promise
-        .then(() => console.log(`Playing ${streamUrl}`))
-        .catch((error) => {
-          // Auto-play was prevented
-          console.error(`Error playing ${streamUrl}`);
-        });
-    }
-  }, [audioRef, scopeRef]);
-
-  return (
-    <>
-      <audio ref={audioRef} crossOrigin="anonymous" />
-      <Canvas>
-        <color attach="background" args={["black"]} />
-        <VizCanvas scopeRef={scopeRef} />
-      </Canvas>
-    </>
-  );
-};
-
-export default AudioScope;
+export default ScopeVisual;

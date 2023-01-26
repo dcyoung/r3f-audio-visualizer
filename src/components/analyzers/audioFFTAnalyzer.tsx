@@ -1,24 +1,22 @@
-import { folder, useControls } from "leva";
 import { useEffect, useMemo } from "react";
 import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
-  getAnalyzerSourceDisplayName,
-  getPlatformSupportedAudioSources,
+  useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
-import AnalyzerControls from "./controls";
+import FFTAnalyzerControls from "./fftAnalyzerControls";
 import FFTAnalyzer from "./analyzers/fft";
 
 interface InternalAudioAnalyzerProps {
   audioSource: AudioSource;
 }
-const InternalAudioAnalyzer = ({
+const InternalAudioFFTAnalyzer = ({
   audioSource,
 }: InternalAudioAnalyzerProps): JSX.Element => {
   if (audioSource === AUDIO_SOURCE.MICROPHONE) {
-    throw new Error("Use MicrophoneAnalzyer for microphone inputs.");
+    throw new Error("Use InternalMicrophoneFFTAnalyzer for microphone inputs.");
   }
   const audio = useMemo(() => {
     const node = new Audio();
@@ -51,15 +49,12 @@ const InternalAudioAnalyzer = ({
         audio={audio}
         audioSource={audioSource as unknown as AudioSource}
       />
-      <AnalyzerControls analyzer={analyzer} />
+      <FFTAnalyzerControls analyzer={analyzer} />
     </>
   );
 };
 
-export function useMicrophoneLink(
-  audio: HTMLAudioElement,
-  analyzer: FFTAnalyzer
-) {
+function useMicrophoneLink(audio: HTMLAudioElement, analyzer: FFTAnalyzer) {
   return {
     onMicDisabled: () => {
       analyzer.disconnectInputs();
@@ -77,9 +72,9 @@ export function useMicrophoneLink(
   };
 }
 
-interface InternalMicrophoneAnalyzerProps {}
-const InternalMicrophoneAnalyzer =
-  ({}: InternalMicrophoneAnalyzerProps): JSX.Element => {
+interface InternalMicrophoneFFTAnalyzerProps {}
+const InternalMicrophoneFFTAnalyzer =
+  ({}: InternalMicrophoneFFTAnalyzerProps): JSX.Element => {
     const audio = useMemo(() => {
       const node = new Audio();
       node.crossOrigin = "anonymous";
@@ -112,34 +107,22 @@ const InternalMicrophoneAnalyzer =
           onMicDisabled={onMicDisabled}
           onStreamCreated={onStreamCreated}
         />
-        <AnalyzerControls analyzer={analyzer} />
+        <FFTAnalyzerControls analyzer={analyzer} />
       </>
     );
   };
 
-export interface AudioAnalyzerProps {}
-const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();
-const AudioAnalyzer = ({}: AudioAnalyzerProps): JSX.Element => {
-  const { audioSource } = useControls({
-    Audio: folder({
-      audioSource: {
-        value: AVAILABLE_SOURCES[0],
-        options: AVAILABLE_SOURCES.reduce(
-          (o, src) => ({ ...o, [getAnalyzerSourceDisplayName(src)]: src }),
-          {}
-        ),
-        order: -100,
-      },
-    }),
-  });
+export interface AudioFFTAnalyzerProps {}
+const AudioFFTAnalyzer = ({}: AudioFFTAnalyzerProps): JSX.Element => {
+  const audioSource = useSelectAudioSource();
 
   return (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE ? (
-    <InternalMicrophoneAnalyzer />
+    <InternalMicrophoneFFTAnalyzer />
   ) : (
-    <InternalAudioAnalyzer
+    <InternalAudioFFTAnalyzer
       audioSource={audioSource as unknown as AudioSource}
     />
   );
 };
 
-export default AudioAnalyzer;
+export default AudioFFTAnalyzer;

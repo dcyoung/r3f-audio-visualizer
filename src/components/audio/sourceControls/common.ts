@@ -1,3 +1,5 @@
+import { folder, useControls } from "leva";
+
 export interface AudioSourceControlsProps {
   // audioRef: MutableRefObject<HTMLAudioElement>;
   audio: HTMLAudioElement;
@@ -36,3 +38,20 @@ export const getPlatformSupportedAudioSources = (): AudioSource[] => {
         AUDIO_SOURCE.MICROPHONE,
       ];
 };
+
+const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();
+export function useSelectAudioSource() {
+  const { audioSource } = useControls({
+    Audio: folder({
+      audioSource: {
+        value: AVAILABLE_SOURCES[0],
+        options: AVAILABLE_SOURCES.reduce(
+          (o, src) => ({ ...o, [getAnalyzerSourceDisplayName(src)]: src }),
+          {}
+        ),
+        order: -100,
+      },
+    }),
+  });
+  return audioSource;
+}

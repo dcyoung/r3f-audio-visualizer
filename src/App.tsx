@@ -13,8 +13,9 @@ import AudioVisual from "./components/visualizers/visualizerAudio";
 import WaveformVisual from "./components/visualizers/visualizerWaveform";
 import NoiseVisual from "./components/visualizers/visualizerNoise";
 import CurlVisual from "./components/visualizers/visualizerParticleNoise";
-import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
-import AudioScope from "./components/scope/scope";
+import AudioFFTAnalyzer from "./components/analyzers/audioFFTAnalyzer";
+import AudioScopeAnalyzer from "./components/analyzers/audioScopeAnalyzer";
+import AudioScopeVisual from "./components/visualizers/visualizerAudioScope";
 
 const getVisualizerComponent = (
   mode: ApplicationMode,
@@ -36,18 +37,34 @@ const getVisualizerComponent = (
   }
 };
 
+const getAnalyzerComponent = (mode: ApplicationMode): JSX.Element | null => {
+  switch (mode) {
+    case APPLICATION_MODE.AUDIO:
+      return <AudioFFTAnalyzer />;
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return <AudioScopeAnalyzer />;
+    default:
+      return null;
+  }
+};
+
 const AVAILABLE_MODES = getPlatformSupportedApplicationModes();
 
-const App = (): JSX.Element => {
-  const { mode, visualizer } = useControls({
-    mode: {
-      value: AVAILABLE_MODES[0],
-      options: AVAILABLE_MODES.reduce(
-        (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
-        {}
-      ),
-      order: -100,
-    },
+const AudioScopeCanvas = (): JSX.Element => {
+  // const backgroundColor = "#010204";
+  return (
+    <Canvas>
+      <color attach="background" args={["black"]} />
+      <AudioScopeVisual />
+    </Canvas>
+  );
+};
+
+interface VisualCanvasProps {
+  mode: ApplicationMode;
+}
+const VisualCanvas = ({ mode }: VisualCanvasProps): JSX.Element => {
+  const { visualizer } = useControls({
     visualizer: {
       value: "grid",
       options: [
@@ -60,30 +77,52 @@ const App = (): JSX.Element => {
       ],
     },
   });
-
   const backgroundColor = "#010204";
-  return <AudioScope></AudioScope>;
+  return (
+    <Canvas
+      camera={{
+        fov: 45,
+        near: 1,
+        far: 1000,
+        position: [-17, -6, 6.5],
+        up: [0, 0, 1],
+      }}
+    >
+      <color attach="background" args={[backgroundColor]} />
+      <ambientLight />
+      <fog attach="fog" args={[backgroundColor, 0, 100]} />
+      {getVisualizerComponent(mode as ApplicationMode, visualizer)}
+      {/* <Stats /> */}
+      <OrbitControls makeDefault />
+    </Canvas>
+  );
+};
+
+const getCanvasComponent = (mode: ApplicationMode): JSX.Element => {
+  switch (mode) {
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return <AudioScopeCanvas />;
+    default:
+      return <VisualCanvas mode={mode} />;
+  }
+};
+
+const App = (): JSX.Element => {
+  const { mode } = useControls({
+    mode: {
+      value: AVAILABLE_MODES[0],
+      options: AVAILABLE_MODES.reduce(
+        (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
+        {}
+      ),
+      order: -100,
+    },
+  });
+
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {(mode as ApplicationMode) === APPLICATION_MODE.AUDIO ? (
-        <AudioAnalyzer />
-      ) : null}
-      <Canvas
-        camera={{
-          fov: 45,
-          near: 1,
-          far: 1000,
-          position: [-17, -6, 6.5],
-          up: [0, 0, 1],
-        }}
-      >
-        <color attach="background" args={[backgroundColor]} />
-        <ambientLight />
-        <fog attach="fog" args={[backgroundColor, 0, 100]} />
-        {getVisualizerComponent(mode as ApplicationMode, visualizer)}
-        {/* <Stats /> */}
-        <OrbitControls makeDefault />
-      </Canvas>
+      {getAnalyzerComponent(mode as ApplicationMode)}
+      {getCanvasComponent(mode as ApplicationMode)}
     </Suspense>
   );
 };

@@ -28,7 +28,7 @@ const useAppState = create<IAppState>((set, get) => ({
           visualSourceData: {
             x: new Float32Array(newSize).fill(0),
             y: new Float32Array(newSize).fill(0),
-            z: new Float32Array(newSize).fill(0),
+            // z: new Float32Array(newSize).fill(0),
           },
         };
       }),

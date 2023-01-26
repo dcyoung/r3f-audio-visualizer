@@ -6,6 +6,7 @@ import {
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
+import { useMicrophoneLink } from "./analyzers/common";
 import ScopeAnalyzer from "./analyzers/scope";
 import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";
 
@@ -56,23 +57,6 @@ const InternalAudioScopeAnalyzer = ({
   );
 };
 
-function useMicrophoneLink(audio: HTMLAudioElement, analyzer: ScopeAnalyzer) {
-  return {
-    onMicDisabled: () => {
-      analyzer.disconnectInputs();
-    },
-    onStreamCreated: (stream: MediaStream) => {
-      // Disable any audio
-      audio.pause();
-      // create stream using audio context
-      const streamSrc = analyzer._audioCtx.createMediaStreamSource(stream);
-      // connect microphone stream to analyzer
-      analyzer.connectInput(streamSrc);
-      // mute output to prevent feedback loops from the speakers
-      //   analyzer.volume = 0.0;
-    },
-  };
-}
 interface InternalMicrophoneScopeAnalyzerProps {}
 const InternalMicrophoneScopeAnalyzer =
   ({}: InternalMicrophoneScopeAnalyzerProps): JSX.Element => {

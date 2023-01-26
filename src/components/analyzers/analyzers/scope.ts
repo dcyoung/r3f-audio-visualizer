@@ -1,3 +1,5 @@
+import { AnalyzerInputControl } from "./common";
+
 function createBufferCopy(context: AudioContext, buffer: Float32Array) {
   let copyNode = context.createScriptProcessor(buffer.length, 1, 1);
   copyNode.onaudioprocess = (e) => {
@@ -45,12 +47,13 @@ function createHilbertFilter(
   return [delay, hilbert];
 }
 
-export default class ScopeAnalyzer {
+export default class ScopeAnalyzer implements AnalyzerInputControl {
   public readonly _audioCtx: AudioContext;
   public readonly timeSamples: Float32Array;
   public readonly quadSamples: Float32Array;
   private _sources: AudioNode[];
   private _inputs: AudioNode[];
+  public volume: number = 1.0;
 
   constructor(
     source: HTMLAudioElement,

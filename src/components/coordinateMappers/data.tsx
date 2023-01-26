@@ -10,14 +10,14 @@ import {
  * Supports interpolation and anti-aliasing.
  */
 export class CoordinateMapper_Data extends CoordinateMapperBase {
-  public data: number[];
+  public data: Float32Array;
 
   /**
    *
    * @param amplitude - the maximum amplitude of the scaled output.
    * @param data - the pre-existing 1D data from which to interpolate values.
    */
-  constructor(amplitude: number = 1.0, data: number[]) {
+  constructor(amplitude: number = 1.0, data: Float32Array) {
     super(amplitude);
     this.data = data;
   }

@@ -1,12 +1,10 @@
 import { folder, useControls } from "leva";
 import { useEffect } from "react";
-import { AnalyzerSourceControlsProps } from "./common";
+import { AudioSourceControlsProps } from "./common";
 
-const LivestreamSourceControls = ({
-  audioRef,
-  analyzerRef,
-  dirtyFlip = false,
-}: AnalyzerSourceControlsProps): JSX.Element => {
+const LivestreamAudioControls = ({
+  audio,
+}: AudioSourceControlsProps): JSX.Element => {
   const { streamUrl } = useControls({
     Audio: folder({
       streamUrl: {
@@ -32,24 +30,12 @@ const LivestreamSourceControls = ({
   });
 
   /**
-   * Make sure the volume is up
-   */
-  useEffect(() => {
-    if (analyzerRef.current) {
-      analyzerRef.current.volume = 1.0;
-    }
-  }, [analyzerRef]);
-
-  /**
    * Make sure the correct stream is playing
    */
   useEffect(() => {
-    if (!audioRef.current) {
-      return;
-    }
-    audioRef.current.pause();
-    audioRef.current.src = streamUrl;
-    const promise = audioRef.current.play();
+    audio.pause();
+    audio.src = streamUrl;
+    const promise = audio.play();
     if (promise !== undefined) {
       promise
         .then(() => console.log(`Playing ${streamUrl}`))
@@ -58,9 +44,12 @@ const LivestreamSourceControls = ({
           console.error(`Error playing ${streamUrl}`);
         });
     }
-  }, [audioRef, streamUrl, dirtyFlip]);
+    return () => {
+      audio.pause();
+    };
+  }, [audio, streamUrl]);
 
   return <></>;
 };
 
-export default LivestreamSourceControls;
+export default LivestreamAudioControls;

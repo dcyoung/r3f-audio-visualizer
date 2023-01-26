@@ -1,26 +1,45 @@
 import create from "zustand";
 
 interface IAppState {
-  freqData: number[];
+  visualSourceData: {
+    x: Float32Array;
+    y: Float32Array;
+    z: Float32Array;
+  };
   energyInfo: {
     current: number;
   };
   actions: {
-    resizeFreqData: (newSize: number) => void;
+    resizeVisualSourceData: (newSize: number) => void;
   };
 }
 
 const useAppState = create<IAppState>((set, get) => ({
-  freqData: new Array<number>(121).fill(0),
+  visualSourceData: {
+    x: new Float32Array(121).fill(0),
+    y: new Float32Array(121).fill(0),
+    z: new Float32Array(121).fill(0),
+  },
   energyInfo: { current: 0 },
   actions: {
-    resizeFreqData: (newSize: number) =>
+    resizeVisualSourceData: (newSize: number) =>
       set((state) => {
-        return { freqData: new Array<number>(newSize).fill(0) };
+        return {
+          visualSourceData: {
+            x: new Float32Array(newSize).fill(0),
+            y: new Float32Array(newSize).fill(0),
+            z: new Float32Array(newSize).fill(0),
+          },
+        };
       }),
   },
 }));
 
-export const useFreqData = () => useAppState((state) => state.freqData);
+export const useVisualSourceDataX = () =>
+  useAppState((state) => state.visualSourceData.x);
+export const useVisualSourceDataY = () =>
+  useAppState((state) => state.visualSourceData.y);
+export const useVisualSourceDataZ = () =>
+  useAppState((state) => state.visualSourceData.z);
 export const useEnergyInfo = () => useAppState((state) => state.energyInfo);
 export const useAppStateActions = () => useAppState((state) => state.actions);

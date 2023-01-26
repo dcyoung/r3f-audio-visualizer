@@ -1,6 +1,6 @@
 import { folder, useControls } from "leva";
 import React, { Suspense } from "react";
-import { useEnergyInfo, useFreqData } from "../appState";
+import { useEnergyInfo, useVisualSourceDataX } from "../appState";
 import { CoordinateMapper_Data } from "../coordinateMappers/data";
 import { EnergyTracker } from "../valueTracker/energyTracker";
 
@@ -9,7 +9,7 @@ interface AudioVisualProps {
 }
 
 const AudioVisual = ({ visual }: AudioVisualProps): JSX.Element => {
-  const freqData = useFreqData();
+  const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
 
   const { amplitude } = useControls({

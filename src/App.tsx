@@ -1,7 +1,5 @@
 import "./App.css";
 import { Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import { useControls } from "leva";
 import {
   ApplicationMode,
@@ -9,36 +7,35 @@ import {
   getAppModeDisplayName,
   getPlatformSupportedApplicationModes,
 } from "./components/applicationModes";
-import AudioVisual from "./components/visualizers/visualizerAudio";
-import WaveformVisual from "./components/visualizers/visualizerWaveform";
-import NoiseVisual from "./components/visualizers/visualizerNoise";
-import CurlVisual from "./components/visualizers/visualizerParticleNoise";
-import AudioAnalyzer from "./components/analyzers/audioAnalyzer";
+import AudioFFTAnalyzer from "./components/analyzers/audioFFTAnalyzer";
+import AudioScopeAnalyzer from "./components/analyzers/audioScopeAnalyzer";
+import AudioScopeCanvas from "./components/canvas/AudioScope";
+import Visual3DCanvas from "./components/canvas/Visual3D";
 
-const getVisualizerComponent = (
-  mode: ApplicationMode,
-  visual: string
-): JSX.Element => {
+const getAnalyzerComponent = (mode: ApplicationMode): JSX.Element | null => {
   switch (mode) {
-    case APPLICATION_MODE.WAVE_FORM:
-      return <WaveformVisual visual={visual} />;
-    case APPLICATION_MODE.NOISE:
-      return visual === "particleSwarm" ? (
-        <CurlVisual />
-      ) : (
-        <NoiseVisual visual={visual} />
-      );
     case APPLICATION_MODE.AUDIO:
-      return <AudioVisual visual={visual} />;
+      return <AudioFFTAnalyzer />;
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return <AudioScopeAnalyzer />;
     default:
-      throw new Error(`Unknown mode ${mode}`);
+      return null;
   }
 };
 
 const AVAILABLE_MODES = getPlatformSupportedApplicationModes();
 
+const getCanvasComponent = (mode: ApplicationMode): JSX.Element => {
+  switch (mode) {
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return <AudioScopeCanvas />;
+    default:
+      return <Visual3DCanvas mode={mode} />;
+  }
+};
+
 const App = (): JSX.Element => {
-  const { mode, visualizer } = useControls({
+  const { mode } = useControls({
     mode: {
       value: AVAILABLE_MODES[0],
       options: AVAILABLE_MODES.reduce(
@@ -47,42 +44,12 @@ const App = (): JSX.Element => {
       ),
       order: -100,
     },
-    visualizer: {
-      value: "grid",
-      options: [
-        "grid",
-        "sphere",
-        "cube",
-        "diffusedRing",
-        "pinGrid",
-        // "particleSwarm",
-      ],
-    },
   });
-
-  const backgroundColor = "#010204";
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-      {(mode as ApplicationMode) === APPLICATION_MODE.AUDIO ? (
-        <AudioAnalyzer />
-      ) : null}
-      <Canvas
-        camera={{
-          fov: 45,
-          near: 1,
-          far: 1000,
-          position: [-17, -6, 6.5],
-          up: [0, 0, 1],
-        }}
-      >
-        <color attach="background" args={[backgroundColor]} />
-        <ambientLight />
-        <fog attach="fog" args={[backgroundColor, 0, 100]} />
-        {getVisualizerComponent(mode as ApplicationMode, visualizer)}
-        {/* <Stats /> */}
-        <OrbitControls makeDefault />
-      </Canvas>
+      {getAnalyzerComponent(mode as ApplicationMode)}
+      {getCanvasComponent(mode as ApplicationMode)}
     </Suspense>
   );
 };

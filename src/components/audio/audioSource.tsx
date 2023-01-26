@@ -1,39 +1,22 @@
-import { useRef } from "react";
 import { AudioSource, AUDIO_SOURCE } from "./sourceControls/common";
-import FileSourceControls from "./sourceControls/file";
-import LivestreamSourceControls from "./sourceControls/livestream";
-import MicrophoneSourceControls from "./sourceControls/mic";
+import FileAudioControls from "./sourceControls/file";
+import LivestreamAudioControls from "./sourceControls/livestream";
 
-export interface AudioSourceComponentProps {
+export interface ControlledAudioSourceProps {
+  audio: HTMLAudioElement;
   audioSource: AudioSource;
 }
-const AudioSourceComponent = ({
+const ControlledAudioSource = ({
+  audio,
   audioSource,
-}: AudioSourceComponentProps): JSX.Element => {
-  const audioRef = useRef<HTMLAudioElement>(null!);
+}: ControlledAudioSourceProps): JSX.Element => {
   switch (audioSource) {
     case AUDIO_SOURCE.LIVE_STREAM:
-      return (
-        <>
-          <audio ref={audioRef} crossOrigin="anonymous" />;
-          <LivestreamSourceControls audioRef={audioRef} />;
-        </>
-      );
-    case AUDIO_SOURCE.MICROPHONE:
-      return (
-        <>
-          <audio ref={audioRef} />
-          <MicrophoneSourceControls audioRef={audioRef} />
-        </>
-      );
+      return <LivestreamAudioControls audio={audio} />;
     case AUDIO_SOURCE.FILE_UPLOAD:
-      return (
-        <>
-          <audio ref={audioRef} />;
-          <FileSourceControls audioRef={audioRef} />;
-        </>
-      );
+      return <FileAudioControls audio={audio} />;
+    default:
+      throw new Error(`Unsupported source: ${audioSource}`);
   }
 };
-
-export default AudioSourceComponent;
+export default ControlledAudioSource;

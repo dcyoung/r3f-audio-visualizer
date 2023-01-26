@@ -77,8 +77,15 @@ export default class FFTAnalyzer {
     return this._runId !== undefined;
   }
 
-  constructor(source: HTMLAudioElement) {
-    this._audioCtx = new window.AudioContext();
+  constructor(
+    source: HTMLAudioElement,
+    audioContext: AudioContext | undefined = undefined
+  ) {
+    if (audioContext === undefined) {
+      this._audioCtx = new window.AudioContext();
+    } else {
+      this._audioCtx = audioContext;
+    }
 
     if (!this._audioCtx.createGain) {
       throw new Error("Provided audio context is not valid");

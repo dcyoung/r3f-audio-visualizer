@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { audioFileInput } from "../../levaPlugins/audioFileInput";
 import { AudioSourceControlsProps } from "./common";
 
-const FileSourceControls = ({
-  audioRef,
+const FileAudioControls = ({
+  audio,
 }: AudioSourceControlsProps): JSX.Element => {
   const { audioFile } = useControls({
     Audio: folder({
@@ -13,19 +13,16 @@ const FileSourceControls = ({
   });
 
   /**
-   * Make sure the correct stream is playing
+   * Make sure the correct file is playing
    */
   useEffect(() => {
-    if (!audioRef.current) {
-      return;
-    }
-    audioRef.current.pause();
+    audio.pause();
 
     if (!audioFile) {
       return;
     }
-    audioRef.current.src = URL.createObjectURL(audioFile);
-    const promise = audioRef.current.play();
+    audio.src = URL.createObjectURL(audioFile);
+    const promise = audio.play();
     if (promise !== undefined) {
       promise
         .then(() => console.log(`Playing ${audioFile.name}`))
@@ -34,9 +31,11 @@ const FileSourceControls = ({
           console.error(`Error playing ${audioFile}`);
         });
     }
-  }, [audioRef, audioFile]);
-
+    return () => {
+      audio.pause();
+    };
+  }, [audio, audioFile]);
   return <></>;
 };
 
-export default FileSourceControls;
+export default FileAudioControls;

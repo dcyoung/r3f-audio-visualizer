@@ -2,8 +2,8 @@ import { folder, useControls } from "leva";
 import { useEffect } from "react";
 import { AudioSourceControlsProps } from "./common";
 
-const LivestreamSourceControls = ({
-  audioRef,
+const LivestreamAudioControls = ({
+  audio,
 }: AudioSourceControlsProps): JSX.Element => {
   const { streamUrl } = useControls({
     Audio: folder({
@@ -33,12 +33,9 @@ const LivestreamSourceControls = ({
    * Make sure the correct stream is playing
    */
   useEffect(() => {
-    if (!audioRef.current) {
-      return;
-    }
-    audioRef.current.pause();
-    audioRef.current.src = streamUrl;
-    const promise = audioRef.current.play();
+    audio.pause();
+    audio.src = streamUrl;
+    const promise = audio.play();
     if (promise !== undefined) {
       promise
         .then(() => console.log(`Playing ${streamUrl}`))
@@ -47,9 +44,12 @@ const LivestreamSourceControls = ({
           console.error(`Error playing ${streamUrl}`);
         });
     }
-  }, [audioRef, streamUrl]);
+    return () => {
+      audio.pause();
+    };
+  }, [audio, streamUrl]);
 
   return <></>;
 };
 
-export default LivestreamSourceControls;
+export default LivestreamAudioControls;

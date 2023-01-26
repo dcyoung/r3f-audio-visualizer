@@ -1,7 +1,6 @@
-import { MutableRefObject } from "react";
-
 export interface AudioSourceControlsProps {
-  audioRef: MutableRefObject<HTMLAudioElement>;
+  // audioRef: MutableRefObject<HTMLAudioElement>;
+  audio: HTMLAudioElement;
 }
 
 export const AUDIO_SOURCE = {

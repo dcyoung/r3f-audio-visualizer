@@ -1,172 +1,121 @@
 import { folder, useControls } from "leva";
-import { useEffect, useRef, useState } from "react";
-import {
-  useAppStateActions,
-  useEnergyInfo,
-  useVisualSourceDataX,
-} from "../appState";
-import AudioSourceComponent from "../audio/audioSource";
+import { useEffect, useMemo } from "react";
+import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
   getAnalyzerSourceDisplayName,
   getPlatformSupportedAudioSources,
 } from "../audio/sourceControls/common";
-import FFTAnalyzer, { EnergyMeasure } from "./fft";
-import { AnalyzerSourceControlsProps } from "./sourceControls/common";
-import FileSourceControls from "./sourceControls/file";
-import LivestreamSourceControls from "./sourceControls/livestream";
-import MicrophoneSourceControls from "./sourceControls/mic";
+import MicrophoneAudioControls from "../audio/sourceControls/mic";
+import AnalyzerControls from "./controls";
+import FFTAnalyzer from "./fft";
 
-function useAnalyzerControls({
-  audioRef,
-  analyzerRef,
-}: AnalyzerSourceControlsProps) {
-  const [dirtyFlip, setDirtyFlip] = useState(true);
-  const { octaveBands, energyMeasure } = useControls({
-    Audio: folder({
-      octaveBands: {
-        value: 2,
-        options: {
-          "1/24th octave bands": 1,
-          "1/12th octave bands": 2,
-          "1/8th octave bands": 3,
-          "1/6th octave bands": 4,
-          "1/4th octave bands": 5,
-          "1/3rd octave bands": 6,
-          "Half octave bands": 7,
-          "Full octave bands": 8,
-        },
-      },
-      energyMeasure: {
-        value: "overall",
-        options: [
-          "overall",
-          "peak",
-          "bass",
-          "lowMid",
-          "mid",
-          "highMid",
-          "treble",
-        ],
-      },
-    }),
-  });
-  const freqData = useVisualSourceDataX();
-  const energyInfo = useEnergyInfo();
-  const { resizeVisualSourceData } = useAppStateActions();
-  const animationRequestRef = useRef<number>(null!);
+interface InternalAudioAnalyzerProps {
+  audioSource: AudioSource;
+}
+const InternalAudioAnalyzer = ({
+  audioSource,
+}: InternalAudioAnalyzerProps): JSX.Element => {
+  if (audioSource === AUDIO_SOURCE.MICROPHONE) {
+    throw new Error("Use MicrophoneAnalzyer for microphone inputs.");
+  }
+  const audio = useMemo(() => {
+    const node = new Audio();
+    node.crossOrigin = "anonymous";
+    return node;
+  }, []);
 
-  /**
-   * Transfers data from the analyzer to the target array
-   */
-  const animate = (): void => {
-    if (!analyzerRef.current) {
-      return;
-    }
-    const bars = analyzerRef.current.getBars();
+  const analyzer = useMemo(() => {
+    return new FFTAnalyzer(audio);
+  }, [audio]);
 
-    if (freqData.length != bars.length) {
-      console.log(`Resizing ${bars.length}`);
-      resizeVisualSourceData(bars.length);
-      return;
-    }
+  useEffect(() => {
+    analyzer.volume =
+      (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE
+        ? 0.0
+        : 1.0;
+  }, [analyzer, audioSource]);
 
-    energyInfo.current = analyzerRef.current.getEnergy(
-      energyMeasure as EnergyMeasure
-    );
-    // console.log(energyInfo.current);
+  useEffect(() => {
+    return () => {
+      console.log("REMOVING");
+      audio.pause();
+      audio.remove();
+    };
+  }, [audio]);
 
-    bars.forEach(({ value }, index) => {
-      freqData[index] = value;
-    });
-    animationRequestRef.current = requestAnimationFrame(animate);
+  return (
+    <>
+      <ControlledAudioSource
+        audio={audio}
+        audioSource={audioSource as unknown as AudioSource}
+      />
+      <AnalyzerControls analyzer={analyzer} />
+    </>
+  );
+};
+
+export function useMicrophoneLink(
+  audio: HTMLAudioElement,
+  analyzer: FFTAnalyzer
+) {
+  return {
+    onMicDisabled: () => {
+      analyzer.disconnectInputs();
+    },
+    onStreamCreated: (stream: MediaStream) => {
+      // Disable any audio
+      audio.pause();
+      // create stream using audio context
+      const streamSrc = analyzer._audioCtx.createMediaStreamSource(stream);
+      // connect microphone stream to analyzer
+      analyzer.connectInput(streamSrc);
+      // mute output to prevent feedback loops from the speakers
+      analyzer.volume = 0.0;
+    },
   };
-
-  /**
-   * Re-Synchronize the animation loop if the target data destination changes.
-   */
-  useEffect(() => {
-    if (animationRequestRef.current) {
-      cancelAnimationFrame(animationRequestRef.current);
-    }
-    animationRequestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationRequestRef.current);
-  }, [freqData, energyMeasure]);
-
-  /**
-   * Make sure an analyzer exists with the correct mode
-   */
-  useEffect(() => {
-    if (!audioRef.current) {
-      return;
-    }
-
-    if (analyzerRef.current) {
-      analyzerRef.current.mode = octaveBands;
-      return;
-    }
-
-    analyzerRef.current = new FFTAnalyzer(audioRef.current);
-    analyzerRef.current.mode = octaveBands;
-    setDirtyFlip(!dirtyFlip);
-  }, [octaveBands]);
-
-  return dirtyFlip;
 }
 
-const AudioAnalyzerMicrophone = ({ ...props }): JSX.Element => {
-  const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<FFTAnalyzer>(null!);
-  const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
-  return (
-    <>
-      <audio ref={audioRef} />
-      <MicrophoneSourceControls
-        audioRef={audioRef}
-        analyzerRef={analyzerRef}
-        dirtyFlip={dirtyFlip}
-        {...props}
-      />
-    </>
-  );
-};
+interface InternalMicrophoneAnalyzerProps {}
+const InternalMicrophoneAnalyzer =
+  ({}: InternalMicrophoneAnalyzerProps): JSX.Element => {
+    const audio = useMemo(() => {
+      const node = new Audio();
+      node.crossOrigin = "anonymous";
+      return node;
+    }, []);
 
-const AudioAnalyzerFileUpload = ({ ...props }): JSX.Element => {
-  const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<FFTAnalyzer>(null!);
-  const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
+    const analyzer = useMemo(() => {
+      const out = new FFTAnalyzer(audio);
+      out.volume = 0.0;
+      return out;
+    }, [audio]);
 
-  return (
-    <>
-      <audio ref={audioRef} />
-      <FileSourceControls
-        audioRef={audioRef}
-        analyzerRef={analyzerRef}
-        dirtyFlip={dirtyFlip}
-        {...props}
-      />
-    </>
-  );
-};
+    const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
+      audio,
+      analyzer
+    );
 
-const AudioAnalyzerLivestream = ({ ...props }): JSX.Element => {
-  const audioRef = useRef<HTMLAudioElement>(null!);
-  const analyzerRef = useRef<FFTAnalyzer>(null!);
-  const dirtyFlip = useAnalyzerControls({ audioRef, analyzerRef });
+    useEffect(() => {
+      return () => {
+        console.log("REMOVING");
+        audio.pause();
+        audio.remove();
+      };
+    }, [audio]);
 
-  return (
-    <>
-      <audio ref={audioRef} crossOrigin="anonymous" />
-      <LivestreamSourceControls
-        audioRef={audioRef}
-        analyzerRef={analyzerRef}
-        dirtyFlip={dirtyFlip}
-        {...props}
-      />
-    </>
-  );
-};
+    return (
+      <>
+        <MicrophoneAudioControls
+          audio={audio}
+          onMicDisabled={onMicDisabled}
+          onStreamCreated={onStreamCreated}
+        />
+        <AnalyzerControls analyzer={analyzer} />
+      </>
+    );
+  };
 
 export interface AudioAnalyzerProps {}
 const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();
@@ -184,37 +133,13 @@ const AudioAnalyzer = ({}: AudioAnalyzerProps): JSX.Element => {
     }),
   });
 
-  switch (audioSource as unknown as AudioSource) {
-    case AUDIO_SOURCE.LIVE_STREAM:
-      return (
-        <>
-          <AudioSourceComponent
-            audioSource={audioSource as unknown as AudioSource}
-          />
-          ;{/* <AudioAnalyzerLivestream />; */}
-        </>
-      );
-    case AUDIO_SOURCE.MICROPHONE:
-      return (
-        <>
-          <AudioSourceComponent
-            audioSource={audioSource as unknown as AudioSource}
-          />
-          ;{/* <AudioAnalyzerMicrophone />; */}
-        </>
-      );
-    case AUDIO_SOURCE.FILE_UPLOAD:
-      return (
-        <>
-          <AudioSourceComponent
-            audioSource={audioSource as unknown as AudioSource}
-          />
-          ;{/* <AudioAnalyzerFileUpload />; */}
-        </>
-      );
-    default:
-      throw new Error(`Unsupported source: ${audioSource}`);
-  }
+  return (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE ? (
+    <InternalMicrophoneAnalyzer />
+  ) : (
+    <InternalAudioAnalyzer
+      audioSource={audioSource as unknown as AudioSource}
+    />
+  );
 };
 
 export default AudioAnalyzer;

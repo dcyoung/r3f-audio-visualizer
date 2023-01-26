@@ -1,7 +1,6 @@
 import create from "zustand";
 
 interface IAppState {
-  audioContext: AudioContext;
   visualSourceData: {
     x: Float32Array;
     y: Float32Array;
@@ -16,7 +15,6 @@ interface IAppState {
 }
 
 const useAppState = create<IAppState>((set, get) => ({
-  audioContext: new window.AudioContext(),
   visualSourceData: {
     x: new Float32Array(121).fill(0),
     y: new Float32Array(121).fill(0),
@@ -37,7 +35,6 @@ const useAppState = create<IAppState>((set, get) => ({
   },
 }));
 
-export const useAudioContext = () => useAppState((state) => state.audioContext);
 export const useVisualSourceDataX = () =>
   useAppState((state) => state.visualSourceData.x);
 export const useVisualSourceDataY = () =>

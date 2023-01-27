@@ -29,18 +29,25 @@ const getVisualizerComponent = (
 export interface Visual3DCanvasProps {
   mode: ApplicationMode;
 }
+const AVAILABLE_VISUALS = [
+  "grid",
+  "sphere",
+  "cube",
+  "diffusedRing",
+  "pinGrid",
+  // "particleSwarm",
+];
 const Visual3DCanvas = ({ mode }: Visual3DCanvasProps): JSX.Element => {
+  const visualizerParam = new URLSearchParams(document.location.search).get(
+    "visual"
+  ) as string;
   const { visualizer } = useControls({
     visualizer: {
-      value: "grid",
-      options: [
-        "grid",
-        "sphere",
-        "cube",
-        "diffusedRing",
-        "pinGrid",
-        // "particleSwarm",
-      ],
+      value:
+        visualizerParam && AVAILABLE_VISUALS.includes(visualizerParam)
+          ? visualizerParam
+          : AVAILABLE_VISUALS[0],
+      options: AVAILABLE_VISUALS,
     },
   });
   const backgroundColor = "#010204";

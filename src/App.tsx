@@ -35,9 +35,15 @@ const getCanvasComponent = (mode: ApplicationMode): JSX.Element => {
 };
 
 const App = (): JSX.Element => {
+  const modeParam = new URLSearchParams(document.location.search).get(
+    "mode"
+  ) as ApplicationMode | null;
   const { mode } = useControls({
     mode: {
-      value: AVAILABLE_MODES[0],
+      value:
+        modeParam && AVAILABLE_MODES.includes(modeParam)
+          ? modeParam
+          : AVAILABLE_MODES[0],
       options: AVAILABLE_MODES.reduce(
         (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
         {}

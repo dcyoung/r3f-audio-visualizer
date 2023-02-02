@@ -45,6 +45,7 @@ jobs:
 
       - name: Install and Build
         run: |
+          cd pr-build
           npm install
           npm run build
         env:

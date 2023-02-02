@@ -16,6 +16,7 @@ const AudioVisual = ({ visual }: AudioVisualProps): JSX.Element => {
     Audio: folder({
       amplitude: {
         value: 1.0,
+        order: 74,
         min: 0.0,
         max: 5.0,
         step: 0.01,

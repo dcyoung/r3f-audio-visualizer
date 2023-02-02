@@ -29,11 +29,13 @@ export function AudioFileInputComponent() {
     [onUpdate]
   );
 
-  const { getRootProps, getInputProps, isDragAccept } = useDropzone({
+  const { getRootProps, getInputProps, isDragAccept, open } = useDropzone({
     maxFiles: 1,
-    accept: "audio/*",
+    accept:
+      "audio/,audio/mpeg,audio/mp4,audio/ogg,application/ogg,audio/x-aiff,audio/vnd.wav",
     onDrop,
     disabled,
+    noClick: true,
   });
 
   // TODO fix any in DropZone
@@ -50,7 +52,7 @@ export function AudioFileInputComponent() {
             </FilePreview>
           </>
         ) : (
-          <DropZone {...(getRootProps({ isDragAccept }) as any)}>
+          <DropZone {...(getRootProps({ isDragAccept }) as any)} onClick={open}>
             <input {...getInputProps()} />
             <Instructions>{"Click to Upload"}</Instructions>
           </DropZone>

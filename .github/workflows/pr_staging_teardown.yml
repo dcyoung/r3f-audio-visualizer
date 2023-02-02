@@ -14,6 +14,8 @@ jobs:
   delete-page-host:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Delete repository for temporary deployment
         uses: ./actions/delete-git-repo
         with:

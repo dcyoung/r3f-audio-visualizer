@@ -13,6 +13,8 @@ jobs:
   create-page-host:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Create new repository for temporary deployment
         uses: ./actions/create-git-repo # Uses an action in a local dir
         with:

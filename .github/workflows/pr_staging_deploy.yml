@@ -47,7 +47,7 @@ jobs:
         run: |
           cd pr-build
           npm install
-          npm run build
+          npm run build -- --base=/${{ env.PR_REPO_NAME }}/
         env:
           CI: ""
 

@@ -4,11 +4,11 @@ on:
     branches: [dev]
     types: [closed]
     paths-ignore:
-      # - ".github/workflows/**"
       - "**.md"
+      # - ".github/workflows/**"
 
 env:
-  PR_REPO_NAME: r3f-aud-viz-pr-${{ github.event.pull_request.node_id }}
+  PR_REPO_NAME: staging-pr-${{ github.event.pull_request.node_id }}
 
 jobs:
   delete-page-host:

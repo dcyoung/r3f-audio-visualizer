@@ -1,0 +1,31 @@
+{
+  "name": "create-git-repo-action",
+  "version": "1.0.0",
+  "description": "Create a new repository from your workflows.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
+    "all": "npm run lint && npm run prepare"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcyoung/r3f-audio-visualizer.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "JavaScript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/dcyoung/r3f-audio-visualizer",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "axios": "^1.3.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.36.1",
+    "eslint": "^8.33.0"
+  }
+}

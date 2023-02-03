@@ -17,6 +17,7 @@ const FFTAnalyzerControls = ({
     Audio: folder({
       octaveBands: {
         value: 2,
+        order: 75,
         options: {
           "1/24th octave bands": 1,
           "1/12th octave bands": 2,
@@ -30,6 +31,7 @@ const FFTAnalyzerControls = ({
       },
       energyMeasure: {
         value: "overall",
+        order: 76,
         options: [
           "overall",
           "peak",

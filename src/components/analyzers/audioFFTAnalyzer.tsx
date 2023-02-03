@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
+  iOS,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
@@ -13,6 +14,7 @@ import { useMicrophoneLink } from "./analyzers/common";
 interface InternalAudioAnalyzerProps {
   audioSource: AudioSource;
 }
+
 const InternalAudioFFTAnalyzer = ({
   audioSource,
 }: InternalAudioAnalyzerProps): JSX.Element => {
@@ -28,6 +30,31 @@ const InternalAudioFFTAnalyzer = ({
   const analyzer = useMemo(() => {
     return new FFTAnalyzer(audio);
   }, [audio]);
+
+  const [ready, setReady] = useState(!iOS());
+  const interactionListener = () => {
+    if (ready === false) {
+      // Play an impercemptible sound on the first interaction
+      audio.pause();
+      audio.src =
+        "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
+      audio.play();
+      setReady(true);
+    }
+  };
+
+  useEffect(() => {
+    const events = ["mousedown", "touchstart"];
+    events.forEach((event) => {
+      document.addEventListener(event, interactionListener);
+    });
+
+    return () => {
+      events.forEach((event) => {
+        document.removeEventListener(event, interactionListener);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     analyzer.volume =

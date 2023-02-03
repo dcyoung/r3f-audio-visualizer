@@ -1,7 +1,7 @@
 import { folder, useControls } from "leva";
 import { useEffect } from "react";
 import { audioFileInput } from "../../levaPlugins/audioFileInput";
-import { AudioSourceControlsProps, iOS } from "./common";
+import { AudioSourceControlsProps } from "./common";
 
 const FileAudioControls = ({
   audio,
@@ -11,16 +11,6 @@ const FileAudioControls = ({
       audioFile: audioFileInput({ file: undefined }),
     }),
   });
-  const { mute } = iOS()
-    ? useControls({
-        Audio: folder({
-          mute: {
-            value: iOS(),
-            order: -98,
-          },
-        }),
-      })
-    : { mute: false };
 
   /**
    * Make sure the correct file is playing
@@ -32,21 +22,19 @@ const FileAudioControls = ({
       return;
     }
     audio.src = URL.createObjectURL(audioFile);
-    if (!mute) {
-      const promise = audio.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => console.log(`Playing ${audioFile.name}`))
-          .catch((error) => {
-            // Auto-play was prevented
-            console.error(`Error playing ${audioFile}`);
-          });
-      }
+    const promise = audio.play();
+    if (promise !== undefined) {
+      promise
+        .then(() => console.log(`Playing ${audioFile.name}`))
+        .catch((error) => {
+          // Auto-play was prevented
+          console.error(`Error playing ${audioFile}`);
+        });
     }
     return () => {
       audio.pause();
     };
-  }, [audio, audioFile, mute]);
+  }, [audio, audioFile]);
   return <></>;
 };
 

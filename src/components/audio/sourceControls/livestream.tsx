@@ -1,6 +1,6 @@
 import { folder, useControls } from "leva";
 import { useEffect } from "react";
-import { AudioSourceControlsProps, iOS } from "./common";
+import { AudioSourceControlsProps } from "./common";
 
 const LivestreamAudioControls = ({
   audio,
@@ -29,38 +29,25 @@ const LivestreamAudioControls = ({
     }),
   });
 
-  const { mute } = iOS()
-    ? useControls({
-        Audio: folder({
-          mute: {
-            value: iOS(),
-            order: -98,
-          },
-        }),
-      })
-    : { mute: false };
-
   /**
    * Make sure the correct stream is playing
    */
   useEffect(() => {
     audio.pause();
     audio.src = streamUrl;
-    if (!mute) {
-      const promise = audio.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => console.log(`Playing ${streamUrl}`))
-          .catch((error) => {
-            // Auto-play was prevented
-            console.error(`Error playing ${streamUrl}`);
-          });
-      }
+    const promise = audio.play();
+    if (promise !== undefined) {
+      promise
+        .then(() => console.log(`Playing ${streamUrl}`))
+        .catch((error) => {
+          // Auto-play was prevented
+          console.error(`Error playing ${streamUrl}`);
+        });
     }
     return () => {
       audio.pause();
     };
-  }, [audio, streamUrl, mute]);
+  }, [audio, streamUrl]);
 
   return <></>;
 };

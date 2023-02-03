@@ -8,7 +8,7 @@ on:
       - "**.md"
 
 env:
-  PR_REPO_NAME: pr-${{ github.event.pull_request.node_id }}
+  PR_REPO_NAME: r3f-aud-viz-pr-${{ github.event.pull_request.node_id }}
 
 jobs:
   delete-page-host:

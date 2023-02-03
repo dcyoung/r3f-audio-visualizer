@@ -66,4 +66,4 @@ jobs:
           git add .
           git commit -m $GITHUB_SHA
           git branch -M gh-pages
-          git push -u origin gh-pages
+          git push -f -u origin gh-pages

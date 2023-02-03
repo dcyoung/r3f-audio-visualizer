@@ -6,15 +6,21 @@ import { AudioSourceControlsProps, iOS } from "./common";
 const FileAudioControls = ({
   audio,
 }: AudioSourceControlsProps): JSX.Element => {
-  const { audioFile, mute } = useControls({
+  const { audioFile } = useControls({
     Audio: folder({
       audioFile: audioFileInput({ file: undefined }),
-      mute: {
-        value: iOS(),
-        order: -98,
-      },
     }),
   });
+  const { mute } = iOS()
+    ? useControls({
+        Audio: folder({
+          mute: {
+            value: iOS(),
+            order: -98,
+          },
+        }),
+      })
+    : { mute: false };
 
   /**
    * Make sure the correct file is playing

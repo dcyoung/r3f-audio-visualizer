@@ -5,7 +5,7 @@ import { AudioSourceControlsProps, iOS } from "./common";
 const LivestreamAudioControls = ({
   audio,
 }: AudioSourceControlsProps): JSX.Element => {
-  const { streamUrl, mute } = useControls({
+  const { streamUrl } = useControls({
     Audio: folder({
       streamUrl: {
         value: "http://igor.torontocast.com:1950/stream",
@@ -26,12 +26,19 @@ const LivestreamAudioControls = ({
         },
         order: -99,
       },
-      mute: {
-        value: iOS(),
-        order: -98,
-      },
     }),
   });
+
+  const { mute } = iOS()
+    ? useControls({
+        Audio: folder({
+          mute: {
+            value: iOS(),
+            order: -98,
+          },
+        }),
+      })
+    : { mute: false };
 
   /**
    * Make sure the correct stream is playing

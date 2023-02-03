@@ -1,11 +1,11 @@
 import { folder, useControls } from "leva";
 import { useEffect } from "react";
-import { AudioSourceControlsProps } from "./common";
+import { AudioSourceControlsProps, iOS } from "./common";
 
 const LivestreamAudioControls = ({
   audio,
 }: AudioSourceControlsProps): JSX.Element => {
-  const { streamUrl } = useControls({
+  const { streamUrl, mute } = useControls({
     Audio: folder({
       streamUrl: {
         value: "http://igor.torontocast.com:1950/stream",
@@ -26,6 +26,10 @@ const LivestreamAudioControls = ({
         },
         order: -99,
       },
+      mute: {
+        value: iOS(),
+        order: -98,
+      },
     }),
   });
 
@@ -35,19 +39,21 @@ const LivestreamAudioControls = ({
   useEffect(() => {
     audio.pause();
     audio.src = streamUrl;
-    const promise = audio.play();
-    if (promise !== undefined) {
-      promise
-        .then(() => console.log(`Playing ${streamUrl}`))
-        .catch((error) => {
-          // Auto-play was prevented
-          console.error(`Error playing ${streamUrl}`);
-        });
+    if (!mute) {
+      const promise = audio.play();
+      if (promise !== undefined) {
+        promise
+          .then(() => console.log(`Playing ${streamUrl}`))
+          .catch((error) => {
+            // Auto-play was prevented
+            console.error(`Error playing ${streamUrl}`);
+          });
+      }
     }
     return () => {
       audio.pause();
     };
-  }, [audio, streamUrl]);
+  }, [audio, streamUrl, mute]);
 
   return <></>;
 };

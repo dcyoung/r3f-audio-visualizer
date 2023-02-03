@@ -27,16 +27,25 @@ export const getAnalyzerSourceDisplayName = (source: AudioSource): string => {
   }
 };
 
+export const iOS = (): boolean => {
+  // apple "iP..." device detection. Ex: iPad, iPod, iPhone etc.
+  if (navigator.platform.toLowerCase().startsWith("ip")) {
+    return true;
+  }
+  // iPad on iOS 13 detection
+  return navigator.userAgent?.toLowerCase().startsWith("mac") && "ontouchend" in document;
+}
+
 export const getPlatformSupportedAudioSources = (): AudioSource[] => {
   // Apple devices/browsers using WebKit do NOT support CrossOrigin Audio
   // see: https://bugs.webkit.org/show_bug.cgi?id=195043
-  return navigator.platform.toLowerCase().startsWith("ip")
+  return iOS()
     ? [AUDIO_SOURCE.FILE_UPLOAD, AUDIO_SOURCE.MICROPHONE]
     : [
-        AUDIO_SOURCE.LIVE_STREAM,
-        AUDIO_SOURCE.FILE_UPLOAD,
-        AUDIO_SOURCE.MICROPHONE,
-      ];
+      AUDIO_SOURCE.LIVE_STREAM,
+      AUDIO_SOURCE.FILE_UPLOAD,
+      AUDIO_SOURCE.MICROPHONE,
+    ];
 };
 
 const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();

@@ -14,7 +14,6 @@ jobs:
         uses: dcyoung/ga-create-git-repo@v1.0.0
         with:
           name: ${{ env.PR_REPO_NAME }}
-          # org: dcyoung
           access-token: ${{ secrets.PAT }}
   pr-build-deploy:
     needs: create-page-host

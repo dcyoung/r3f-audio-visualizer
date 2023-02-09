@@ -28,7 +28,7 @@ const FileAudioControls = ({
         .then(() => console.log(`Playing ${audioFile.name}`))
         .catch((error) => {
           // Auto-play was prevented
-          console.error(`Error playing ${audioFile}`);
+          console.error(`Error playing ${audioFile}`, error);
         });
     }
     return () => {

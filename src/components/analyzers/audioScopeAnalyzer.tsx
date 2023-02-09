@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
-  iOS,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
+import { useAudio, useAudioContext } from "../audio/sourceControls/hooks";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
 import { useMicrophoneLink } from "./analyzers/common";
 import ScopeAnalyzer from "./analyzers/scope";
@@ -22,40 +22,11 @@ const InternalAudioScopeAnalyzer = ({
       "Use InternalMicrophoneScopeAnalyzer for microphone inputs."
     );
   }
-  const audio = useMemo(() => {
-    const node = new Audio();
-    node.crossOrigin = "anonymous";
-    return node;
-  }, []);
-
+  const { audioCtx } = useAudioContext();
+  const { audio } = useAudio();
   const analyzer = useMemo(() => {
-    return new ScopeAnalyzer(audio);
-  }, [audio]);
-
-  const [ready, setReady] = useState(!iOS());
-  const interactionListener = () => {
-    if (ready === false) {
-      // Play an impercemptible sound on the first interaction
-      audio.pause();
-      audio.src =
-        "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
-      audio.play();
-      setReady(true);
-    }
-  };
-
-  useEffect(() => {
-    const events = ["mousedown", "touchstart"];
-    events.forEach((event) => {
-      document.addEventListener(event, interactionListener);
-    });
-
-    return () => {
-      events.forEach((event) => {
-        document.removeEventListener(event, interactionListener);
-      });
-    };
-  }, []);
+    return new ScopeAnalyzer(audio, audioCtx);
+  }, [audio, audioCtx]);
 
   // useEffect(() => {
   //   analyzer.volume =
@@ -63,14 +34,6 @@ const InternalAudioScopeAnalyzer = ({
   //       ? 0.0
   //       : 1.0;
   // }, [analyzer, audioSource]);
-
-  useEffect(() => {
-    return () => {
-      console.log("REMOVING");
-      audio.pause();
-      audio.remove();
-    };
-  }, [audio]);
 
   return (
     <>
@@ -86,28 +49,16 @@ const InternalAudioScopeAnalyzer = ({
 interface InternalMicrophoneScopeAnalyzerProps {}
 const InternalMicrophoneScopeAnalyzer =
   ({}: InternalMicrophoneScopeAnalyzerProps): JSX.Element => {
-    const audio = useMemo(() => {
-      const node = new Audio();
-      node.crossOrigin = "anonymous";
-      return node;
-    }, []);
-
+    const { audioCtx } = useAudioContext();
+    const { audio } = useAudio();
     const analyzer = useMemo(() => {
-      return new ScopeAnalyzer(audio);
-    }, [audio]);
+      return new ScopeAnalyzer(audio, audioCtx);
+    }, [audio, audioCtx]);
 
     const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
       audio,
       analyzer
     );
-
-    useEffect(() => {
-      return () => {
-        console.log("REMOVING");
-        audio.pause();
-        audio.remove();
-      };
-    }, [audio]);
 
     return (
       <>

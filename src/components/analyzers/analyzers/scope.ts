@@ -57,9 +57,9 @@ export default class ScopeAnalyzer implements AnalyzerInputControl {
 
   constructor(
     source: HTMLAudioElement,
+    audioContext: AudioContext | undefined = undefined,
     n: number = 512,
     fftSize: number = 1024,
-    audioContext: AudioContext | undefined = undefined
   ) {
     if (audioContext === undefined) {
       this._audioCtx = new window.AudioContext();

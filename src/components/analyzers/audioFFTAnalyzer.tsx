@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
-  iOS,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
 import FFTAnalyzerControls from "./fftAnalyzerControls";
 import FFTAnalyzer from "./analyzers/fft";
 import { useMicrophoneLink } from "./analyzers/common";
+import { useAudio, useAudioContext } from "../audio/sourceControls/hooks";
 
 interface InternalAudioAnalyzerProps {
   audioSource: AudioSource;
@@ -21,40 +21,11 @@ const InternalAudioFFTAnalyzer = ({
   if (audioSource === AUDIO_SOURCE.MICROPHONE) {
     throw new Error("Use InternalMicrophoneFFTAnalyzer for microphone inputs.");
   }
-  const audio = useMemo(() => {
-    const node = new Audio();
-    node.crossOrigin = "anonymous";
-    return node;
-  }, []);
-
+  const { audioCtx } = useAudioContext();
+  const { audio } = useAudio();
   const analyzer = useMemo(() => {
-    return new FFTAnalyzer(audio);
-  }, [audio]);
-
-  const [ready, setReady] = useState(!iOS());
-  const interactionListener = () => {
-    if (ready === false) {
-      // Play an impercemptible sound on the first interaction
-      audio.pause();
-      audio.src =
-        "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
-      audio.play();
-      setReady(true);
-    }
-  };
-
-  useEffect(() => {
-    const events = ["mousedown", "touchstart"];
-    events.forEach((event) => {
-      document.addEventListener(event, interactionListener);
-    });
-
-    return () => {
-      events.forEach((event) => {
-        document.removeEventListener(event, interactionListener);
-      });
-    };
-  }, []);
+    return new FFTAnalyzer(audio, audioCtx);
+  }, [audio, audioCtx]);
 
   useEffect(() => {
     analyzer.volume =
@@ -62,14 +33,6 @@ const InternalAudioFFTAnalyzer = ({
         ? 0.0
         : 1.0;
   }, [analyzer, audioSource]);
-
-  useEffect(() => {
-    return () => {
-      console.log("REMOVING");
-      audio.pause();
-      audio.remove();
-    };
-  }, [audio]);
 
   return (
     <>
@@ -85,30 +48,18 @@ const InternalAudioFFTAnalyzer = ({
 interface InternalMicrophoneFFTAnalyzerProps {}
 const InternalMicrophoneFFTAnalyzer =
   ({}: InternalMicrophoneFFTAnalyzerProps): JSX.Element => {
-    const audio = useMemo(() => {
-      const node = new Audio();
-      node.crossOrigin = "anonymous";
-      return node;
-    }, []);
-
+    const { audioCtx } = useAudioContext();
+    const { audio } = useAudio();
     const analyzer = useMemo(() => {
-      const out = new FFTAnalyzer(audio);
+      const out = new FFTAnalyzer(audio, audioCtx);
       out.volume = 0.0;
       return out;
-    }, [audio]);
+    }, [audio, audioCtx]);
 
     const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
       audio,
       analyzer
     );
-
-    useEffect(() => {
-      return () => {
-        console.log("REMOVING");
-        audio.pause();
-        audio.remove();
-      };
-    }, [audio]);
 
     return (
       <>

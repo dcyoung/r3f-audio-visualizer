@@ -25,7 +25,6 @@ jobs:
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v2
-      # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
       - name: Set GitHub Actions as Commit Author
         run: |
           git config --global user.name github-actions

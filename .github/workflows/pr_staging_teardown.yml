@@ -5,11 +5,8 @@ on:
     types: [closed]
     paths-ignore:
       - "**.md"
-      # - ".github/workflows/**"
-
 env:
   PR_REPO_NAME: staging-pr-${{ github.event.pull_request.node_id }}
-
 jobs:
   delete-page-host:
     runs-on: ubuntu-latest
@@ -17,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Delete repository for temporary deployment
-        uses: ./actions/delete-git-repo
+        uses: dcyoung/ga-delete-git-repo@v1.0.0
         with:
           name: dcyoung/${{ env.PR_REPO_NAME }}
           access-token: ${{ secrets.PAT }}

@@ -16,12 +16,6 @@ jobs:
           name: ${{ env.PR_REPO_NAME }}
           # org: dcyoung
           access-token: ${{ secrets.PAT }}
-      - name: Create link in PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            **Staging Preview:**
-            https://dcyoung.github.io/${{ env.PR_REPO_NAME }}/
   pr-build-deploy:
     needs: create-page-host
     runs-on: ubuntu-latest
@@ -62,3 +56,9 @@ jobs:
           git commit -m $GITHUB_SHA
           git branch -M gh-pages
           git push -f -u origin gh-pages
+      - name: Create link in PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **Staging Preview:**
+            https://dcyoung.github.io/${{ env.PR_REPO_NAME }}/

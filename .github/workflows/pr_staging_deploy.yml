@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create new repository for temporary deployment
-        uses: dcyoung/ga-create-git-repo
+        uses: dcyoung/ga-create-git-repo@v1.0.0
         with:
           name: ${{ env.PR_REPO_NAME }}
           # org: dcyoung

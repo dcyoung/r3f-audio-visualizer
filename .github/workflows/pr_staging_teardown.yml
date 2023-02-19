@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Delete repository for temporary deployment
-        uses: dcyoung/ga-delete-git-repo
+        uses: dcyoung/ga-delete-git-repo@v1.0.0
         with:
           name: dcyoung/${{ env.PR_REPO_NAME }}
           access-token: ${{ secrets.PAT }}

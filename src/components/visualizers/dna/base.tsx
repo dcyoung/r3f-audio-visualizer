@@ -10,6 +10,7 @@ import {
   BoxGeometry,
   Matrix4,
   Quaternion,
+  Object3D,
 } from "three";
 import {
   COORDINATE_TYPE,
@@ -112,6 +113,7 @@ const BaseDoubleHelix = ({
       new TubeGeometry(curveB, 100, strandRadius, 12, false),
     ];
   }, [helixLength, helixRadius, helixWindingSeparation, strandRadius]);
+  const tmpObject = useMemo(() => new Object3D(), []);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const tmpVecA = useMemo(() => new Vector3(), []);
   const tmpVecB = useMemo(() => new Vector3(), []);
@@ -147,7 +149,6 @@ const BaseDoubleHelix = ({
       targetScale = 0;
     const targetScaleMin = 0.25;
     const targetScaleMax = 1.0;
-    const eps = 1 ** -5;
     for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
       normBpIdx = bpIdx / Math.max(nBasePairs - 1, 1);
 
@@ -165,18 +166,30 @@ const BaseDoubleHelix = ({
         targetScaleMin +
         ((1 + targetScale) / 2) * (targetScaleMax - targetScaleMin);
 
+      // refBaseMesh.setMatrixAt(tmpObject.matrix);
+
       // Base A
       refBaseMesh.current.getMatrixAt(bpIdx * 2, tmpMatrix);
-      tmpMatrix.decompose(tmpVecA, tmpQuat, tmpVecScale);
-      tmpVecScale.setZ(targetScale / tmpVecScale.z);
-      tmpMatrix.scale(tmpVecScale);
-      refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
+      tmpObject.matrix.fromArray(tmpMatrix.toArray());
+      tmpObject.scale.z = targetScale;
+      tmpObject.updateMatrix();
+      refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpObject.matrix);
       // Base B
       refBaseMesh.current.getMatrixAt(bpIdx * 2 + 1, tmpMatrix);
-      tmpMatrix.decompose(tmpVecB, tmpQuat, tmpVecScale);
-      tmpVecScale.setZ(targetScale / tmpVecScale.z);
-      tmpMatrix.scale(tmpVecScale);
-      refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
+      tmpObject.matrix.fromArray(tmpMatrix.toArray());
+      tmpObject.scale.z = targetScale;
+      tmpObject.updateMatrix();
+      refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpObject.matrix);
+      // tmpMatrix.decompose(tmpVecA, tmpQuat, tmpVecScale);
+      // tmpVecScale.setZ(targetScale / tmpVecScale.z);
+      // tmpMatrix.scale(tmpVecScale);
+      // refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
+      // // Base B
+      // refBaseMesh.current.getMatrixAt(bpIdx * 2 + 1, tmpMatrix);
+      // tmpMatrix.decompose(tmpVecB, tmpQuat, tmpVecScale);
+      // tmpVecScale.setZ(targetScale / tmpVecScale.z);
+      // tmpMatrix.scale(tmpVecScale);
+      // refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
     }
     refBaseMesh.current.instanceMatrix.needsUpdate = true;
   });

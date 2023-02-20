@@ -56,7 +56,7 @@ const distBetweenPointsOnCircle = (r: number, angDiffRad: number) => {
   return Math.hypot(r * Math.sin(angDiffRad), r * Math.cos(angDiffRad) - r);
 };
 
-interface BaseDoubleHelixProps {
+export interface BaseDoubleHelixProps {
   coordinateMapper: ICoordinateMapper;
   helixLength?: number;
   helixRadius?: number;

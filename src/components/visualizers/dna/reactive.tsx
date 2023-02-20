@@ -1,12 +1,11 @@
 import { folder, useControls } from "leva";
 import BaseDoubleHelix from "./base";
 import { VisualProps } from "../common";
-import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import { Euler, Group, MathUtils, Vector3 } from "three";
+import MultiStrand from "./multi";
 
 const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const {
+    multi,
     helixLength,
     helixRadius,
     helixWindingSeparation,
@@ -17,6 +16,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   } = useControls({
     "Visual - DNA": folder(
       {
+        multi: true,
         helixLength: { value: 15, min: 5, max: 100, step: 5 },
         helixRadius: { value: 1, min: 1, max: 5, step: 1 },
         helixWindingSeparation: { value: 10, min: 5, max: 50, step: 1 },
@@ -34,79 +34,28 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
     ),
   });
 
-  const bounds = 15;
-  const strandCount = 12;
-  const strandRefs = Array.from({ length: strandCount }).map((x) =>
-    useRef<Group>(null!)
-  );
-  const strandPositions = Array.from({ length: strandCount }).map((x, i) => {
-    return new Vector3()
-      .fromArray(
-        Array.from({ length: 3 }).map(
-          (_, j) => 2 * MathUtils.seededRandom(i + j) - 1
-        )
-      )
-      .normalize()
-      .multiplyScalar(bounds);
-  });
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    const amplitude = 0.0005;
-    const speed = 0.05;
-    let tmpVec;
-    let norm = 0;
-    strandRefs.forEach((strandRef, strandIdx) => {
-      if (!strandRef.current) {
-        return;
-      }
-      tmpVec = strandPositions[strandIdx];
-      norm = Math.sin(
-        speed * (0.5 + 0.5 * MathUtils.seededRandom(strandIdx)) * t +
-          MathUtils.seededRandom(strandIdx) / speed
-      );
-      strandRef.current.position.set(
-        tmpVec.x * norm,
-        tmpVec.y * norm,
-        tmpVec.z * norm
-      );
-      strandRef.current.rotation.z +=
-        amplitude *
-        Math.cos((0.5 + 0.5 * MathUtils.seededRandom(strandIdx)) * t);
-      strandRef.current.rotation.y +=
-        amplitude *
-        Math.cos((0.5 + 0.5 * MathUtils.seededRandom(strandIdx)) * t);
-    });
-  });
-
-  return (
-    <>
-      {strandRefs.map((ref, i) => (
-        <group
-          key={i}
-          ref={ref}
-          position={strandPositions[i]}
-          rotation={
-            new Euler(
-              ...Array.from({ length: 3 }).map(
-                (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1)
-              )
-            )
-          }
-        >
-          <BaseDoubleHelix
-            coordinateMapper={coordinateMapper}
-            helixLength={helixLength}
-            helixRadius={helixRadius}
-            helixWindingSeparation={helixWindingSeparation}
-            strandRadius={strandRadius}
-            baseSpacing={baseSpacing}
-            strandOffsetRad={strandOffsetRad}
-            mirrorEffects={mirrorEffects}
-          />
-        </group>
-      ))}
-    </>
+  return multi ? (
+    <MultiStrand
+      coordinateMapper={coordinateMapper}
+      helixLength={helixLength}
+      helixRadius={helixRadius}
+      helixWindingSeparation={helixWindingSeparation}
+      strandRadius={strandRadius}
+      baseSpacing={baseSpacing}
+      strandOffsetRad={strandOffsetRad}
+      mirrorEffects={mirrorEffects}
+    />
+  ) : (
+    <BaseDoubleHelix
+      coordinateMapper={coordinateMapper}
+      helixLength={helixLength}
+      helixRadius={helixRadius}
+      helixWindingSeparation={helixWindingSeparation}
+      strandRadius={strandRadius}
+      baseSpacing={baseSpacing}
+      strandOffsetRad={strandOffsetRad}
+      mirrorEffects={mirrorEffects}
+    />
   );
 };
 

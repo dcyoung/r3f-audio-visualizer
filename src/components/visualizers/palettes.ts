@@ -1,4 +1,4 @@
-import { Color, Vector3 } from "three";
+import { Color } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
 
 /**

@@ -1,7 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { Lut } from "three/examples/jsm/math/Lut";
 import {
   COORDINATE_TYPE,
   ICoordinateMapper,

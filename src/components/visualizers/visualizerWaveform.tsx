@@ -1,12 +1,17 @@
 import { useControls } from "leva";
 import React, { Suspense, useEffect } from "react";
-import { CoordinateMapper_WaveformSuperposition } from "../coordinateMappers/waveform";
+import { CoordinateMapper_WaveformSuperposition } from "../mappers/coordinateMappers/waveform";
+import { ColorPaletteType, COLOR_PALETTE } from "./palettes";
 
 interface WaveformVisualizerProps {
   visual: string;
+  palette?: ColorPaletteType;
 }
 
-const WaveformVisual = ({ visual }: WaveformVisualizerProps): JSX.Element => {
+const WaveformVisual = ({
+  visual,
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
+}: WaveformVisualizerProps): JSX.Element => {
   const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
 
   const [{ double, amplitude, frequencyHz_1, frequencyHz_2 }, set] =
@@ -64,7 +69,10 @@ const WaveformVisual = ({ visual }: WaveformVisualizerProps): JSX.Element => {
   return (
     <>
       <Suspense fallback={null}>
-        <VisualComponent coordinateMapper={coordinateMapper} />
+        <VisualComponent
+          coordinateMapper={coordinateMapper}
+          palette={palette}
+        />
       </Suspense>
     </>
   );

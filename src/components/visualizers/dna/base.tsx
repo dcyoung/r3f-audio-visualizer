@@ -10,12 +10,14 @@ import {
   BoxGeometry,
   Matrix4,
   Quaternion,
+  MathUtils,
 } from "three";
 import {
   COORDINATE_TYPE,
   ICoordinateMapper,
   TWO_PI,
-} from "../../coordinateMappers/common";
+} from "../../mappers/coordinateMappers/common";
+import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 const clipAngleRad = (rad: number) => {
   return ((rad % TWO_PI) + TWO_PI) % TWO_PI;
@@ -66,6 +68,7 @@ export interface BaseDoubleHelixProps {
   strandOffsetRad?: number;
   mirrorEffects?: boolean;
   fixedBaseGap?: boolean;
+  palette?: ColorPaletteType;
 }
 const BaseDoubleHelix = ({
   coordinateMapper,
@@ -77,13 +80,15 @@ const BaseDoubleHelix = ({
   strandOffsetRad = Math.PI / 2,
   mirrorEffects = true,
   fixedBaseGap = true,
+  palette = COLOR_PALETTE.THREE_RAINBOW,
   ...props
 }: BaseDoubleHelixProps): JSX.Element => {
   const nBasePairs = Math.floor(helixLength / baseSpacing);
+  const lut = ColorPalette.getPalette(palette).buildLut();
   const refBaseMesh = useRef<InstancedMesh>(null!);
   const matBase = useMemo(() => {
     return new MeshBasicMaterial({ color: "#606060" });
-  }, []);
+  }, [lut]);
   const geoBase = useMemo(() => {
     const helixGap = distBetweenPointsOnCircle(helixRadius, strandOffsetRad);
     const baseLength = 0.45 * helixGap;
@@ -108,8 +113,9 @@ const BaseDoubleHelix = ({
   const refHelixMeshA = useRef<Mesh>(null!);
   const refHelixMeshB = useRef<Mesh>(null!);
   const matHelix = useMemo(() => {
-    return new MeshBasicMaterial({ color: "#d9d9d9" });
-  }, []);
+    // return new MeshBasicMaterial({ color: "#d9d9d9" });
+    return new MeshBasicMaterial({ color: lut.getColor(0.5) });
+  }, [lut]);
   const [curveHelixA, geoHelixA, curveHelixB, geoHelixB] = useMemo(() => {
     const curveA = new HelixCurve(
       helixLength,
@@ -136,6 +142,7 @@ const BaseDoubleHelix = ({
     strandRadius,
     strandOffsetRad,
   ]);
+
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const tmpVecA = useMemo(() => new Vector3(), []);
   const tmpVecB = useMemo(() => new Vector3(), []);
@@ -148,6 +155,8 @@ const BaseDoubleHelix = ({
     let normBpIdx = 0;
     for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
       normBpIdx = bpIdx / Math.max(nBasePairs - 1, 1);
+      const tagA = Math.floor(3.99 * MathUtils.seededRandom(bpIdx));
+      const tagB = 3 - tagA;
 
       curveHelixA.getPoint(normBpIdx, tmpVecA);
       curveHelixB.getPoint(normBpIdx, tmpVecB);
@@ -156,14 +165,17 @@ const BaseDoubleHelix = ({
       tmpMatrix.setPosition(tmpVecA);
       tmpMatrix.lookAt(tmpVecA, tmpVecB, upVec);
       refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
+      refBaseMesh.current.setColorAt(bpIdx * 2, lut.getColor(tagA / 3));
 
       // Base B
       tmpMatrix.setPosition(tmpVecB);
       tmpMatrix.lookAt(tmpVecB, tmpVecA, upVec);
       refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
+      refBaseMesh.current.setColorAt(bpIdx * 2 + 1, lut.getColor(tagB / 3));
     }
     refBaseMesh.current.instanceMatrix.needsUpdate = true;
-  }, [curveHelixA, curveHelixB, refBaseMesh, nBasePairs]);
+    refBaseMesh.current.instanceColor!.needsUpdate = true;
+  }, [curveHelixA, curveHelixB, refBaseMesh, nBasePairs, lut]);
 
   useFrame(({ clock }) => {
     const elapsedTimeSec = clock.getElapsedTime();

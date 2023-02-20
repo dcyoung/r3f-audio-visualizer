@@ -3,8 +3,12 @@ import { Vector3 } from "three";
 import Ground from "../../ground";
 import BaseCube from "./base";
 import { VisualProps } from "../common";
+import { COLOR_PALETTE } from "../palettes";
 
-const CubeVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
+const CubeVisual = ({
+  coordinateMapper,
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
+}: VisualProps): JSX.Element => {
   const { nPerSide, cubeUnitSideLength, cubeUnitSpacingScalar, volume } =
     useControls({
       "Visual - Cube": folder(
@@ -41,6 +45,7 @@ const CubeVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
         cubeSideLength={cubeUnitSideLength}
         cubeSpacingScalar={cubeUnitSpacingScalar}
         volume={volume}
+        palette={palette}
       />
       <Ground
         position={

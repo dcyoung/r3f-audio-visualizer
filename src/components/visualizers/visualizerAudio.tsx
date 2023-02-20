@@ -1,14 +1,19 @@
 import { folder, useControls } from "leva";
 import React, { Suspense } from "react";
 import { useEnergyInfo, useVisualSourceDataX } from "../../appState";
-import { CoordinateMapper_Data } from "../coordinateMappers/data";
-import { EnergyTracker } from "../valueTracker/energyTracker";
+import { CoordinateMapper_Data } from "../mappers/coordinateMappers/data";
+import { EnergyTracker } from "../mappers/valueTracker/energyTracker";
+import { ColorPaletteType, COLOR_PALETTE } from "./palettes";
 
 interface AudioVisualProps {
   visual: string;
+  palette?: ColorPaletteType;
 }
 
-const AudioVisual = ({ visual }: AudioVisualProps): JSX.Element => {
+const AudioVisual = ({
+  visual,
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
+}: AudioVisualProps): JSX.Element => {
   const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
 
@@ -33,6 +38,7 @@ const AudioVisual = ({ visual }: AudioVisualProps): JSX.Element => {
       <VisualComponent
         coordinateMapper={coordinateMapper}
         scalarTracker={energyTracker}
+        palette={palette}
       />
     </Suspense>
   );

@@ -1,12 +1,17 @@
 import { folder, useControls } from "leva";
 import React, { Suspense } from "react";
-import { CoordinateMapper_Noise } from "../coordinateMappers/noise";
+import { CoordinateMapper_Noise } from "../mappers/coordinateMappers/noise";
+import { ColorPaletteType, COLOR_PALETTE } from "./palettes";
 
 interface NoiseVisualizerProps {
   visual: string;
+  palette?: ColorPaletteType;
 }
 
-const NoiseVisual = ({ visual }: NoiseVisualizerProps): JSX.Element => {
+const NoiseVisual = ({
+  visual,
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
+}: NoiseVisualizerProps): JSX.Element => {
   const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
 
   const { amplitude, spatialScale, timeScale, nIterations } = useControls({
@@ -48,7 +53,10 @@ const NoiseVisual = ({ visual }: NoiseVisualizerProps): JSX.Element => {
   return (
     <>
       <Suspense fallback={null}>
-        <VisualComponent coordinateMapper={coordinateMapper} />
+        <VisualComponent
+          coordinateMapper={coordinateMapper}
+          palette={palette}
+        />
       </Suspense>
     </>
   );

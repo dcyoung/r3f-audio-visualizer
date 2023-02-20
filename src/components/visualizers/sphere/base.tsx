@@ -1,12 +1,12 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
-import { Lut } from "three/examples/jsm/math/Lut";
 import {
   COORDINATE_TYPE,
   ICoordinateMapper,
   TWO_PI,
-} from "../../coordinateMappers/common";
+} from "../../mappers/coordinateMappers/common";
+import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
 // const MAPPING_MODE_POLAR_PHI = "polar_phi";
@@ -17,7 +17,7 @@ interface BaseSphereProps {
   radius?: number;
   nPoints?: number;
   cubeSideLength?: number;
-  colorLut?: string;
+  palette?: ColorPaletteType;
 }
 
 const BaseSphere = ({
@@ -25,14 +25,13 @@ const BaseSphere = ({
   radius = 2,
   nPoints = 800,
   cubeSideLength = 0.05,
-  colorLut = "cooltowarm",
-}: BaseSphereProps): JSX.Element => {
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
+}: BaseSphereProps) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-
+  const lut = ColorPalette.getPalette(palette).buildLut();
   // Recolor
   useEffect(() => {
-    const lut = new Lut(colorLut);
     for (let i = 0; i < nPoints; i++) {
       meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
     }

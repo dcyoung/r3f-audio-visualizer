@@ -5,7 +5,7 @@ import { VisualProps } from "../common";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 
-const PinGridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
+const PinGridVisual = ({ coordinateMapper }: VisualProps) => {
   const { nPinGridRows, nPinGridCols, pinGridUnitSideLength } = useControls({
     "Visual - Grid": folder(
       {
@@ -55,7 +55,7 @@ const PinGridVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
           cubeSideLength={pinGridUnitSideLength}
           cubeSpacingScalar={1.1}
           pinStyle={true}
-          colorLut={""}
+          palette={undefined}
           color={"black"}
         />
         <pointLight position={[0, 0, 5 * radius]} intensity={5.0} />

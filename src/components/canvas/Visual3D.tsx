@@ -35,6 +35,7 @@ const AVAILABLE_VISUALS = [
   "cube",
   "diffusedRing",
   "pinGrid",
+  "dna",
   // "particleSwarm",
 ];
 const Visual3DCanvas = ({ mode }: Visual3DCanvasProps): JSX.Element => {

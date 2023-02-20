@@ -65,6 +65,7 @@ export interface BaseDoubleHelixProps {
   baseSpacing?: number;
   strandOffsetRad?: number;
   mirrorEffects?: boolean;
+  fixedBaseGap?: boolean;
 }
 const BaseDoubleHelix = ({
   coordinateMapper,
@@ -75,6 +76,7 @@ const BaseDoubleHelix = ({
   baseSpacing = 0.35,
   strandOffsetRad = Math.PI / 2,
   mirrorEffects = true,
+  fixedBaseGap = true,
   ...props
 }: BaseDoubleHelixProps): JSX.Element => {
   const nBasePairs = Math.floor(helixLength / baseSpacing);
@@ -166,7 +168,9 @@ const BaseDoubleHelix = ({
   useFrame(({ clock }) => {
     const elapsedTimeSec = clock.getElapsedTime();
     let normBpIdx = 0,
-      targetScale = 0;
+      targetScale = 0,
+      targetScaleA = 0,
+      targetScaleB = 0;
     const targetScaleMin = 0.25;
     const targetScaleMax = 1.0;
     for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
@@ -181,22 +185,30 @@ const BaseDoubleHelix = ({
           0,
           elapsedTimeSec
         ) / coordinateMapper.amplitude;
+      // Range 0:1
+      targetScale = (1 + targetScale) / 2;
+
       // Range min:max
-      targetScale =
+      targetScaleA =
         targetScaleMin +
-        ((1 + targetScale) / 2) * (targetScaleMax - targetScaleMin);
+        (fixedBaseGap ? 2 * targetScale : targetScale) *
+          (targetScaleMax - targetScaleMin);
+      targetScaleB = fixedBaseGap
+        ? targetScaleMin +
+          2 * (1 - targetScale) * (targetScaleMax - targetScaleMin)
+        : targetScaleA;
 
       // Base A
       refBaseMesh.current.getMatrixAt(bpIdx * 2, tmpMatrix);
       tmpMatrix.decompose(tmpVecA, tmpQuat, tmpVecScale);
-      tmpVecScale.z = targetScale;
+      tmpVecScale.z = targetScaleA;
       tmpMatrix.compose(tmpVecA, tmpQuat, tmpVecScale);
       refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
 
       // Base B
       refBaseMesh.current.getMatrixAt(bpIdx * 2 + 1, tmpMatrix);
       tmpMatrix.decompose(tmpVecB, tmpQuat, tmpVecScale);
-      tmpVecScale.z = targetScale;
+      tmpVecScale.z = targetScaleB;
       tmpMatrix.compose(tmpVecB, tmpQuat, tmpVecScale);
       refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
     }

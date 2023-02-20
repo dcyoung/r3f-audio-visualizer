@@ -13,6 +13,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
     baseSpacing,
     strandOffsetRad,
     mirrorEffects,
+    fixedBaseGap,
   } = useControls({
     "Visual - DNA": folder(
       {
@@ -29,6 +30,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
           step: Math.PI / 8,
         },
         mirrorEffects: true,
+        fixedBaseGap: false,
       },
       { collapsed: true }
     ),
@@ -44,6 +46,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
       baseSpacing={baseSpacing}
       strandOffsetRad={strandOffsetRad}
       mirrorEffects={mirrorEffects}
+      fixedBaseGap={fixedBaseGap}
     />
   ) : (
     <BaseDoubleHelix
@@ -55,6 +58,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
       baseSpacing={baseSpacing}
       strandOffsetRad={strandOffsetRad}
       mirrorEffects={mirrorEffects}
+      fixedBaseGap={fixedBaseGap}
     />
   );
 };

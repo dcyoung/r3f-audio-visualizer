@@ -3,7 +3,7 @@ import BaseDoubleHelix from "./base";
 import { VisualProps } from "../common";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { Group, MathUtils, Vector3 } from "three";
+import { Euler, Group, MathUtils, Vector3 } from "three";
 
 const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
   const {
@@ -86,9 +86,13 @@ const DNAVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
           key={i}
           ref={ref}
           position={strandPositions[i]}
-          rotation={Array.from({ length: 3 }).map(
-            (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1)
-          )}
+          rotation={
+            new Euler(
+              ...Array.from({ length: 3 }).map(
+                (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1)
+              )
+            )
+          }
         >
           <BaseDoubleHelix
             coordinateMapper={coordinateMapper}

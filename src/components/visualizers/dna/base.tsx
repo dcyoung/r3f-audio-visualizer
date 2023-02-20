@@ -10,7 +10,6 @@ import {
   BoxGeometry,
   Matrix4,
   Quaternion,
-  Object3D,
 } from "three";
 import {
   COORDINATE_TYPE,
@@ -53,6 +52,10 @@ class HelixCurve extends Curve<Vector3> {
   }
 }
 
+const distBetweenPointsOnCircle = (r: number, angDiffRad: number) => {
+  return Math.hypot(r * Math.sin(angDiffRad), r * Math.cos(angDiffRad) - r);
+};
+
 interface BaseDoubleHelixProps {
   coordinateMapper: ICoordinateMapper;
   helixLength?: number;
@@ -60,6 +63,7 @@ interface BaseDoubleHelixProps {
   helixWindingSeparation?: number;
   strandRadius?: number;
   baseSpacing?: number;
+  strandOffsetRad?: number;
   mirrorEffects?: boolean;
 }
 const BaseDoubleHelix = ({
@@ -69,7 +73,9 @@ const BaseDoubleHelix = ({
   helixRadius = 1.0,
   strandRadius = 0.1,
   baseSpacing = 0.35,
+  strandOffsetRad = Math.PI / 2,
   mirrorEffects = true,
+  ...props
 }: BaseDoubleHelixProps): JSX.Element => {
   const nBasePairs = Math.floor(helixLength / baseSpacing);
   const refBaseMesh = useRef<InstancedMesh>(null!);
@@ -77,7 +83,16 @@ const BaseDoubleHelix = ({
     return new MeshBasicMaterial({ color: "#606060" });
   }, []);
   const geoBase = useMemo(() => {
-    const baseLength = helixRadius * 0.9;
+    const helixGap = distBetweenPointsOnCircle(helixRadius, strandOffsetRad);
+    const baseLength = 0.45 * helixGap;
+    // const geo = new CylinderGeometry(
+    //   strandRadius,
+    //   strandRadius,
+    //   baseLength,
+    //   12,
+    //   1
+    // );
+    // geo.rotateX(Math.PI / 2);
     const geo = new BoxGeometry(strandRadius, strandRadius, baseLength, 1);
     for (let i = 0; i < geo.attributes.position.count; i++) {
       geo.attributes.position.setZ(
@@ -87,7 +102,7 @@ const BaseDoubleHelix = ({
     }
     geo.attributes.position.needsUpdate = true;
     return geo;
-  }, [helixRadius, strandRadius]);
+  }, [helixRadius, strandRadius, strandOffsetRad]);
   const refHelixMeshA = useRef<Mesh>(null!);
   const refHelixMeshB = useRef<Mesh>(null!);
   const matHelix = useMemo(() => {
@@ -104,7 +119,7 @@ const BaseDoubleHelix = ({
       helixLength,
       helixRadius,
       helixWindingSeparation,
-      Math.PI / 2
+      strandOffsetRad
     );
     return [
       curveA,
@@ -112,8 +127,13 @@ const BaseDoubleHelix = ({
       curveB,
       new TubeGeometry(curveB, 100, strandRadius, 12, false),
     ];
-  }, [helixLength, helixRadius, helixWindingSeparation, strandRadius]);
-  const tmpObject = useMemo(() => new Object3D(), []);
+  }, [
+    helixLength,
+    helixRadius,
+    helixWindingSeparation,
+    strandRadius,
+    strandOffsetRad,
+  ]);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const tmpVecA = useMemo(() => new Vector3(), []);
   const tmpVecB = useMemo(() => new Vector3(), []);
@@ -131,17 +151,17 @@ const BaseDoubleHelix = ({
       curveHelixB.getPoint(normBpIdx, tmpVecB);
 
       // Base A
-      tmpMatrix.lookAt(tmpVecA, tmpVecB, upVec);
       tmpMatrix.setPosition(tmpVecA);
+      tmpMatrix.lookAt(tmpVecA, tmpVecB, upVec);
       refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
 
       // Base B
-      tmpMatrix.lookAt(tmpVecB, tmpVecA, upVec);
       tmpMatrix.setPosition(tmpVecB);
+      tmpMatrix.lookAt(tmpVecB, tmpVecA, upVec);
       refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
     }
     refBaseMesh.current.instanceMatrix.needsUpdate = true;
-  }, [curveHelixA, curveHelixB, refBaseMesh]);
+  }, [curveHelixA, curveHelixB, refBaseMesh, nBasePairs]);
 
   useFrame(({ clock }) => {
     const elapsedTimeSec = clock.getElapsedTime();
@@ -156,7 +176,7 @@ const BaseDoubleHelix = ({
       targetScale =
         coordinateMapper.map(
           COORDINATE_TYPE.CARTESIAN_1D,
-          mirrorEffects ? Math.abs(normBpIdx - 0.5) : normBpIdx,
+          mirrorEffects ? 2 * Math.abs(normBpIdx - 0.5) : normBpIdx,
           0,
           0,
           elapsedTimeSec
@@ -166,36 +186,25 @@ const BaseDoubleHelix = ({
         targetScaleMin +
         ((1 + targetScale) / 2) * (targetScaleMax - targetScaleMin);
 
-      // refBaseMesh.setMatrixAt(tmpObject.matrix);
-
       // Base A
       refBaseMesh.current.getMatrixAt(bpIdx * 2, tmpMatrix);
-      tmpObject.matrix.fromArray(tmpMatrix.toArray());
-      tmpObject.scale.z = targetScale;
-      tmpObject.updateMatrix();
-      refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpObject.matrix);
+      tmpMatrix.decompose(tmpVecA, tmpQuat, tmpVecScale);
+      tmpVecScale.z = targetScale;
+      tmpMatrix.compose(tmpVecA, tmpQuat, tmpVecScale);
+      refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
+
       // Base B
       refBaseMesh.current.getMatrixAt(bpIdx * 2 + 1, tmpMatrix);
-      tmpObject.matrix.fromArray(tmpMatrix.toArray());
-      tmpObject.scale.z = targetScale;
-      tmpObject.updateMatrix();
-      refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpObject.matrix);
-      // tmpMatrix.decompose(tmpVecA, tmpQuat, tmpVecScale);
-      // tmpVecScale.setZ(targetScale / tmpVecScale.z);
-      // tmpMatrix.scale(tmpVecScale);
-      // refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
-      // // Base B
-      // refBaseMesh.current.getMatrixAt(bpIdx * 2 + 1, tmpMatrix);
-      // tmpMatrix.decompose(tmpVecB, tmpQuat, tmpVecScale);
-      // tmpVecScale.setZ(targetScale / tmpVecScale.z);
-      // tmpMatrix.scale(tmpVecScale);
-      // refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
+      tmpMatrix.decompose(tmpVecB, tmpQuat, tmpVecScale);
+      tmpVecScale.z = targetScale;
+      tmpMatrix.compose(tmpVecB, tmpQuat, tmpVecScale);
+      refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
     }
     refBaseMesh.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <group>
+    <group {...props}>
       <mesh
         ref={refHelixMeshA}
         geometry={geoHelixA}

@@ -5,13 +5,14 @@ import {
   COORDINATE_TYPE,
   ICoordinateMapper,
   TWO_PI,
-} from "../../coordinateMappers/common";
+} from "../../mappers/coordinateMappers/common";
 
 interface BaseDiffusedRingProps {
   coordinateMapper: ICoordinateMapper;
   radius?: number;
   nPoints?: number;
   pointSize?: number;
+  mirrorEffects?: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ const BaseDiffusedRing = ({
   radius = 2.0,
   pointSize = 0.2,
   nPoints = 1000,
+  mirrorEffects = false,
 }: BaseDiffusedRingProps): JSX.Element => {
   const noise = [...Array(nPoints)].map(gaussianRandom);
   const refPoints = useRef<Points>(null!);
@@ -47,10 +49,11 @@ const BaseDiffusedRing = ({
   useFrame(({ clock }) => {
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
-    let effectiveRadius, angNorm, angRad;
+    let effectiveRadius, angNorm, angRad, effectNorm;
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
       angNorm = i / (nPoints - 1);
+      effectNorm = mirrorEffects ? 2 * Math.abs(angNorm - 0.5) : angNorm;
       angRad = angNorm * TWO_PI;
       effectiveRadius =
         radius *
@@ -58,7 +61,7 @@ const BaseDiffusedRing = ({
           noise[i] *
             coordinateMapper.map(
               COORDINATE_TYPE.CARTESIAN_1D,
-              angNorm,
+              effectNorm,
               0,
               0,
               elapsedTimeSec

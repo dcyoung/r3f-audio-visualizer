@@ -3,8 +3,12 @@ import { Vector3 } from "three";
 import Ground from "../../ground";
 import BaseSphere from "./base";
 import { VisualProps } from "../common";
+import { COLOR_PALETTE } from "../palettes";
 
-const SphereVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
+const SphereVisual = ({
+  coordinateMapper,
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
+}: VisualProps) => {
   const {
     radius,
     nPoints,
@@ -41,6 +45,7 @@ const SphereVisual = ({ coordinateMapper }: VisualProps): JSX.Element => {
         radius={radius}
         nPoints={nPoints}
         cubeSideLength={cubeSideLength}
+        palette={palette}
       />
       <Ground
         position={

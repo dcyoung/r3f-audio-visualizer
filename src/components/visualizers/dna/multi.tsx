@@ -5,8 +5,8 @@ import { Euler, Group, MathUtils, Vector3 } from "three";
 
 interface MultiStrandProps extends BaseDoubleHelixProps {}
 
-const MultiStrand = ({ ...props }: MultiStrandProps): JSX.Element => {
-  const strandCount = 12;
+const MultiStrand = ({ ...props }: MultiStrandProps) => {
+  const strandCount = 5;
   const bounds = 15;
   const strandRefs = Array.from({ length: strandCount }).map((x) =>
     useRef<Group>(null!)

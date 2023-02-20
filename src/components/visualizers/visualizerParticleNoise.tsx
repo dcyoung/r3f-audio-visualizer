@@ -1,5 +1,5 @@
 import { useControls } from "leva";
-import { MotionMapper_Noise } from "../motionMappers/curlNoise";
+import { MotionMapper_Noise } from "../mappers/motionMappers/curlNoise";
 import ParticleSwarmVisual from "./particleSwarm/reactive";
 
 interface CurlVisualizerProps {}
@@ -21,7 +21,6 @@ const ParticleNoiseVisual = ({}: CurlVisualizerProps): JSX.Element => {
   });
 
   const motionMapper = new MotionMapper_Noise(spatialScale, curlAmount);
-
   return <ParticleSwarmVisual motionMapper={motionMapper} />;
 };
 

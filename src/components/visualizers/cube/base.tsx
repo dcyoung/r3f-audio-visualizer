@@ -6,7 +6,8 @@ import {
   ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
-} from "../../coordinateMappers/common";
+} from "../../mappers/coordinateMappers/common";
+import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 interface BaseCubeProps {
   coordinateMapper: ICoordinateMapper;
@@ -14,7 +15,7 @@ interface BaseCubeProps {
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
   volume?: boolean;
-  colorLut?: string;
+  palette?: ColorPaletteType;
 }
 
 const BaseCube = ({
@@ -23,17 +24,17 @@ const BaseCube = ({
   cubeSideLength = 0.5,
   cubeSpacingScalar = 0.1,
   volume = true,
-  colorLut = "cooltowarm",
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
 }: BaseCubeProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const inputCoordinateType = volume
     ? COORDINATE_TYPE.CARTESIAN_3D
     : COORDINATE_TYPE.CARTESIAN_CUBE_FACES;
+  const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor
   useEffect(() => {
-    const lut = new Lut(colorLut);
     let instanceIdx, normCubeX, normCubeY, normCubeZ, normRadialOffset;
     // interior
     for (let row = 0; row < nPerSide; row++) {

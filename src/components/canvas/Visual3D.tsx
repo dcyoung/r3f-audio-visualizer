@@ -1,7 +1,13 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useControls } from "leva";
+import { folder, useControls } from "leva";
 import { ApplicationMode, APPLICATION_MODE } from "../applicationModes";
+import {
+  AVAILABLE_COLOR_PALETTES,
+  ColorPalette,
+  ColorPaletteType,
+  COLOR_PALETTE,
+} from "../visualizers/palettes";
 import AudioVisual from "../visualizers/visualizerAudio";
 import NoiseVisual from "../visualizers/visualizerNoise";
 import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
@@ -9,19 +15,20 @@ import WaveformVisual from "../visualizers/visualizerWaveform";
 
 const getVisualizerComponent = (
   mode: ApplicationMode,
-  visual: string
+  visual: string,
+  palette: ColorPaletteType
 ): JSX.Element => {
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
-      return <WaveformVisual visual={visual} />;
+      return <WaveformVisual visual={visual} palette={palette} />;
     case APPLICATION_MODE.NOISE:
       return visual === "particleSwarm" ? (
         <ParticleNoiseVisual />
       ) : (
-        <NoiseVisual visual={visual} />
+        <NoiseVisual visual={visual} palette={palette} />
       );
     case APPLICATION_MODE.AUDIO:
-      return <AudioVisual visual={visual} />;
+      return <AudioVisual visual={visual} palette={palette} />;
     default:
       throw new Error(`Unknown mode ${mode}`);
   }
@@ -51,7 +58,21 @@ const Visual3DCanvas = ({ mode }: Visual3DCanvasProps): JSX.Element => {
       options: AVAILABLE_VISUALS,
     },
   });
-  const backgroundColor = "#010204";
+  const { palette, colorBackground } = useControls({
+    "Visual - Color": folder(
+      {
+        palette: {
+          value: COLOR_PALETTE.THREE_COOL_TO_WARM,
+          options: AVAILABLE_COLOR_PALETTES,
+        },
+        colorBackground: false,
+      },
+      { collapsed: true }
+    ),
+  });
+  const backgroundColor = colorBackground
+    ? ColorPalette.getPalette(palette).calcBackgroundColor(0)
+    : "#010204";
   return (
     <Canvas
       camera={{
@@ -65,7 +86,7 @@ const Visual3DCanvas = ({ mode }: Visual3DCanvasProps): JSX.Element => {
       <color attach="background" args={[backgroundColor]} />
       <ambientLight />
       <fog attach="fog" args={[backgroundColor, 0, 100]} />
-      {getVisualizerComponent(mode as ApplicationMode, visualizer)}
+      {getVisualizerComponent(mode as ApplicationMode, visualizer, palette)}
       {/* <Stats /> */}
       <OrbitControls makeDefault />
     </Canvas>

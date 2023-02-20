@@ -1,11 +1,11 @@
 import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Lut } from "three/examples/jsm/math/Lut.js";
 import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
 import {
   COORDINATE_TYPE,
   ICoordinateMapper,
-} from "../../coordinateMappers/common";
+} from "../../mappers/coordinateMappers/common";
+import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 interface BaseGridProps {
   coordinateMapper: ICoordinateMapper;
@@ -13,7 +13,7 @@ interface BaseGridProps {
   nGridCols?: number;
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
-  colorLut?: string;
+  palette?: ColorPaletteType | undefined;
   pinStyle?: boolean;
   color?: string;
 }
@@ -24,19 +24,18 @@ const BaseGrid = ({
   nGridCols = 100,
   cubeSideLength = 0.025,
   cubeSpacingScalar = 5,
-  colorLut = "cooltowarm",
+  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
   pinStyle = false,
   color = "white",
 }: BaseGridProps): JSX.Element => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-
+  const lut = palette ? ColorPalette.getPalette(palette).buildLut() : null;
   // Recolor
   useEffect(() => {
-    if (!colorLut) {
+    if (!lut) {
       return;
     }
-    const lut = new Lut(colorLut);
     const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
     let instanceIdx, normGridX, normGridY, normRadialOffset;
     for (let row = 0; row < nGridRows; row++) {

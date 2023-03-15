@@ -73,3 +73,60 @@ export function useSelectAudioSource() {
   });
   return audioSource;
 }
+
+export const buildAudio = () => {
+  console.log("Building audio...");
+  const out = new Audio();
+  out.crossOrigin = "anonymous";
+  return out;
+};
+
+const webAudioTouchUnlock = (context: AudioContext) => {
+  return new Promise(function (resolve, reject) {
+    const unlockTriggerNames = ["mousedown", "touchstart", "touchend"] as const;
+    if (context.state === "suspended" && "ontouchstart" in window) {
+      var unlock = function () {
+        context.resume().then(
+          function () {
+            unlockTriggerNames.forEach((name) => {
+              document.body.removeEventListener(name, unlock);
+            });
+            resolve(true);
+          },
+          function (reason) {
+            reject(reason);
+          }
+        );
+      };
+      unlockTriggerNames.forEach((name) => {
+        document.body.removeEventListener(name, unlock, false);
+      });
+    } else {
+      resolve(false);
+    }
+  });
+};
+
+export const buildAudioContext = () => {
+  console.log("Building audioCtx...");
+  const audioCtx = new window.AudioContext();
+  if (iOS()) {
+    console.log("Attempting to unlock AudioContext");
+    webAudioTouchUnlock(audioCtx).then(
+      function (unlocked) {
+        if (unlocked) {
+          // AudioContext was unlocked from an explicit user action,
+          // sound should work now
+          console.log("Successfully unlocked AudioContext!");
+        } else {
+          // There was no need for unlocking, devices other than iOS
+          console.log("No need to unlock AudioContext.");
+        }
+      },
+      function (reason) {
+        console.error(reason);
+      }
+    );
+  }
+  return audioCtx;
+};

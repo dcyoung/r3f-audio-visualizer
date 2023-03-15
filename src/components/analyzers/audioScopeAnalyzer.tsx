@@ -3,10 +3,11 @@ import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
+  buildAudio,
+  buildAudioContext,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
-import { useAudio, useAudioContext } from "../audio/sourceControls/hooks";
 import { useMicrophoneLink } from "./analyzers/common";
 import ScopeAnalyzer from "./analyzers/scope";
 import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";
@@ -22,9 +23,8 @@ const InternalAudioScopeAnalyzer = ({
       "Use InternalMicrophoneScopeAnalyzer for microphone inputs."
     );
   }
-  const { audioCtx } = useAudioContext();
-  const { audio } = useAudio();
-
+  const audioCtx = useMemo(() => buildAudioContext(), []);
+  const audio = useMemo(() => buildAudio(), []);
   const analyzer = useMemo(() => {
     return new ScopeAnalyzer(audio, audioCtx);
   }, [audio, audioCtx]);
@@ -43,9 +43,8 @@ const InternalAudioScopeAnalyzer = ({
 interface InternalMicrophoneScopeAnalyzerProps {}
 const InternalMicrophoneScopeAnalyzer =
   ({}: InternalMicrophoneScopeAnalyzerProps): JSX.Element => {
-    const { audioCtx } = useAudioContext();
-    const { audio } = useAudio();
-
+    const audioCtx = useMemo(() => buildAudioContext(), []);
+    const audio = useMemo(() => buildAudio(), []);
     const analyzer = useMemo(() => {
       return new ScopeAnalyzer(audio, audioCtx);
     }, [audio, audioCtx]);

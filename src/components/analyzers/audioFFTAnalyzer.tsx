@@ -3,13 +3,14 @@ import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
+  buildAudio,
+  buildAudioContext,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
 import FFTAnalyzerControls from "./fftAnalyzerControls";
 import FFTAnalyzer from "./analyzers/fft";
 import { useMicrophoneLink } from "./analyzers/common";
-import { useAudio, useAudioContext } from "../audio/sourceControls/hooks";
 
 interface InternalAudioAnalyzerProps {
   audioSource: AudioSource;
@@ -20,10 +21,11 @@ const InternalAudioFFTAnalyzer = ({
   if (audioSource === AUDIO_SOURCE.MICROPHONE) {
     throw new Error("Use InternalMicrophoneFFTAnalyzer for microphone inputs.");
   }
-  const { audioCtx } = useAudioContext();
-  const { audio } = useAudio();
 
+  const audioCtx = useMemo(() => buildAudioContext(), []);
+  const audio = useMemo(() => buildAudio(), []);
   const analyzer = useMemo(() => {
+    console.log("Creating analyzer...");
     return new FFTAnalyzer(audio, audioCtx);
   }, [audio, audioCtx]);
 
@@ -33,6 +35,24 @@ const InternalAudioFFTAnalyzer = ({
         ? 0.0
         : 1.0;
   }, [analyzer, audioSource]);
+
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("Removing audio.");
+  //     audio.pause();
+  //     audio.remove();
+  //   };
+  // }, [audio]);
+
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("Closing audio context...");
+  //     audioCtx
+  //       .close()
+  //       .then(() => console.log("Successfully closed AudioContext."))
+  //       .catch((e) => console.error(e));
+  //   };
+  // }, [audioCtx]);
 
   return (
     <>
@@ -48,9 +68,8 @@ const InternalAudioFFTAnalyzer = ({
 interface InternalMicrophoneFFTAnalyzerProps {}
 const InternalMicrophoneFFTAnalyzer =
   ({}: InternalMicrophoneFFTAnalyzerProps): JSX.Element => {
-    const { audioCtx } = useAudioContext();
-    const { audio } = useAudio();
-
+    const audioCtx = useMemo(() => buildAudioContext(), []);
+    const audio = useMemo(() => buildAudio(), []);
     const analyzer = useMemo(() => {
       const out = new FFTAnalyzer(audio, audioCtx);
       out.volume = 0.0;

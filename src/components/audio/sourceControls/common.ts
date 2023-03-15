@@ -110,6 +110,7 @@ const webAudioTouchUnlock = (context: AudioContext) => {
 export const buildAudioContext = () => {
   console.log("Building audioCtx...");
   const audioCtx = new window.AudioContext();
+  return audioCtx;
   if (iOS()) {
     console.log("Attempting to unlock AudioContext");
     webAudioTouchUnlock(audioCtx).then(

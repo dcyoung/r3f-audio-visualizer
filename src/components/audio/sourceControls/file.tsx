@@ -1,5 +1,5 @@
 import { folder, useControls } from "leva";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { audioFileInput } from "../../levaPlugins/audioFileInput";
 import { AudioSourceControlsProps, iOS } from "./common";
 import "./overlay.css";
@@ -13,6 +13,25 @@ const FileAudioControls = ({
     }),
   });
 
+  const playAudio = () => {
+    if (!audioFile) {
+      return;
+    }
+    // Can play immediately on non-ios platforms
+    const promise = audio.play();
+    if (promise !== undefined) {
+      promise
+        .then(() => {
+          setIsPlaying(true);
+          console.log(`Playing ${audioFile.name}`);
+        })
+        .catch((error) => {
+          // Auto-play was prevented
+          console.error(`Error playing ${audioFile}`, error);
+        });
+    }
+  };
+
   /**
    * Make sure the correct file is playing
    */
@@ -25,18 +44,7 @@ const FileAudioControls = ({
     audio.src = URL.createObjectURL(audioFile);
     if (!iOS()) {
       // Can play immediately on non-ios platforms
-      const promise = audio.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => {
-            setIsPlaying(true);
-            console.log(`Playing ${audioFile.name}`);
-          })
-          .catch((error) => {
-            // Auto-play was prevented
-            console.error(`Error playing ${audioFile}`, error);
-          });
-      }
+      playAudio();
     }
     return () => {
       audio.pause();
@@ -56,26 +64,7 @@ const FileAudioControls = ({
       }}
       hidden={!audioFile || isPlaying}
     >
-      <button
-        disabled={!audioFile || isPlaying}
-        onClick={() => {
-          if (!audioFile) {
-            return;
-          }
-          const promise = audio.play();
-          if (promise !== undefined) {
-            promise
-              .then(() => {
-                setIsPlaying(true);
-                console.log(`Playing ${audioFile.name}`);
-              })
-              .catch((error) => {
-                // Auto-play was prevented
-                console.error(`Error playing ${audioFile}`, error);
-              });
-          }
-        }}
-      >
+      <button disabled={!audioFile || isPlaying} onClick={playAudio}>
         Play
       </button>
     </div>

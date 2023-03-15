@@ -1,7 +1,6 @@
 import { folder, useControls } from "leva";
 
 export interface AudioSourceControlsProps {
-  // audioRef: MutableRefObject<HTMLAudioElement>;
   audio: HTMLAudioElement;
 }
 

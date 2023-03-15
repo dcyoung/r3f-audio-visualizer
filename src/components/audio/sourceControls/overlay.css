@@ -40,3 +40,28 @@
 #info a {
   pointer-events: auto;
 }
+
+#info p:last-child {
+  margin-bottom: 0;
+}
+
+.contrast #info *,
+.contrast footer * {
+  text-shadow: none;
+  color: black;
+}
+
+#info h1 {
+  font-family: "Montserrat", sans-serif;
+  margin-bottom: 0.5em;
+  font-size: 1.5rem;
+}
+
+#info h2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+}
+
+#info p {
+  margin-bottom: 1em;
+}

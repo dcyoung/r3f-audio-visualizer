@@ -6,7 +6,7 @@ import {
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
-import { useAudio, useAudioContext } from "../audio/sourceControls/useAudio";
+import { useAudio, useAudioContext } from "../audio/sourceControls/hooks";
 import { useMicrophoneLink } from "./analyzers/common";
 import ScopeAnalyzer from "./analyzers/scope";
 import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";

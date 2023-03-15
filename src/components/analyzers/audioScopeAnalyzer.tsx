@@ -6,6 +6,7 @@ import {
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
+import { useAudio, useAudioContext } from "../audio/sourceControls/useAudio";
 import { useMicrophoneLink } from "./analyzers/common";
 import ScopeAnalyzer from "./analyzers/scope";
 import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";
@@ -21,30 +22,12 @@ const InternalAudioScopeAnalyzer = ({
       "Use InternalMicrophoneScopeAnalyzer for microphone inputs."
     );
   }
-  const audio = useMemo(() => {
-    const node = new Audio();
-    node.crossOrigin = "anonymous";
-    return node;
-  }, []);
+  const { audioCtx } = useAudioContext();
+  const { audio } = useAudio();
 
   const analyzer = useMemo(() => {
-    return new ScopeAnalyzer(audio);
-  }, [audio]);
-
-  // useEffect(() => {
-  //   analyzer.volume =
-  //     (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE
-  //       ? 0.0
-  //       : 1.0;
-  // }, [analyzer, audioSource]);
-
-  useEffect(() => {
-    return () => {
-      console.log("REMOVING");
-      audio.pause();
-      audio.remove();
-    };
-  }, [audio]);
+    return new ScopeAnalyzer(audio, audioCtx);
+  }, [audio, audioCtx]);
 
   return (
     <>
@@ -60,28 +43,17 @@ const InternalAudioScopeAnalyzer = ({
 interface InternalMicrophoneScopeAnalyzerProps {}
 const InternalMicrophoneScopeAnalyzer =
   ({}: InternalMicrophoneScopeAnalyzerProps): JSX.Element => {
-    const audio = useMemo(() => {
-      const node = new Audio();
-      node.crossOrigin = "anonymous";
-      return node;
-    }, []);
+    const { audioCtx } = useAudioContext();
+    const { audio } = useAudio();
 
     const analyzer = useMemo(() => {
-      return new ScopeAnalyzer(audio);
-    }, [audio]);
+      return new ScopeAnalyzer(audio, audioCtx);
+    }, [audio, audioCtx]);
 
     const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
       audio,
       analyzer
     );
-
-    useEffect(() => {
-      return () => {
-        console.log("REMOVING");
-        audio.pause();
-        audio.remove();
-      };
-    }, [audio]);
 
     return (
       <>

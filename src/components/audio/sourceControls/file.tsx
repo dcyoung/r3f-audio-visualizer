@@ -48,7 +48,12 @@ const FileAudioControls = ({
   return iOS() ? (
     <div
       id="info"
-      style={{ bottom: "0.5em", right: "0.5em" }}
+      style={{
+        top: "50%",
+        left: "50%",
+        transform: "translateX(-50%) translateY(-50%)",
+        msTransform: "translateX(-50%) translateY(-50%)",
+      }}
       hidden={!audioFile || isPlaying}
     >
       <button

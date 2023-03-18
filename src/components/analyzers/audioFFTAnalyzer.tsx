@@ -3,6 +3,8 @@ import ControlledAudioSource from "../audio/audioSource";
 import {
   AudioSource,
   AUDIO_SOURCE,
+  buildAudio,
+  buildAudioContext,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
@@ -19,15 +21,13 @@ const InternalAudioFFTAnalyzer = ({
   if (audioSource === AUDIO_SOURCE.MICROPHONE) {
     throw new Error("Use InternalMicrophoneFFTAnalyzer for microphone inputs.");
   }
-  const audio = useMemo(() => {
-    const node = new Audio();
-    node.crossOrigin = "anonymous";
-    return node;
-  }, []);
 
+  const audioCtx = useMemo(() => buildAudioContext(), []);
+  const audio = useMemo(() => buildAudio(), []);
   const analyzer = useMemo(() => {
-    return new FFTAnalyzer(audio);
-  }, [audio]);
+    console.log("Creating analyzer...");
+    return new FFTAnalyzer(audio, audioCtx);
+  }, [audio, audioCtx]);
 
   useEffect(() => {
     analyzer.volume =
@@ -36,13 +36,23 @@ const InternalAudioFFTAnalyzer = ({
         : 1.0;
   }, [analyzer, audioSource]);
 
-  useEffect(() => {
-    return () => {
-      console.log("REMOVING");
-      audio.pause();
-      audio.remove();
-    };
-  }, [audio]);
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("Removing audio.");
+  //     audio.pause();
+  //     audio.remove();
+  //   };
+  // }, [audio]);
+
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("Closing audio context...");
+  //     audioCtx
+  //       .close()
+  //       .then(() => console.log("Successfully closed AudioContext."))
+  //       .catch((e) => console.error(e));
+  //   };
+  // }, [audioCtx]);
 
   return (
     <>
@@ -58,30 +68,18 @@ const InternalAudioFFTAnalyzer = ({
 interface InternalMicrophoneFFTAnalyzerProps {}
 const InternalMicrophoneFFTAnalyzer =
   ({}: InternalMicrophoneFFTAnalyzerProps): JSX.Element => {
-    const audio = useMemo(() => {
-      const node = new Audio();
-      node.crossOrigin = "anonymous";
-      return node;
-    }, []);
-
+    const audioCtx = useMemo(() => buildAudioContext(), []);
+    const audio = useMemo(() => buildAudio(), []);
     const analyzer = useMemo(() => {
-      const out = new FFTAnalyzer(audio);
+      const out = new FFTAnalyzer(audio, audioCtx);
       out.volume = 0.0;
       return out;
-    }, [audio]);
+    }, [audio, audioCtx]);
 
     const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
       audio,
       analyzer
     );
-
-    useEffect(() => {
-      return () => {
-        console.log("REMOVING");
-        audio.pause();
-        audio.remove();
-      };
-    }, [audio]);
 
     return (
       <>

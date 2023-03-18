@@ -98,7 +98,7 @@ const webAudioTouchUnlock = (context: AudioContext) => {
         );
       };
       unlockTriggerNames.forEach((name) => {
-        document.body.removeEventListener(name, unlock, false);
+        document.body.addEventListener(name, unlock, false);
       });
     } else {
       resolve(false);

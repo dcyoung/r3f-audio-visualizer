@@ -44,7 +44,7 @@ const AVAILABLE_VISUALS = [
   "pinGrid",
   "dna",
   // "traceParticles",
-  "particleSwarm",
+  // "particleSwarm",
 ];
 const Visual3DCanvas = ({ mode }: Visual3DCanvasProps) => {
   const visualizerParam = new URLSearchParams(document.location.search).get(

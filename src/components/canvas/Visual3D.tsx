@@ -43,6 +43,7 @@ const AVAILABLE_VISUALS = [
   "diffusedRing",
   "pinGrid",
   "dna",
+  "traceParticles",
   // "particleSwarm",
 ];
 const Visual3DCanvas = ({ mode }: Visual3DCanvasProps): JSX.Element => {

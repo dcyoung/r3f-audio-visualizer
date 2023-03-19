@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { useVisualSourceDataX, useVisualSourceDataY } from "../../appState";
-import ScopeVisual, { TextureMapper } from "./audioScope/reactive";
+import { TextureMapper } from "./audioScope/base";
+import ScopeVisual from "./audioScope/reactive";
 
 interface AudioScopeVisualProps {}
 

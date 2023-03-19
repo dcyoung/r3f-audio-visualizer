@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Points } from "three";
 import {
   COORDINATE_TYPE,
+  gaussianRandom,
   ICoordinateMapper,
   TWO_PI,
 } from "../../mappers/coordinateMappers/common";
@@ -14,27 +15,6 @@ interface BaseDiffusedRingProps {
   pointSize?: number;
   mirrorEffects?: boolean;
 }
-
-/**
- * Generates random numbers from a normalized gaussian distribution.
- * @returns - a random normalized value from a gaussian distribution.
- */
-const gaussianRandom = (): number => {
-  let u = 0,
-    v = 0;
-  while (u === 0) {
-    u = Math.random(); //Converting [0,1) to (0,1)
-  }
-  while (v === 0) {
-    v = Math.random();
-  }
-  const num =
-    (Math.sqrt(-2.0 * Math.log(u)) * Math.cos(TWO_PI * v)) / 10.0 + 0.5; // Translate to 0 -> 1
-  if (num > 1 || num < 0) {
-    return gaussianRandom(); // resample between 0 and 1
-  }
-  return num;
-};
 
 const BaseDiffusedRing = ({
   coordinateMapper,
@@ -49,24 +29,26 @@ const BaseDiffusedRing = ({
   useFrame(({ clock }) => {
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
-    let effectiveRadius, angNorm, angRad, effectNorm;
+    let effectiveRadius, normIdx, angRad, effectNorm;
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
-      angNorm = i / (nPoints - 1);
-      effectNorm = mirrorEffects ? 2 * Math.abs(angNorm - 0.5) : angNorm;
-      angRad = angNorm * TWO_PI;
+      normIdx = i / (nPoints - 1);
+      if (mirrorEffects) {
+        normIdx = 2 * Math.abs(normIdx - 0.5);
+      }
       effectiveRadius =
         radius *
         (1 +
           noise[i] *
             coordinateMapper.map(
               COORDINATE_TYPE.CARTESIAN_1D,
-              effectNorm,
+              normIdx,
               0,
               0,
               elapsedTimeSec
             ));
 
+      angRad = normIdx * TWO_PI;
       positionsBuffer.setXYZ(
         i,
         effectiveRadius * Math.cos(angRad), // x

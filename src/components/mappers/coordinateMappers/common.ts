@@ -9,6 +9,35 @@ export const HALF_DIAGONAL_UNIT_SQUARE = Math.hypot(0.5, 0.5);
 export const HALF_DIAGONAL_UNIT_CUBE = Math.hypot(0.5, 0.5, 0.5);
 
 /**
+ * Generates random numbers from a normalized gaussian distribution.
+ * @returns - a random normalized value from a gaussian distribution.
+ */
+export const gaussianRandom = (): number => {
+  let u = 0,
+    v = 0;
+  while (u === 0) {
+    u = Math.random(); //Converting [0,1) to (0,1)
+  }
+  while (v === 0) {
+    v = Math.random();
+  }
+  const num =
+    (Math.sqrt(-2.0 * Math.log(u)) * Math.cos(TWO_PI * v)) / 10.0 + 0.5; // Translate to 0 -> 1
+  if (num > 1 || num < 0) {
+    return gaussianRandom(); // resample between 0 and 1
+  }
+  return num;
+};
+
+export const normalizedToRange = (
+  vNorm: number,
+  a: number,
+  b: number
+): number => {
+  return Math.min(a, b) + vNorm * Math.abs(b - a);
+};
+
+/**
  * For a point in 3D space, calculate the radial offset value from the center of the nearest face of a unit cube.
  * @param xNorm - The normalized x coordinate in 3D space. Range [0,1] inclusive.
  * @param yNorm - The normalized y coordinate in 3D space. Range [0,1] inclusive.

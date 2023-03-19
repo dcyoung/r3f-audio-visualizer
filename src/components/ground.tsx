@@ -9,7 +9,7 @@ const Ground = ({
   size = 250,
   position = new Vector3(0, 0, 0),
   ...props
-}: GroundProps): JSX.Element => {
+}: GroundProps) => {
   return (
     <mesh position={position} {...props}>
       <planeGeometry args={[size, size]} />

@@ -11,7 +11,7 @@ export interface AudioScopeAnalyzerControlsProps {
 }
 const AudioScopeAnalyzerControls = ({
   analyzer,
-}: AudioScopeAnalyzerControlsProps): JSX.Element => {
+}: AudioScopeAnalyzerControlsProps) => {
   const timeData = useVisualSourceDataX();
   const quadData = useVisualSourceDataY();
   const { resizeVisualSourceData } = useAppStateActions();

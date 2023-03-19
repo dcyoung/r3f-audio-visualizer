@@ -12,7 +12,7 @@ import AudioScopeAnalyzer from "./components/analyzers/audioScopeAnalyzer";
 import AudioScopeCanvas from "./components/canvas/AudioScope";
 import Visual3DCanvas from "./components/canvas/Visual3D";
 
-const getAnalyzerComponent = (mode: ApplicationMode): JSX.Element | null => {
+const getAnalyzerComponent = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO:
       return <AudioFFTAnalyzer />;
@@ -25,7 +25,7 @@ const getAnalyzerComponent = (mode: ApplicationMode): JSX.Element | null => {
 
 const AVAILABLE_MODES = getPlatformSupportedApplicationModes();
 
-const getCanvasComponent = (mode: ApplicationMode): JSX.Element => {
+const getCanvasComponent = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO_SCOPE:
       return <AudioScopeCanvas />;
@@ -34,7 +34,7 @@ const getCanvasComponent = (mode: ApplicationMode): JSX.Element => {
   }
 };
 
-const App = (): JSX.Element => {
+const App = () => {
   const modeParam = new URLSearchParams(document.location.search).get(
     "mode"
   ) as ApplicationMode | null;

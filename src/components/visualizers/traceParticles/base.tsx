@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
   BufferGeometry,
@@ -11,8 +11,7 @@ import {
   COORDINATE_TYPE,
   gaussianRandom,
   ICoordinateMapper,
-} from "../../coordinateMappers/common";
-import { getPoly2D } from "./polys/owl";
+} from "../../mappers/coordinateMappers/common";
 
 const computeNormals = (
   vertices: Vector2[],
@@ -58,7 +57,7 @@ const BaseTraceParticles = ({
   pointSize = 0.2,
   nPoints = 5000,
   transitionSpeedSec = 2.5,
-}: BaseTraceParticlesProps): JSX.Element => {
+}: BaseTraceParticlesProps) => {
   const scale = 25.0;
   const noise = [...Array(nPoints)].map(gaussianRandom);
   const referencePositionsByPoly = polyStates.map((poly) =>

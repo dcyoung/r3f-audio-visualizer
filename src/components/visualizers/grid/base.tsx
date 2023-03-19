@@ -27,7 +27,7 @@ const BaseGrid = ({
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
   pinStyle = false,
   color = "white",
-}: BaseGridProps): JSX.Element => {
+}: BaseGridProps) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const lut = palette ? ColorPalette.getPalette(palette).buildLut() : null;

@@ -8,7 +8,7 @@ import { COLOR_PALETTE } from "../palettes";
 const CubeVisual = ({
   coordinateMapper,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: VisualProps): JSX.Element => {
+}: VisualProps) => {
   const { nPerSide, cubeUnitSideLength, cubeUnitSpacingScalar, volume } =
     useControls({
       "Visual - Cube": folder(

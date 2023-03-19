@@ -82,7 +82,7 @@ const BaseDoubleHelix = ({
   fixedBaseGap = true,
   palette = COLOR_PALETTE.THREE_RAINBOW,
   ...props
-}: BaseDoubleHelixProps): JSX.Element => {
+}: BaseDoubleHelixProps) => {
   const nBasePairs = Math.floor(helixLength / baseSpacing);
   const lut = ColorPalette.getPalette(palette).buildLut();
   const refBaseMesh = useRef<InstancedMesh>(null!);

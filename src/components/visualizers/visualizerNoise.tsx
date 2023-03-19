@@ -11,7 +11,7 @@ interface NoiseVisualizerProps {
 const NoiseVisual = ({
   visual,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: NoiseVisualizerProps): JSX.Element => {
+}: NoiseVisualizerProps) => {
   const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
 
   const { amplitude, spatialScale, timeScale, nIterations } = useControls({

@@ -6,9 +6,7 @@ import BaseTraceParticles from "./base";
 import { getPoly2D as getPoly2D_OWL } from "./polys/owl";
 import { getPoly2D as getPoly2D_DIAG } from "./polys/diagonal";
 
-const TraceParticlesVisual = ({
-  coordinateMapper,
-}: VisualProps): JSX.Element => {
+const TraceParticlesVisual = ({ coordinateMapper }: VisualProps) => {
   const { pointSize, power, bounds, transitionSpeed } = useControls({
     "Visual - Trace Particles": folder(
       {

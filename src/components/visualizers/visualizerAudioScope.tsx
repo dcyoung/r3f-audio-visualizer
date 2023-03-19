@@ -5,7 +5,7 @@ import ScopeVisual from "./audioScope/reactive";
 
 interface AudioScopeVisualProps {}
 
-const AudioScopeVisual = ({}: AudioScopeVisualProps): JSX.Element => {
+const AudioScopeVisual = ({}: AudioScopeVisualProps) => {
   const timeSamples = useVisualSourceDataX();
   const quadSamples = useVisualSourceDataY();
 

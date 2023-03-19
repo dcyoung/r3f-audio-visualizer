@@ -88,7 +88,7 @@ const BaseScopeVisual = ({
   usePoints = true,
   interpolate = false,
   color = { r: 0, g: 255, b: 0, a: 255 },
-}: BaseAudioScopeVisualProps): JSX.Element => {
+}: BaseAudioScopeVisualProps) => {
   const { tex, textureData } = textureMapper.generateSupportedTextureAndData();
   tex.needsUpdate = true;
   const matRef = useRef<ShaderMaterial>(null!);
@@ -141,7 +141,6 @@ const BaseScopeVisual = ({
   useEffect(() => {
     if (matRef.current?.uniforms) {
       matRef.current.uniforms.b_should_interpolate.value = interpolate;
-      console.log(color);
       matRef.current.uniforms.color.value.x = color.r / 255.0;
       matRef.current.uniforms.color.value.y = color.g / 255.0;
       matRef.current.uniforms.color.value.z = color.b / 255.0;

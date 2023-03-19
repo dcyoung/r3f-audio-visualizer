@@ -67,9 +67,7 @@ const useAudioFile = (audio: HTMLAudioElement) => {
     playAudio,
   };
 };
-const FileAudioControls = ({
-  audio,
-}: AudioSourceControlsProps): JSX.Element => {
+const FileAudioControls = ({ audio }: AudioSourceControlsProps) => {
   const { loaded, isPlaying, playAudio } = useAudioFile(audio);
 
   // IOS needs a dedicated play button

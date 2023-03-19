@@ -22,7 +22,7 @@ const BaseDiffusedRing = ({
   pointSize = 0.2,
   nPoints = 1000,
   mirrorEffects = false,
-}: BaseDiffusedRingProps): JSX.Element => {
+}: BaseDiffusedRingProps) => {
   const noise = [...Array(nPoints)].map(gaussianRandom);
   const refPoints = useRef<Points>(null!);
 

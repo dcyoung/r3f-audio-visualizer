@@ -9,7 +9,7 @@ export interface ControlledAudioSourceProps {
 const ControlledAudioSource = ({
   audio,
   audioSource,
-}: ControlledAudioSourceProps): JSX.Element => {
+}: ControlledAudioSourceProps) => {
   switch (audioSource) {
     case AUDIO_SOURCE.LIVE_STREAM:
       return <LivestreamAudioControls audio={audio} />;

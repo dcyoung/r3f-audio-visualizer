@@ -5,7 +5,7 @@ import BaseScopeVisual from "./base";
 interface ScopeVisualProps {
   textureMapper: TextureMapper;
 }
-const ScopeVisual = ({ textureMapper }: ScopeVisualProps): JSX.Element => {
+const ScopeVisual = ({ textureMapper }: ScopeVisualProps) => {
   const { usePoints, color } = useControls({
     "Visual - Scope": folder(
       {

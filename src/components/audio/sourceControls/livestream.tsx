@@ -2,9 +2,7 @@ import { folder, useControls } from "leva";
 import { useEffect } from "react";
 import { AudioSourceControlsProps } from "./common";
 
-const LivestreamAudioControls = ({
-  audio,
-}: AudioSourceControlsProps): JSX.Element => {
+const LivestreamAudioControls = ({ audio }: AudioSourceControlsProps) => {
   const { streamUrl } = useControls({
     Audio: folder({
       streamUrl: {

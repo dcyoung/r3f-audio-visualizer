@@ -1,7 +1,7 @@
 const vertexShader = `
 precision mediump float;
 
-uniform float maxAmplitude;
+uniform float max_amplitude;
 uniform vec2 resolution;
 uniform sampler2D samples;
 uniform vec2 sample_scale;
@@ -11,7 +11,7 @@ attribute float index;
 
 float decode(vec2 c) {
     float unscaled = (c.x * 255.0 * 256.0 + c.y * 255.0) / (256.0 * 256.0 - 1.0);
-    return (unscaled * 2.0 - 1.0) * maxAmplitude;
+    return (unscaled * 2.0 - 1.0) * max_amplitude;
 }
 
 vec2 interpolate_sample(int i) {

@@ -33,16 +33,13 @@ const BaseDiffusedRing = ({
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
       normIdx = i / (nPoints - 1);
-      if (mirrorEffects) {
-        normIdx = 2 * Math.abs(normIdx - 0.5);
-      }
       effectiveRadius =
         radius *
         (1 +
           noise[i] *
             coordinateMapper.map(
               COORDINATE_TYPE.CARTESIAN_1D,
-              normIdx,
+              mirrorEffects ? 2 * Math.abs(normIdx - 0.5) : normIdx,
               0,
               0,
               elapsedTimeSec

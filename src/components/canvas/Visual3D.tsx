@@ -17,7 +17,7 @@ const getVisualizerComponent = (
   mode: ApplicationMode,
   visual: string,
   palette: ColorPaletteType
-): JSX.Element => {
+) => {
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
       return <WaveformVisual visual={visual} palette={palette} />;
@@ -43,9 +43,10 @@ const AVAILABLE_VISUALS = [
   "diffusedRing",
   "pinGrid",
   "dna",
+  // "traceParticles",
   // "particleSwarm",
 ];
-const Visual3DCanvas = ({ mode }: Visual3DCanvasProps): JSX.Element => {
+const Visual3DCanvas = ({ mode }: Visual3DCanvasProps) => {
   const visualizerParam = new URLSearchParams(document.location.search).get(
     "visual"
   ) as string;

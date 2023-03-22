@@ -11,7 +11,7 @@ interface WaveformVisualizerProps {
 const WaveformVisual = ({
   visual,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: WaveformVisualizerProps): JSX.Element => {
+}: WaveformVisualizerProps) => {
   const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
 
   const [{ double, amplitude, frequencyHz_1, frequencyHz_2 }, set] =

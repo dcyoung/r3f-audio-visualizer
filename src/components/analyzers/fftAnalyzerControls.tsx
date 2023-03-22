@@ -10,9 +10,7 @@ import FFTAnalyzer, { EnergyMeasure } from "./analyzers/fft";
 export interface FFTAnalyzerControlsProps {
   analyzer: FFTAnalyzer;
 }
-const FFTAnalyzerControls = ({
-  analyzer,
-}: FFTAnalyzerControlsProps): JSX.Element => {
+const FFTAnalyzerControls = ({ analyzer }: FFTAnalyzerControlsProps) => {
   const { octaveBands, energyMeasure } = useControls({
     Audio: folder({
       octaveBands: {

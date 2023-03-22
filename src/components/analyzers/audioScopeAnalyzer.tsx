@@ -17,7 +17,7 @@ interface InternalAudioScopeAnalyzerProps {
 }
 const InternalAudioScopeAnalyzer = ({
   audioSource,
-}: InternalAudioScopeAnalyzerProps): JSX.Element => {
+}: InternalAudioScopeAnalyzerProps) => {
   if (audioSource === AUDIO_SOURCE.MICROPHONE) {
     throw new Error(
       "Use InternalMicrophoneScopeAnalyzer for microphone inputs."
@@ -42,7 +42,7 @@ const InternalAudioScopeAnalyzer = ({
 
 interface InternalMicrophoneScopeAnalyzerProps {}
 const InternalMicrophoneScopeAnalyzer =
-  ({}: InternalMicrophoneScopeAnalyzerProps): JSX.Element => {
+  ({}: InternalMicrophoneScopeAnalyzerProps) => {
     const audioCtx = useMemo(() => buildAudioContext(), []);
     const audio = useMemo(() => buildAudio(), []);
     const analyzer = useMemo(() => {
@@ -67,7 +67,7 @@ const InternalMicrophoneScopeAnalyzer =
   };
 
 export interface AudioScopeAnalyzerProps {}
-const AudioFFTAnalyzer = ({}: AudioScopeAnalyzerProps): JSX.Element => {
+const AudioFFTAnalyzer = ({}: AudioScopeAnalyzerProps) => {
   const audioSource = useSelectAudioSource();
 
   return (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE ? (

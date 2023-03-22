@@ -24,7 +24,7 @@ const BaseCube = ({
   cubeSpacingScalar = 0.1,
   volume = true,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: BaseCubeProps): JSX.Element => {
+}: BaseCubeProps) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const inputCoordinateType = volume

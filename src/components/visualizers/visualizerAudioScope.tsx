@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 import { useVisualSourceDataX, useVisualSourceDataY } from "../../appState";
-import ScopeVisual, { TextureMapper } from "./audioScope/reactive";
+import { TextureMapper } from "./audioScope/base";
+import ScopeVisual from "./audioScope/reactive";
 
 interface AudioScopeVisualProps {}
 
-const AudioScopeVisual = ({}: AudioScopeVisualProps): JSX.Element => {
+const AudioScopeVisual = ({}: AudioScopeVisualProps) => {
   const timeSamples = useVisualSourceDataX();
   const quadSamples = useVisualSourceDataY();
 

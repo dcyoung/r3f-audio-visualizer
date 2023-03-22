@@ -9,7 +9,7 @@ const MicrophoneAudioControls = ({
   audio,
   onMicDisabled,
   onStreamCreated,
-}: MicrophoneAudioControlsProps): JSX.Element => {
+}: MicrophoneAudioControlsProps) => {
   const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
 
   /**

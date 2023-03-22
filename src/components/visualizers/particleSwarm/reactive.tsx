@@ -4,11 +4,9 @@ import Ground from "../../ground";
 import { Vector3 } from "three";
 import { MotionVisualProps } from "../common";
 
-const ParticleSwarmVisual = ({
-  motionMapper,
-}: MotionVisualProps): JSX.Element => {
+const ParticleSwarmVisual = ({ motionMapper }: MotionVisualProps) => {
   const { maxDim, pointSize } = useControls({
-    Ring: folder(
+    Particles: folder(
       {
         maxDim: { value: 10, min: 0.25, max: 10, step: 0.25 },
         pointSize: { value: 0.2, min: 0.01, max: 2, step: 0.01 },

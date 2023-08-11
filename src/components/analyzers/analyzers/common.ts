@@ -10,7 +10,7 @@ export function useMicrophoneLink(
   analyzer: AnalyzerInputControl
 ) {
   return {
-    onMicDisabled: () => {
+    onDisabled: () => {
       analyzer.disconnectInputs();
     },
     onStreamCreated: (stream: MediaStream) => {

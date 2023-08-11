@@ -1,15 +1,15 @@
 import { useEffect, useRef } from "react";
 import { AudioSourceControlsProps } from "./common";
 
-export interface MicrophoneAudioControlsProps extends AudioSourceControlsProps {
+export interface ScreenShareControlsProps extends AudioSourceControlsProps {
   onDisabled: () => void;
   onStreamCreated: (stream: MediaStream) => void;
 }
-const MicrophoneAudioControls = ({
+const ScreenShareControls = ({
   audio,
   onDisabled,
   onStreamCreated,
-}: MicrophoneAudioControlsProps) => {
+}: ScreenShareControlsProps) => {
   const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
 
   /**
@@ -25,11 +25,21 @@ const MicrophoneAudioControls = ({
     console.log("Enabling mic...");
     if (navigator.mediaDevices) {
       navigator.mediaDevices
-        .getUserMedia({
+        .getDisplayMedia({
+          video: {
+            displaySurface: "browser",
+            // logicalSurface: "exact",
+            width: 1,
+          },
           audio: true,
-          video: false,
+          selfBrowserSurface: "exclude",
+          surfaceSwitching: "exclude",
+          // systemAudio: "include",
         })
-        .then(onStreamCreated)
+        .then((media) => {
+          console.log(media.getAudioTracks());
+          onStreamCreated(media);
+        })
         .catch((err) => {
           console.error(err);
           alert("Microphone access denied by user");
@@ -49,4 +59,4 @@ const MicrophoneAudioControls = ({
   return <></>;
 };
 
-export default MicrophoneAudioControls;
+export default ScreenShareControls;

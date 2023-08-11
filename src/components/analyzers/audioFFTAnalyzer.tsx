@@ -76,16 +76,13 @@ const InternalMicrophoneFFTAnalyzer =
       return out;
     }, [audio, audioCtx]);
 
-    const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
-      audio,
-      analyzer
-    );
+    const { onDisabled, onStreamCreated } = useMicrophoneLink(audio, analyzer);
 
     return (
       <>
         <MicrophoneAudioControls
           audio={audio}
-          onMicDisabled={onMicDisabled}
+          onDisabled={onDisabled}
           onStreamCreated={onStreamCreated}
         />
         <FFTAnalyzerControls analyzer={analyzer} />

@@ -1,4 +1,3 @@
-import "./App.css";
 import { Suspense } from "react";
 import { useControls } from "leva";
 import {

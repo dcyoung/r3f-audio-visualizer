@@ -1,4 +1,4 @@
-import { Color } from "three";
+import { Color, SRGBColorSpace } from "three";
 import { Lut } from "three/examples/jsm/math/Lut";
 
 /**
@@ -120,7 +120,7 @@ export class ColorPalette implements IColorPalette {
     const tmp = { h: 0, s: 0, l: 0 };
     bkg.getHSL(tmp);
     tmp.s = Math.min(tmp.s, 0.5);
-    bkg.setHSL(tmp.h, tmp.s, tmp.l);
+    bkg.setHSL(tmp.h, tmp.s, tmp.l, SRGBColorSpace);
     return bkg;
   };
 

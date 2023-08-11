@@ -49,16 +49,13 @@ const InternalMicrophoneScopeAnalyzer =
       return new ScopeAnalyzer(audio, audioCtx);
     }, [audio, audioCtx]);
 
-    const { onMicDisabled, onStreamCreated } = useMicrophoneLink(
-      audio,
-      analyzer
-    );
+    const { onDisabled, onStreamCreated } = useMicrophoneLink(audio, analyzer);
 
     return (
       <>
         <MicrophoneAudioControls
           audio={audio}
-          onMicDisabled={onMicDisabled}
+          onDisabled={onDisabled}
           onStreamCreated={onStreamCreated}
         />
         <AudioScopeAnalyzerControls analyzer={analyzer} />

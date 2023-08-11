@@ -1,6 +1,6 @@
 import { folder, useControls } from "leva";
-import { TextureMapper } from "./base";
-import BaseScopeVisual from "./base";
+
+import BaseScopeVisual, { type TextureMapper } from "./base";
 
 interface ScopeVisualProps {
   textureMapper: TextureMapper;

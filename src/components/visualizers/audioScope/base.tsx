@@ -2,19 +2,19 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import {
   Vector2,
-  ShaderMaterial,
+  type ShaderMaterial,
   DataTexture,
   RGBAFormat,
   Vector3,
 } from "three";
 
-import vertexShader from "./shaders/vertex";
 import fragmentShader from "./shaders/fragment";
+import vertexShader from "./shaders/vertex";
 
 export class TextureMapper {
   public samplesX: Float32Array;
   public samplesY: Float32Array;
-  public maxAmplitude: number = 4.0;
+  public maxAmplitude = 4.0;
   private readonly M: number = 4;
 
   constructor(samplesX: Float32Array, samplesY: Float32Array) {
@@ -133,23 +133,31 @@ const BaseScopeVisual = ({
 
   useEffect(() => {
     if (matRef.current?.uniforms) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.resolution.value.x = size.width;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.resolution.value.y = size.height;
     }
   }, [size]);
 
   useEffect(() => {
     if (matRef.current?.uniforms) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.b_should_interpolate.value = interpolate;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.color.value.x = color.r / 255.0;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.color.value.y = color.g / 255.0;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.color.value.z = color.b / 255.0;
     }
   }, [interpolate, color]);
 
   useEffect(() => {
     if (matRef.current?.uniforms) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.sample_scale.value.x = nParticles;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.sample_scale.value.y = 1;
     }
   }, [nParticles]);

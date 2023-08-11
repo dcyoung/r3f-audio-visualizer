@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
+
+import type ScopeAnalyzer from "./analyzers/scope";
 import {
   useAppStateActions,
   useVisualSourceDataX,
   useVisualSourceDataY,
 } from "../../appState";
-import ScopeAnalyzer from "./analyzers/scope";
 
 export interface AudioScopeAnalyzerControlsProps {
   analyzer: ScopeAnalyzer;

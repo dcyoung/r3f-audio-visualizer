@@ -1,11 +1,12 @@
-import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+import { useRef, useEffect, useMemo } from "react";
+import { BoxGeometry, type InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+
 import {
   COORDINATE_TYPE,
-  ICoordinateMapper,
+  type ICoordinateMapper,
 } from "../../mappers/coordinateMappers/common";
-import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
+import { ColorPalette, type ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 interface BaseGridProps {
   coordinateMapper: ICoordinateMapper;
@@ -87,7 +88,7 @@ const BaseGrid = ({
     }
 
     // Update the instance
-    meshRef.current.instanceMatrix!.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (

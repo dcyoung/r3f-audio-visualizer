@@ -1,9 +1,10 @@
 import { folder, useControls } from "leva";
 import React, { Suspense } from "react";
+
+import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
 import { useEnergyInfo, useVisualSourceDataX } from "../../appState";
 import { CoordinateMapper_Data } from "../mappers/coordinateMappers/data";
 import { EnergyTracker } from "../mappers/valueTracker/energyTracker";
-import { ColorPaletteType, COLOR_PALETTE } from "./palettes";
 
 interface AudioVisualProps {
   visual: string;
@@ -31,7 +32,10 @@ const AudioVisual = ({
 
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);
-  const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
+  const VisualComponent = React.lazy(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    async () => await import(`./${visual}/reactive.tsx`)
+  );
 
   return (
     <Suspense fallback={null}>

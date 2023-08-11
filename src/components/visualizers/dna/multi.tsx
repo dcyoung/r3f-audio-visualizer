@@ -1,14 +1,15 @@
-import BaseDoubleHelix, { BaseDoubleHelixProps } from "./base";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { Euler, Group, MathUtils, Vector3 } from "three";
+import { Euler, type Group, MathUtils, Vector3 } from "three";
 
-interface MultiStrandProps extends BaseDoubleHelixProps {}
+import BaseDoubleHelix, { type BaseDoubleHelixProps } from "./base";
+
+type MultiStrandProps = BaseDoubleHelixProps;
 
 const MultiStrand = ({ ...props }: MultiStrandProps) => {
   const strandCount = 5;
   const bounds = 15;
-  const strandRefs = Array.from({ length: strandCount }).map((x) =>
+  const strandRefs = Array.from({ length: strandCount }).map(() =>
     useRef<Group>(null!)
   );
   const strandPositions = Array.from({ length: strandCount }).map((x, i) => {

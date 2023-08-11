@@ -1,23 +1,24 @@
-import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import {
   Curve,
   TubeGeometry,
   Vector3,
-  Mesh,
+  type Mesh,
   MeshBasicMaterial,
-  InstancedMesh,
+  type InstancedMesh,
   BoxGeometry,
   Matrix4,
   Quaternion,
   MathUtils,
 } from "three";
+
 import {
   COORDINATE_TYPE,
-  ICoordinateMapper,
+  type ICoordinateMapper,
   TWO_PI,
 } from "../../mappers/coordinateMappers/common";
-import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
+import { ColorPalette, type ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 const clipAngleRad = (rad: number) => {
   return ((rad % TWO_PI) + TWO_PI) % TWO_PI;
@@ -33,7 +34,7 @@ class HelixCurve extends Curve<Vector3> {
     helixLength: number,
     helixRadius: number,
     helixWindingSeparation: number,
-    helixStartingAngleRad: number = 0.0
+    helixStartingAngleRad = 0.0
   ) {
     super();
     this.helixLength = helixLength;

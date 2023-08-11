@@ -1,13 +1,14 @@
-import { Suspense } from "react";
 import { useControls } from "leva";
+import { Suspense } from "react";
+
+import AudioFFTAnalyzer from "./components/analyzers/audioFFTAnalyzer";
+import AudioScopeAnalyzer from "./components/analyzers/audioScopeAnalyzer";
 import {
-  ApplicationMode,
+  type ApplicationMode,
   APPLICATION_MODE,
   getAppModeDisplayName,
   getPlatformSupportedApplicationModes,
 } from "./components/applicationModes";
-import AudioFFTAnalyzer from "./components/analyzers/audioFFTAnalyzer";
-import AudioScopeAnalyzer from "./components/analyzers/audioScopeAnalyzer";
 import AudioScopeCanvas from "./components/canvas/AudioScope";
 import Visual3DCanvas from "./components/canvas/Visual3D";
 

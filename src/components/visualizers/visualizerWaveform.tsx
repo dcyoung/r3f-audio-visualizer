@@ -1,7 +1,8 @@
 import { useControls } from "leva";
 import React, { Suspense, useEffect } from "react";
+
+import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
 import { CoordinateMapper_WaveformSuperposition } from "../mappers/coordinateMappers/waveform";
-import { ColorPaletteType, COLOR_PALETTE } from "./palettes";
 
 interface WaveformVisualizerProps {
   visual: string;
@@ -12,7 +13,10 @@ const WaveformVisual = ({
   visual,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
 }: WaveformVisualizerProps) => {
-  const VisualComponent = React.lazy(() => import(`./${visual}/reactive.tsx`));
+  const VisualComponent = React.lazy(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    async () => await import(`./${visual}/reactive.tsx`)
+  );
 
   const [{ double, amplitude, frequencyHz_1, frequencyHz_2 }, set] =
     useControls(
@@ -36,6 +40,7 @@ const WaveformVisual = ({
           min: 0.0,
           max: 30,
           step: 0.05,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           render: (get) => get("Wave Generator.double"),
         },
       }),

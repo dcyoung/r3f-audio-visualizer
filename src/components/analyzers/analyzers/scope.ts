@@ -1,7 +1,7 @@
-import { AnalyzerInputControl } from "./common";
+import { type AnalyzerInputControl } from "./common";
 
 function createBufferCopy(context: AudioContext, buffer: Float32Array) {
-  let copyNode = context.createScriptProcessor(buffer.length, 1, 1);
+  const copyNode = context.createScriptProcessor(buffer.length, 1, 1);
   copyNode.onaudioprocess = (e) => {
     e.inputBuffer.copyFromChannel(buffer, 0);
   };
@@ -53,13 +53,13 @@ export default class ScopeAnalyzer implements AnalyzerInputControl {
   public readonly quadSamples: Float32Array;
   private _sources: AudioNode[];
   private _inputs: AudioNode[];
-  public volume: number = 1.0;
+  public volume = 1.0;
 
   constructor(
     source: HTMLAudioElement,
     audioContext: AudioContext | undefined = undefined,
-    n: number = 512,
-    fftSize: number = 1024
+    n = 512,
+    fftSize = 1024
   ) {
     if (audioContext === undefined) {
       this._audioCtx = new window.AudioContext();

@@ -14,7 +14,7 @@ interface IAppState {
   };
 }
 
-const useAppState = create<IAppState>((set, get) => ({
+const useAppState = create<IAppState>((set, _) => ({
   visualSourceData: {
     x: new Float32Array(121).fill(0),
     y: new Float32Array(121).fill(0),
@@ -23,7 +23,7 @@ const useAppState = create<IAppState>((set, get) => ({
   energyInfo: { current: 0 },
   actions: {
     resizeVisualSourceData: (newSize: number) =>
-      set((state) => {
+      set((_) => {
         return {
           visualSourceData: {
             x: new Float32Array(newSize).fill(0),

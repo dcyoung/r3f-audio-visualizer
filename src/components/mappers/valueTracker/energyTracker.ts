@@ -1,4 +1,4 @@
-import { IScalarTracker } from "./common";
+import { type IScalarTracker } from "./common";
 
 export class EnergyTracker implements IScalarTracker {
   private readonly _energyInfo: { current: number };

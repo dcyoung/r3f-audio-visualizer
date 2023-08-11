@@ -114,7 +114,7 @@ export class ColorPalette implements IColorPalette {
     return lut;
   };
 
-  public calcBackgroundColor = (norm: number = 0.5) => {
+  public calcBackgroundColor = (norm = 0.5) => {
     const gradient = new GradientLinear(this);
     const bkg = gradient.getAt(norm);
     const tmp = { h: 0, s: 0, l: 0 };

@@ -3,7 +3,7 @@
  * See https://github.com/hvianna/audioMotion-analyzer
  */
 
-import { AnalyzerInputControl } from "./common";
+import { type AnalyzerInputControl } from "./common";
 
 export interface FreqBinInfo {
   binLo: number;
@@ -60,7 +60,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
   private _energy: EnergyInfo = { val: 0, peak: 0, hold: 0 };
   private readonly _minFreq: number = 20;
   private readonly _maxFreq: number = 22000;
-  private _mode: number = 2;
+  private _mode = 2;
   public get mode(): number {
     return this._mode;
   }
@@ -180,12 +180,12 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
     // generate the frequency bands according to current analyzer settings
     const steps = [0, 1, 2, 3, 4, 6, 8, 12, 24][this._mode]; // number of notes grouped per band for each mode
     for (let index = 0; index < temperedScale.length; index += steps) {
-      let { freq: freqLo, bin: binLo, ratio: ratioLo } = temperedScale[index], // band start
-        {
-          freq: freqHi,
-          bin: binHi,
-          ratio: ratioHi,
-        } = temperedScale[index + steps - 1]; // band end
+      let { freq: freqLo, bin: binLo, ratio: ratioLo } = temperedScale[index]; // band start
+      const {
+        freq: freqHi,
+        bin: binHi,
+        ratio: ratioHi,
+      } = temperedScale[index + steps - 1]; // band end
 
       const nBars = infos.length,
         prevBar = infos[nBars - 1];
@@ -238,7 +238,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
     this._freqBinInfos = infos;
   }
 
-  private _freqToBin(freq: number, round: boolean = true): number {
+  private _freqToBin(freq: number, round = true): number {
     const max = this._analyzer.frequencyBinCount - 1,
       bin = (round ? Math.round : Math.floor)(
         (freq * this._analyzer.fftSize) / this._audioCtx.sampleRate
@@ -290,7 +290,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
     }
 
     // schedule next update
-    this._runId = requestAnimationFrame((timestamp) => this._analyze());
+    this._runId = requestAnimationFrame((_) => this._analyze());
   }
 
   public toggleAnalyzer(value: boolean | undefined = undefined): boolean {
@@ -302,7 +302,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
     if (started && !value && this._runId !== undefined) {
       cancelAnimationFrame(this._runId);
     } else if (!started && value) {
-      this._runId = requestAnimationFrame((timestamp) => this._analyze());
+      this._runId = requestAnimationFrame((_) => this._analyze());
     }
     return this.isOn;
   }

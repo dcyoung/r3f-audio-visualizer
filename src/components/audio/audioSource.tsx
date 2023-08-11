@@ -1,4 +1,4 @@
-import { AudioSource, AUDIO_SOURCE } from "./sourceControls/common";
+import { type AudioSource, AUDIO_SOURCE } from "./sourceControls/common";
 import FileAudioControls from "./sourceControls/file";
 import LivestreamAudioControls from "./sourceControls/livestream";
 

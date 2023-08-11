@@ -1,10 +1,11 @@
-import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Points } from "three";
+import { useRef } from "react";
+import { type Points } from "three";
+
 import {
   COORDINATE_TYPE,
   gaussianRandom,
-  ICoordinateMapper,
+  type ICoordinateMapper,
   TWO_PI,
 } from "../../mappers/coordinateMappers/common";
 
@@ -23,13 +24,13 @@ const BaseDiffusedRing = ({
   nPoints = 1000,
   mirrorEffects = false,
 }: BaseDiffusedRingProps) => {
-  const noise = [...Array(nPoints)].map(gaussianRandom);
+  const noise = Array.from({ length: nPoints }).map(gaussianRandom);
   const refPoints = useRef<Points>(null!);
 
   useFrame(({ clock }) => {
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
-    let effectiveRadius, normIdx, angRad, effectNorm;
+    let effectiveRadius, normIdx, angRad;
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
       normIdx = i / (nPoints - 1);

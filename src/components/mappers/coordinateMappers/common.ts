@@ -49,7 +49,7 @@ export const cubeFaceCenterRadialOffset = (
   xNorm: number,
   yNorm: number,
   zNorm: number,
-  interiorValue: number = 1.0
+  interiorValue = 1.0
 ): number => {
   // calculate a radial offset for each face
   // (ie: treat each face as a grid and calculate radial dist from center of grid)
@@ -118,16 +118,16 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
    *
    * @param amplitude - The max amplitude of the scaled output.
    */
-  constructor(amplitude: number = 1.0) {
+  constructor(amplitude = 1.0) {
     this.amplitude = amplitude;
   }
 
   public map(
     inputCoordinateType: CoordinateType,
     xNorm: number,
-    yNorm: number = 0.0,
-    zNorm: number = 0.0,
-    elapsedTimeSec: number = 0.0
+    yNorm = 0.0,
+    zNorm = 0.0,
+    elapsedTimeSec = 0.0
   ): number {
     switch (inputCoordinateType) {
       case COORDINATE_TYPE.CARTESIAN_1D:

@@ -1,7 +1,3 @@
-import { folder, useControls } from "leva";
-import BaseDoubleHelix from "./base";
-import { VisualProps } from "../common";
-import MultiStrand from "./multi";
 import {
   Bloom,
   DepthOfField,
@@ -9,6 +5,11 @@ import {
   Noise,
   Vignette,
 } from "@react-three/postprocessing";
+import { folder, useControls } from "leva";
+
+import BaseDoubleHelix from "./base";
+import MultiStrand from "./multi";
+import { type VisualProps } from "../common";
 import { COLOR_PALETTE } from "../palettes";
 
 const DNAVisual = ({

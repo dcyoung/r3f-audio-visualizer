@@ -1,4 +1,5 @@
 import { Canvas } from "@react-three/fiber";
+
 import AudioScopeVisual from "../visualizers/visualizerAudioScope";
 
 const AudioScopeCanvas = () => {

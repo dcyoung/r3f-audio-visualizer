@@ -26,7 +26,11 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.cjs"
   ],
   "exclude": [
     "node_modules"

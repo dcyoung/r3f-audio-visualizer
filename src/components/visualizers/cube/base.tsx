@@ -1,12 +1,13 @@
-import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+import { useRef, useEffect, useMemo } from "react";
+import { BoxGeometry, type InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+
 import {
-  ICoordinateMapper,
+  type ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
 } from "../../mappers/coordinateMappers/common";
-import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
+import { ColorPalette, type ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 interface BaseCubeProps {
   coordinateMapper: ICoordinateMapper;
@@ -107,7 +108,7 @@ const BaseCube = ({
       }
     }
     // Update the instance
-    meshRef.current.instanceMatrix!.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (

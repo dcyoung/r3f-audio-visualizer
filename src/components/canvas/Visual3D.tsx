@@ -1,11 +1,12 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { folder, useControls } from "leva";
-import { ApplicationMode, APPLICATION_MODE } from "../applicationModes";
+
+import { type ApplicationMode, APPLICATION_MODE } from "../applicationModes";
 import {
   AVAILABLE_COLOR_PALETTES,
   ColorPalette,
-  ColorPaletteType,
+  type ColorPaletteType,
   COLOR_PALETTE,
 } from "../visualizers/palettes";
 import AudioVisual from "../visualizers/visualizerAudio";
@@ -49,7 +50,7 @@ const AVAILABLE_VISUALS = [
 const Visual3DCanvas = ({ mode }: Visual3DCanvasProps) => {
   const visualizerParam = new URLSearchParams(document.location.search).get(
     "visual"
-  ) as string;
+  )!;
   const { visualizer } = useControls({
     visualizer: {
       value:
@@ -87,7 +88,7 @@ const Visual3DCanvas = ({ mode }: Visual3DCanvasProps) => {
       <color attach="background" args={[backgroundColor]} />
       <ambientLight />
       <fog attach="fog" args={[backgroundColor, 0, 100]} />
-      {getVisualizerComponent(mode as ApplicationMode, visualizer, palette)}
+      {getVisualizerComponent(mode , visualizer, palette)}
       {/* <Stats /> */}
       <OrbitControls makeDefault />
     </Canvas>

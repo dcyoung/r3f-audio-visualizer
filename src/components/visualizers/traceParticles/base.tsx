@@ -1,22 +1,20 @@
-import { useLayoutEffect, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useRef } from "react";
 import {
-  BufferGeometry,
+  type BufferGeometry,
   CatmullRomCurve3,
-  Points,
+  type Points,
   Vector2,
   Vector3,
 } from "three";
+
 import {
   COORDINATE_TYPE,
   gaussianRandom,
-  ICoordinateMapper,
+  type ICoordinateMapper,
 } from "../../mappers/coordinateMappers/common";
 
-const computeNormals = (
-  vertices: Vector2[],
-  weighted: boolean = false
-): Vector2[] => {
+const computeNormals = (vertices: Vector2[], weighted = false): Vector2[] => {
   const n = vertices.length;
   const normals = new Array<Vector2>();
   for (let i = 0; i < n; i++) {
@@ -59,7 +57,7 @@ const BaseTraceParticles = ({
   transitionSpeedSec = 2.5,
 }: BaseTraceParticlesProps) => {
   const scale = 25.0;
-  const noise = [...Array(nPoints)].map(gaussianRandom);
+  const noise = Array.from({ length: nPoints }).map(gaussianRandom);
   const referencePositionsByPoly = polyStates.map((poly) =>
     new CatmullRomCurve3(
       poly.map((v) => new Vector3(v.x, v.y, 0.0).multiplyScalar(scale)),

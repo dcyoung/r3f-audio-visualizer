@@ -1,16 +1,17 @@
 import { useEffect, useMemo } from "react";
+
+import { useMicrophoneLink } from "./analyzers/common";
+import FFTAnalyzer from "./analyzers/fft";
+import FFTAnalyzerControls from "./fftAnalyzerControls";
 import ControlledAudioSource from "../audio/audioSource";
 import {
-  AudioSource,
+  type AudioSource,
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
   useSelectAudioSource,
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
-import FFTAnalyzerControls from "./fftAnalyzerControls";
-import FFTAnalyzer from "./analyzers/fft";
-import { useMicrophoneLink } from "./analyzers/common";
 
 interface InternalAudioAnalyzerProps {
   audioSource: AudioSource;
@@ -65,33 +66,30 @@ const InternalAudioFFTAnalyzer = ({
   );
 };
 
-interface InternalMicrophoneFFTAnalyzerProps {}
-const InternalMicrophoneFFTAnalyzer =
-  ({}: InternalMicrophoneFFTAnalyzerProps) => {
-    const audioCtx = useMemo(() => buildAudioContext(), []);
-    const audio = useMemo(() => buildAudio(), []);
-    const analyzer = useMemo(() => {
-      const out = new FFTAnalyzer(audio, audioCtx);
-      out.volume = 0.0;
-      return out;
-    }, [audio, audioCtx]);
+const InternalMicrophoneFFTAnalyzer = () => {
+  const audioCtx = useMemo(() => buildAudioContext(), []);
+  const audio = useMemo(() => buildAudio(), []);
+  const analyzer = useMemo(() => {
+    const out = new FFTAnalyzer(audio, audioCtx);
+    out.volume = 0.0;
+    return out;
+  }, [audio, audioCtx]);
 
-    const { onDisabled, onStreamCreated } = useMicrophoneLink(audio, analyzer);
+  const { onDisabled, onStreamCreated } = useMicrophoneLink(audio, analyzer);
 
-    return (
-      <>
-        <MicrophoneAudioControls
-          audio={audio}
-          onDisabled={onDisabled}
-          onStreamCreated={onStreamCreated}
-        />
-        <FFTAnalyzerControls analyzer={analyzer} />
-      </>
-    );
-  };
+  return (
+    <>
+      <MicrophoneAudioControls
+        audio={audio}
+        onDisabled={onDisabled}
+        onStreamCreated={onStreamCreated}
+      />
+      <FFTAnalyzerControls analyzer={analyzer} />
+    </>
+  );
+};
 
-export interface AudioFFTAnalyzerProps {}
-const AudioFFTAnalyzer = ({}: AudioFFTAnalyzerProps) => {
+const AudioFFTAnalyzer = () => {
   const audioSource = useSelectAudioSource();
 
   return (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE ? (

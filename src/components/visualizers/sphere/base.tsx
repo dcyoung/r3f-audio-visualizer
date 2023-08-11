@@ -1,12 +1,13 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { BoxGeometry, InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+import { BoxGeometry, type InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+
 import {
   COORDINATE_TYPE,
-  ICoordinateMapper,
+  type ICoordinateMapper,
   TWO_PI,
 } from "../../mappers/coordinateMappers/common";
-import { ColorPalette, ColorPaletteType, COLOR_PALETTE } from "../palettes";
+import { ColorPalette, type ColorPaletteType, COLOR_PALETTE } from "../palettes";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
 // const MAPPING_MODE_POLAR_PHI = "polar_phi";
@@ -75,7 +76,7 @@ const BaseSphere = ({
     }
 
     // Update the instance
-    meshRef.current.instanceMatrix!.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (

@@ -1,6 +1,7 @@
 import { folder, useControls } from "leva";
 import { useEffect } from "react";
-import { AudioSourceControlsProps } from "./common";
+
+import { type AudioSourceControlsProps } from "./common";
 
 const LivestreamAudioControls = ({ audio }: AudioSourceControlsProps) => {
   const { streamUrl } = useControls({
@@ -37,7 +38,7 @@ const LivestreamAudioControls = ({ audio }: AudioSourceControlsProps) => {
     if (promise !== undefined) {
       promise
         .then(() => console.log(`Playing ${streamUrl}`))
-        .catch((error) => {
+        .catch((_) => {
           // Auto-play was prevented
           console.error(`Error playing ${streamUrl}`);
         });

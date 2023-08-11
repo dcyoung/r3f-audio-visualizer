@@ -84,7 +84,7 @@ const webAudioTouchUnlock = (context: AudioContext) => {
   return new Promise(function (resolve, reject) {
     const unlockTriggerNames = ["mousedown", "touchstart", "touchend"] as const;
     if (context.state === "suspended" && "ontouchstart" in window) {
-      var unlock = function () {
+      const unlock = function () {
         context.resume().then(
           function () {
             unlockTriggerNames.forEach((name) => {

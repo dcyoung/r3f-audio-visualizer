@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { AudioSourceControlsProps } from "./common";
+
+import { type AudioSourceControlsProps } from "./common";
 
 export interface MicrophoneAudioControlsProps extends AudioSourceControlsProps {
   onDisabled: () => void;
@@ -10,7 +11,7 @@ const MicrophoneAudioControls = ({
   onDisabled,
   onStreamCreated,
 }: MicrophoneAudioControlsProps) => {
-  const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
+  const micStream = useRef<null | MediaStreamAudioSourceNode>(null);
 
   /**
    * Make sure the microphone is enabled

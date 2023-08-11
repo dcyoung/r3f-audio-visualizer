@@ -1,9 +1,10 @@
-import { folder, useControls } from "leva";
-import { PointLight } from "three";
-import BaseGrid from "../grid/base";
-import { VisualProps } from "../common";
 import { useFrame } from "@react-three/fiber";
+import { folder, useControls } from "leva";
 import { useRef } from "react";
+import { type PointLight } from "three";
+
+import { type VisualProps } from "../common";
+import BaseGrid from "../grid/base";
 
 const PinGridVisual = ({ coordinateMapper }: VisualProps) => {
   const { nPinGridRows, nPinGridCols, pinGridUnitSideLength } = useControls({

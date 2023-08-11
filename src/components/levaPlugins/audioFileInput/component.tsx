@@ -1,7 +1,7 @@
-import { useCallback } from "react";
 import { useInputContext, Components } from "leva/plugin";
-import type { AudioFileInputProps } from "./types";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+
 const { Row, Label } = Components;
 import {
   DropZone,
@@ -10,11 +10,13 @@ import {
   Instructions,
   Remove,
 } from "./styled";
+import type { AudioFileInputProps } from "./types";
 
 export function AudioFileInputComponent() {
   const { label, value, onUpdate, disabled } =
     useInputContext<AudioFileInputProps>();
   const onDrop = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (acceptedFiles: string | any[]) => {
       if (acceptedFiles.length) onUpdate(acceptedFiles[0]);
     },
@@ -47,11 +49,12 @@ export function AudioFileInputComponent() {
           <>
             <FilePreview>
               <Remove onClick={clear} disabled={!value}>
-                {`⏹${(value as File).name}`}
+                {`⏹${value.name}`}
               </Remove>
             </FilePreview>
           </>
         ) : (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           <DropZone {...(getRootProps({ isDragAccept }) as any)} onClick={open}>
             <input {...getInputProps()} />
             <Instructions>{"Click to Upload"}</Instructions>

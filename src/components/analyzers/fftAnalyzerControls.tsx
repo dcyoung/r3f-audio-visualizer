@@ -1,11 +1,13 @@
 import { folder, useControls } from "leva";
 import { useEffect, useRef } from "react";
+
+import {type EnergyMeasure} from "./analyzers/fft";
+import type FFTAnalyzer from "./analyzers/fft";
 import {
   useAppStateActions,
   useEnergyInfo,
   useVisualSourceDataX,
 } from "../../appState";
-import FFTAnalyzer, { EnergyMeasure } from "./analyzers/fft";
 
 export interface FFTAnalyzerControlsProps {
   analyzer: FFTAnalyzer;

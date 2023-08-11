@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { AudioSourceControlsProps } from "./common";
+
+import { type AudioSourceControlsProps } from "./common";
 
 export interface ScreenShareControlsProps extends AudioSourceControlsProps {
   onDisabled: () => void;
@@ -10,7 +11,7 @@ const ScreenShareControls = ({
   onDisabled,
   onStreamCreated,
 }: ScreenShareControlsProps) => {
-  const micStream = useRef<null | MediaStreamAudioSourceNode>(null!);
+  const micStream = useRef<null | MediaStreamAudioSourceNode>(null);
 
   /**
    * Make sure the microphone is enabled
@@ -32,8 +33,8 @@ const ScreenShareControls = ({
             width: 1,
           },
           audio: true,
-          selfBrowserSurface: "exclude",
-          surfaceSwitching: "exclude",
+          // selfBrowserSurface: "exclude",
+          // surfaceSwitching: "exclude",
           // systemAudio: "include",
         })
         .then((media) => {

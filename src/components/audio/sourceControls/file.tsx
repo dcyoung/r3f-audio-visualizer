@@ -1,7 +1,8 @@
 import { folder, useControls } from "leva";
 import { useEffect, useState } from "react";
+
+import { type AudioSourceControlsProps, iOS } from "./common";
 import { audioFileInput } from "../../levaPlugins/audioFileInput";
-import { AudioSourceControlsProps, iOS } from "./common";
 import "./overlay.css";
 
 const useAudioFile = (audio: HTMLAudioElement) => {
@@ -27,6 +28,7 @@ const useAudioFile = (audio: HTMLAudioElement) => {
         })
         .catch((error) => {
           // Auto-play was prevented
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           console.error(`Error playing ${audioFile}`, error);
         });
     }

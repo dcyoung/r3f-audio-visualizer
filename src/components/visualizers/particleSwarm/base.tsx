@@ -1,7 +1,8 @@
-import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Points, Vector3 } from "three";
-import { IMotionMapper } from "../../mappers/motionMappers/common";
+import { useRef, useEffect, useMemo } from "react";
+import { type Points, Vector3 } from "three";
+
+import { type IMotionMapper } from "../../mappers/motionMappers/common";
 
 interface BaseParticleSwarmProps {
   motionMapper: IMotionMapper;

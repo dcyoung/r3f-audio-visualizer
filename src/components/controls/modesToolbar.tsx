@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { Activity, Music, Shell, Waves } from "lucide-react";
 import { useMemo } from "react";
 
 import {
@@ -8,12 +8,26 @@ import {
 import { ToolbarItem } from "@/components/controls/common";
 import { useModeContextSetters } from "@/context/mode";
 
+const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
+  switch (mode) {
+    case "WAVE_FORM":
+      return <Activity />;
+    case "NOISE":
+      return <Waves />;
+    case "AUDIO":
+      return <Music />;
+    case "AUDIO_SCOPE":
+      return <Shell />;
+    default:
+      return mode satisfies never;
+  }
+};
 
 const ModeSelectButton = ({ mode }: { mode: ApplicationMode }) => {
   const { setMode } = useModeContextSetters();
   return (
     <ToolbarItem onClick={() => setMode(mode)}>
-      <Info />
+      <ModeIcon mode={mode} />
     </ToolbarItem>
   );
 };

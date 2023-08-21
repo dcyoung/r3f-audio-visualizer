@@ -1,16 +1,10 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { folder, useControls } from "leva";
 
 import { useVisualContext } from "@/context/visual";
 
 import { APPLICATION_MODE } from "../applicationModes";
-import {
-  AVAILABLE_COLOR_PALETTES,
-  ColorPalette,
-  type ColorPaletteType,
-  COLOR_PALETTE,
-} from "../visualizers/palettes";
+import { ColorPalette, type ColorPaletteType } from "../visualizers/palettes";
 import AudioVisual from "../visualizers/visualizerAudio";
 import NoiseVisual from "../visualizers/visualizerNoise";
 // import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
@@ -52,32 +46,7 @@ const Visual3DCanvas = ({
 }: {
   mode: "WAVE_FORM" | "NOISE" | "AUDIO";
 }) => {
-  const { visual } = useVisualContext();
-  // const visualizerParam = new URLSearchParams(document.location.search).get(
-  //   "visual"
-  // )!;
-  // const { visualizer } = useControls({
-  //   visualizer: {
-  //     value:
-  //       visualizerParam &&
-  //       AVAILABLE_VISUALS.map((s) => s as string).includes(visualizerParam)
-  //         ? visualizerParam
-  //         : AVAILABLE_VISUALS[0],
-  //     options: AVAILABLE_VISUALS,
-  //   },
-  // });
-  const { palette, colorBackground } = useControls({
-    "Visual - Color": folder(
-      {
-        palette: {
-          value: COLOR_PALETTE.THREE_COOL_TO_WARM,
-          options: AVAILABLE_COLOR_PALETTES,
-        },
-        colorBackground: false,
-      },
-      { collapsed: true }
-    ),
-  });
+  const { visual, palette, colorBackground } = useVisualContext();
   const backgroundColor = colorBackground
     ? ColorPalette.getPalette(palette).calcBackgroundColor(0)
     : "#010204";

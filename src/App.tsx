@@ -34,7 +34,7 @@ const getCanvasComponent = (mode: ApplicationMode) => {
 const App = () => {
   const { mode } = useModeContext();
   return (
-    <div className="relative h-[100dvh] w-[100dvw] bg-background">
+    <div className=" relative h-[100dvh] w-[100dvw] bg-background">
       <div className="absolute h-[100dvh] w-[100dvw]">
         <Suspense fallback={<span>loading...</span>}>
           {getAnalyzerComponent(mode)}

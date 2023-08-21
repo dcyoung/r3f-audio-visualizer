@@ -2,7 +2,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 
-import { type ApplicationMode, APPLICATION_MODE } from "../applicationModes";
+import { APPLICATION_MODE } from "../applicationModes";
 import {
   AVAILABLE_COLOR_PALETTES,
   ColorPalette,
@@ -11,33 +11,11 @@ import {
 } from "../visualizers/palettes";
 import AudioVisual from "../visualizers/visualizerAudio";
 import NoiseVisual from "../visualizers/visualizerNoise";
-import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
+// import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
 import WaveformVisual from "../visualizers/visualizerWaveform";
+import { useVisualContext } from "@/context/visual";
 
-const getVisualizerComponent = (
-  mode: ApplicationMode,
-  visual: string,
-  palette: ColorPaletteType
-) => {
-  switch (mode) {
-    case APPLICATION_MODE.WAVE_FORM:
-      return <WaveformVisual visual={visual} palette={palette} />;
-    case APPLICATION_MODE.NOISE:
-      return visual === "particleSwarm" ? (
-        <ParticleNoiseVisual />
-      ) : (
-        <NoiseVisual visual={visual} palette={palette} />
-      );
-    case APPLICATION_MODE.AUDIO:
-      return <AudioVisual visual={visual} palette={palette} />;
-    default:
-      throw new Error(`Unknown mode ${mode}`);
-  }
-};
-export interface Visual3DCanvasProps {
-  mode: ApplicationMode;
-}
-const AVAILABLE_VISUALS = [
+export const AVAILABLE_VISUALS = [
   "grid",
   "sphere",
   "cube",
@@ -46,20 +24,47 @@ const AVAILABLE_VISUALS = [
   "dna",
   // "traceParticles",
   // "particleSwarm",
-];
-const Visual3DCanvas = ({ mode }: Visual3DCanvasProps) => {
-  const visualizerParam = new URLSearchParams(document.location.search).get(
-    "visual"
-  )!;
-  const { visualizer } = useControls({
-    visualizer: {
-      value:
-        visualizerParam && AVAILABLE_VISUALS.includes(visualizerParam)
-          ? visualizerParam
-          : AVAILABLE_VISUALS[0],
-      options: AVAILABLE_VISUALS,
-    },
-  });
+] as const;
+
+const getVisualizerComponent = (
+  mode: "WAVE_FORM" | "NOISE" | "AUDIO",
+  visual: (typeof AVAILABLE_VISUALS)[number],
+  palette: ColorPaletteType
+) => {
+  switch (mode) {
+    case APPLICATION_MODE.WAVE_FORM:
+      return <WaveformVisual visual={visual} palette={palette} />;
+    case APPLICATION_MODE.NOISE:
+      // if (visual === "particleSwarm") {
+      //   return <ParticleNoiseVisual />;
+      // }
+      return <NoiseVisual visual={visual} palette={palette} />;
+    case APPLICATION_MODE.AUDIO:
+      return <AudioVisual visual={visual} palette={palette} />;
+    default:
+      return mode satisfies never;
+  }
+};
+
+const Visual3DCanvas = ({
+  mode,
+}: {
+  mode: "WAVE_FORM" | "NOISE" | "AUDIO";
+}) => {
+  const { visual } = useVisualContext();
+  // const visualizerParam = new URLSearchParams(document.location.search).get(
+  //   "visual"
+  // )!;
+  // const { visualizer } = useControls({
+  //   visualizer: {
+  //     value:
+  //       visualizerParam &&
+  //       AVAILABLE_VISUALS.map((s) => s as string).includes(visualizerParam)
+  //         ? visualizerParam
+  //         : AVAILABLE_VISUALS[0],
+  //     options: AVAILABLE_VISUALS,
+  //   },
+  // });
   const { palette, colorBackground } = useControls({
     "Visual - Color": folder(
       {
@@ -88,7 +93,7 @@ const Visual3DCanvas = ({ mode }: Visual3DCanvasProps) => {
       <color attach="background" args={[backgroundColor]} />
       <ambientLight />
       <fog attach="fog" args={[backgroundColor, 0, 100]} />
-      {getVisualizerComponent(mode , visualizer, palette)}
+      {getVisualizerComponent(mode, visual, palette)}
       {/* <Stats /> */}
       <OrbitControls makeDefault />
     </Canvas>

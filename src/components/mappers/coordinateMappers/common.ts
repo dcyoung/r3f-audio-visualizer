@@ -140,7 +140,7 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
       case COORDINATE_TYPE.CARTESIAN_CUBE_FACES:
         return this.map_3DFaces(xNorm, yNorm, zNorm, elapsedTimeSec);
       default:
-        throw Error(`Unsupported coordinate type: ${inputCoordinateType}`);
+        return inputCoordinateType satisfies never;
     }
   }
 

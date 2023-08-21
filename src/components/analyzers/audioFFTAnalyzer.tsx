@@ -1,11 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 import { useMicrophoneLink } from "./analyzers/common";
 import FFTAnalyzer from "./analyzers/fft";
 import FFTAnalyzerControls from "./fftAnalyzerControls";
 import ControlledAudioSource from "../audio/audioSource";
 import {
-  type AudioSource,
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
@@ -13,54 +12,23 @@ import {
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
 
-interface InternalAudioAnalyzerProps {
-  audioSource: AudioSource;
-}
 const InternalAudioFFTAnalyzer = ({
   audioSource,
-}: InternalAudioAnalyzerProps) => {
-  if (audioSource === AUDIO_SOURCE.MICROPHONE) {
-    throw new Error("Use InternalMicrophoneFFTAnalyzer for microphone inputs.");
-  }
-
+}: {
+  audioSource: "LIVE_STREAM" | "FILE_UPLOAD";
+}) => {
   const audioCtx = useMemo(() => buildAudioContext(), []);
   const audio = useMemo(() => buildAudio(), []);
   const analyzer = useMemo(() => {
     console.log("Creating analyzer...");
-    return new FFTAnalyzer(audio, audioCtx);
+    const out = new FFTAnalyzer(audio, audioCtx);
+    out.volume = 1.0;
+    return out;
   }, [audio, audioCtx]);
-
-  useEffect(() => {
-    analyzer.volume =
-      (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE
-        ? 0.0
-        : 1.0;
-  }, [analyzer, audioSource]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("Removing audio.");
-  //     audio.pause();
-  //     audio.remove();
-  //   };
-  // }, [audio]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("Closing audio context...");
-  //     audioCtx
-  //       .close()
-  //       .then(() => console.log("Successfully closed AudioContext."))
-  //       .catch((e) => console.error(e));
-  //   };
-  // }, [audioCtx]);
 
   return (
     <>
-      <ControlledAudioSource
-        audio={audio}
-        audioSource={audioSource as unknown as AudioSource}
-      />
+      <ControlledAudioSource audio={audio} audioSource={audioSource} />
       <FFTAnalyzerControls analyzer={analyzer} />
     </>
   );
@@ -90,15 +58,12 @@ const InternalMicrophoneFFTAnalyzer = () => {
 };
 
 const AudioFFTAnalyzer = () => {
-  const audioSource = useSelectAudioSource();
+  const { audioSource } = useSelectAudioSource();
 
-  return (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE ? (
-    <InternalMicrophoneFFTAnalyzer />
-  ) : (
-    <InternalAudioFFTAnalyzer
-      audioSource={audioSource as unknown as AudioSource}
-    />
-  );
+  if (audioSource === AUDIO_SOURCE.MICROPHONE) {
+    return <InternalMicrophoneFFTAnalyzer />;
+  }
+  return <InternalAudioFFTAnalyzer audioSource={audioSource} />;
 };
 
 export default AudioFFTAnalyzer;

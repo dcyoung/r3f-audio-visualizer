@@ -282,7 +282,7 @@ export class ColorPalette implements IColorPalette {
           "#b40426",
         ]);
       default:
-        throw new Error(`Unsupported color palette: ${type}`);
+        return type satisfies never;
     }
   }
   public static random(

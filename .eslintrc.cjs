@@ -20,6 +20,16 @@ const config = {
     "plugin:import/recommended",
     "plugin:import/typescript",
   ],
+  settings: {
+    'import/resolver': {
+      typescript: {},
+      alias: {
+        map: [
+          ['@', './src'],
+        ],
+      },
+    }
+  },
   rules: {
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/no-unused-vars": [

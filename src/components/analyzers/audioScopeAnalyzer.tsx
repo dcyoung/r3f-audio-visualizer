@@ -5,7 +5,6 @@ import ScopeAnalyzer from "./analyzers/scope";
 import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";
 import ControlledAudioSource from "../audio/audioSource";
 import {
-  type AudioSource,
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
@@ -13,17 +12,11 @@ import {
 } from "../audio/sourceControls/common";
 import MicrophoneAudioControls from "../audio/sourceControls/mic";
 
-interface InternalAudioScopeAnalyzerProps {
-  audioSource: AudioSource;
-}
 const InternalAudioScopeAnalyzer = ({
   audioSource,
-}: InternalAudioScopeAnalyzerProps) => {
-  if (audioSource === AUDIO_SOURCE.MICROPHONE) {
-    throw new Error(
-      "Use InternalMicrophoneScopeAnalyzer for microphone inputs."
-    );
-  }
+}: {
+  audioSource: "LIVE_STREAM" | "FILE_UPLOAD";
+}) => {
   const audioCtx = useMemo(() => buildAudioContext(), []);
   const audio = useMemo(() => buildAudio(), []);
   const analyzer = useMemo(() => {
@@ -32,10 +25,7 @@ const InternalAudioScopeAnalyzer = ({
 
   return (
     <>
-      <ControlledAudioSource
-        audio={audio}
-        audioSource={audioSource as unknown as AudioSource}
-      />
+      <ControlledAudioSource audio={audio} audioSource={audioSource} />
       <AudioScopeAnalyzerControls analyzer={analyzer} />
     </>
   );
@@ -63,15 +53,12 @@ const InternalMicrophoneScopeAnalyzer = () => {
 };
 
 const AudioFFTAnalyzer = () => {
-  const audioSource = useSelectAudioSource();
+  const { audioSource } = useSelectAudioSource();
 
-  return (audioSource as unknown as AudioSource) === AUDIO_SOURCE.MICROPHONE ? (
-    <InternalMicrophoneScopeAnalyzer />
-  ) : (
-    <InternalAudioScopeAnalyzer
-      audioSource={audioSource as unknown as AudioSource}
-    />
-  );
+  if (audioSource === AUDIO_SOURCE.MICROPHONE) {
+    return <InternalMicrophoneScopeAnalyzer />;
+  }
+  return <InternalAudioScopeAnalyzer audioSource={audioSource} />;
 };
 
 export default AudioFFTAnalyzer;

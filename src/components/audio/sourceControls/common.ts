@@ -22,7 +22,7 @@ export const getAnalyzerSourceDisplayName = (source: AudioSource): string => {
     case AUDIO_SOURCE.FILE_UPLOAD:
       return "📁 File Upload";
     default:
-      throw new Error(`Unknown source ${source}`);
+      return source satisfies never;
   }
 };
 
@@ -44,18 +44,19 @@ export const getPlatformSupportedAudioSources = (): AudioSource[] => {
   return iOS()
     ? [AUDIO_SOURCE.FILE_UPLOAD, AUDIO_SOURCE.MICROPHONE]
     : [
-        AUDIO_SOURCE.LIVE_STREAM,
-        AUDIO_SOURCE.FILE_UPLOAD,
-        AUDIO_SOURCE.MICROPHONE,
-      ];
+      AUDIO_SOURCE.LIVE_STREAM,
+      AUDIO_SOURCE.FILE_UPLOAD,
+      AUDIO_SOURCE.MICROPHONE,
+    ];
 };
 
 const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();
+
 export function useSelectAudioSource() {
   const audioSourceParam = new URLSearchParams(document.location.search).get(
     "audioSource"
   ) as AudioSource | null;
-  const { audioSource } = useControls({
+  const { audioSource: selectedAudioSource } = useControls({
     Audio: folder({
       audioSource: {
         value:
@@ -70,7 +71,9 @@ export function useSelectAudioSource() {
       },
     }),
   });
-  return audioSource;
+  return {
+    audioSource: selectedAudioSource as unknown as AudioSource
+  };
 }
 
 export const buildAudio = () => {

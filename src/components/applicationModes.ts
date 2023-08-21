@@ -19,7 +19,7 @@ export const getAppModeDisplayName = (mode: ApplicationMode): string => {
     case APPLICATION_MODE.AUDIO_SCOPE:
       return "🎧 audioscope";
     default:
-      throw new Error(`Unknown mode ${mode}`);
+      return mode satisfies never;
   }
 };
 

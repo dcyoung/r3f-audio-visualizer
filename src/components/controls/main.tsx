@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { ModesToolbar } from "@/components/controls/modesToolbar";
 import { SettingsToolbar } from "@/components/controls/settingsToolbar";
 import { VisualsToolbar } from "@/components/controls/visualsToolbar";
@@ -8,7 +9,7 @@ export const ControlsPanel = () => {
   const [visible, setVisible] = useState(true);
   return (
     <>
-      <div className="absolute top-0 flex flex-row w-full items-center justify-end p-4 pointer-events-none gap-2">
+      <div className="pointer-events-none absolute top-0 flex w-full flex-row items-center justify-end gap-2 p-4">
         <Switch
           defaultChecked={visible}
           className="pointer-events-auto cursor-pointer"
@@ -20,13 +21,13 @@ export const ControlsPanel = () => {
       </div>
       {visible && (
         <>
-          <div className="absolute top-0 flex flex-row w-full items-center justify-center h-24 p-4 pointer-events-none">
+          <div className="pointer-events-none absolute top-0 flex h-24 w-full flex-row items-center justify-center p-4">
             <ModesToolbar />
           </div>
-          <div className="absolute bottom-0 flex flex-row w-full items-center justify-center h-24 p-4 pointer-events-none">
+          <div className="pointer-events-none absolute bottom-0 flex h-24 w-full flex-row items-center justify-center p-4">
             <VisualsToolbar />
           </div>
-          <div className="absolute right-0 flex flex-col h-full items-center justify-center w-24 p-4 pointer-events-none">
+          <div className="pointer-events-none absolute right-0 flex h-full w-24 flex-col items-center justify-center p-4">
             <SettingsToolbar />
           </div>
         </>

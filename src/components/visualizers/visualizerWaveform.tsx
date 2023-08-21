@@ -1,5 +1,5 @@
 import { useControls } from "leva";
-import React, { Suspense, useEffect } from "react";
+import { Suspense, useEffect, lazy } from "react";
 
 import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
 import { CoordinateMapper_WaveformSuperposition } from "../mappers/coordinateMappers/waveform";
@@ -13,7 +13,7 @@ const WaveformVisual = ({
   visual,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
 }: WaveformVisualizerProps) => {
-  const VisualComponent = React.lazy(
+  const VisualComponent = lazy(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     async () => await import(`./${visual}/reactive.tsx`)
   );

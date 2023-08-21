@@ -1,5 +1,5 @@
 import { folder, useControls } from "leva";
-import React, { Suspense } from "react";
+import { Suspense, lazy } from "react";
 
 import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
 import { useEnergyInfo, useVisualSourceDataX } from "../../appState";
@@ -32,7 +32,7 @@ const AudioVisual = ({
 
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);
-  const VisualComponent = React.lazy(
+  const VisualComponent = lazy(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     async () => await import(`./${visual}/reactive.tsx`)
   );

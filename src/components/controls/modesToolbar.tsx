@@ -1,11 +1,13 @@
-import { ToolbarItem } from "@/components/controls/common";
 import { Info } from "lucide-react";
+import { useMemo } from "react";
+
 import {
-  ApplicationMode,
+  type ApplicationMode,
   getPlatformSupportedApplicationModes,
 } from "@/components/applicationModes";
+import { ToolbarItem } from "@/components/controls/common";
 import { useModeContextSetters } from "@/context/mode";
-import { useMemo } from "react";
+
 
 const ModeSelectButton = ({ mode }: { mode: ApplicationMode }) => {
   const { setMode } = useModeContextSetters();
@@ -39,7 +41,7 @@ export const ModesToolbar = () => {
   }, []);
 
   return (
-    <div className="flex flex-row justify-center items-center gap-4 pointer-events-none">
+    <div className="pointer-events-none flex flex-row items-center justify-center gap-4">
       {availableModes.map((mode) => (
         <ModeSelectButton mode={mode} key={mode} />
       ))}

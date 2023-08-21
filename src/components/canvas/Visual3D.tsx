@@ -2,6 +2,8 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 
+import { useVisualContext } from "@/context/visual";
+
 import { APPLICATION_MODE } from "../applicationModes";
 import {
   AVAILABLE_COLOR_PALETTES,
@@ -13,7 +15,6 @@ import AudioVisual from "../visualizers/visualizerAudio";
 import NoiseVisual from "../visualizers/visualizerNoise";
 // import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
 import WaveformVisual from "../visualizers/visualizerWaveform";
-import { useVisualContext } from "@/context/visual";
 
 export const AVAILABLE_VISUALS = [
   "grid",

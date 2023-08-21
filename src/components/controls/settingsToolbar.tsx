@@ -1,4 +1,5 @@
 import { Info } from "lucide-react";
+
 import { ToolbarItem, ToolbarPopover } from "./common";
 
 const ExampleControl = () => {
@@ -21,7 +22,7 @@ const ExampleControl = () => {
 
 export const SettingsToolbar = () => {
   return (
-    <div className="flex flex-col justify-center items-center gap-4 pointer-events-none">
+    <div className="pointer-events-none flex flex-col items-center justify-center gap-4">
       <ExampleControl />
       <ExampleControl />
       <ExampleControl />

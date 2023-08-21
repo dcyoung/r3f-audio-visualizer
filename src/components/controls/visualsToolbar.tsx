@@ -1,7 +1,9 @@
 import { Info } from "lucide-react";
+
+import { useVisualContextSetters } from "@/context/visual";
+
 import { ToolbarItem } from "./common";
 import { AVAILABLE_VISUALS } from "../canvas/Visual3D";
-import { useVisualContextSetters } from "@/context/visual";
 
 const VisualSelectButton = ({
   visual,
@@ -17,7 +19,7 @@ const VisualSelectButton = ({
 };
 export const VisualsToolbar = () => {
   return (
-    <div className="flex flex-row justify-center items-center gap-4 pointer-events-none">
+    <div className="pointer-events-none flex flex-row items-center justify-center gap-4">
       {AVAILABLE_VISUALS.map((visual) => (
         <VisualSelectButton visual={visual} key={visual} />
       ))}

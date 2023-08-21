@@ -1,8 +1,4 @@
 import {
-  ApplicationMode,
-  APPLICATION_MODE,
-} from "@/components/applicationModes";
-import {
   createContext,
   useContext,
   useState,
@@ -10,6 +6,11 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
+
+import {
+  type ApplicationMode,
+  APPLICATION_MODE,
+} from "@/components/applicationModes";
 
 export interface ModeConfig {
   mode: ApplicationMode;

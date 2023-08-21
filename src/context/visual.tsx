@@ -1,4 +1,3 @@
-import { AVAILABLE_VISUALS } from "@/components/canvas/Visual3D";
 import {
   createContext,
   useContext,
@@ -7,6 +6,8 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
+
+import { AVAILABLE_VISUALS } from "@/components/canvas/Visual3D";
 
 type Visual = (typeof AVAILABLE_VISUALS)[number];
 export interface VisualConfig {

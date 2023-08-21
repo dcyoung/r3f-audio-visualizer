@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { getRadioStations } from "./radio";
 
 export interface RadioStation {
@@ -55,4 +56,4 @@ export const useEnergyInfo = () => useAppState((state) => state.energyInfo);
 export const useAppStateActions = () => useAppState((state) => state.actions);
 
 
-getRadioStations().then((stations) => useAppState.setState({ radioStations: stations }))
+getRadioStations().then((stations) => useAppState.setState({ radioStations: stations })).catch((e) => console.error(e));

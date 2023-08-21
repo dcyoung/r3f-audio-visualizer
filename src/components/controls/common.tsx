@@ -1,10 +1,11 @@
-import { cn } from "@/lib/utils";
-import { HTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import { type HTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export const ToolbarItem = ({
   children,

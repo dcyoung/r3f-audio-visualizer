@@ -2,7 +2,7 @@ import { folder, useControls } from "leva";
 import { useEffect } from "react";
 
 import { type AudioSourceControlsProps } from "./common";
-import { RadioStation, useAvailableRadioStations } from "../../../appState";
+import { type RadioStation, useAvailableRadioStations } from "../../../appState";
 
 const InternalLivestreamAudioControls = ({
   audio,

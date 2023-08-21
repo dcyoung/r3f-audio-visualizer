@@ -118,7 +118,7 @@ export class ColorPalette implements IColorPalette {
     const gradient = new GradientLinear(this);
     const bkg = gradient.getAt(norm);
     const tmp = { h: 0, s: 0, l: 0 };
-    bkg.getHSL(tmp);
+    bkg.getHSL(tmp, SRGBColorSpace);
     tmp.s = Math.min(tmp.s, 0.5);
     bkg.setHSL(tmp.h, tmp.s, tmp.l, SRGBColorSpace);
     return bkg;

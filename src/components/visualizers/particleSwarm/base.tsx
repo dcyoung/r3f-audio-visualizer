@@ -4,21 +4,19 @@ import { type Points, Vector3 } from "three";
 
 import { type IMotionMapper } from "../../mappers/motionMappers/common";
 
-interface BaseParticleSwarmProps {
-  motionMapper: IMotionMapper;
-  maxPoints?: number;
-  pointSize?: number;
-  maxDim?: number;
-  color?: string;
-}
-
 const BaseGrid = ({
   motionMapper,
   maxPoints = 1000,
   pointSize = 0.2,
   maxDim = 2,
   color = "white",
-}: BaseParticleSwarmProps) => {
+}: {
+  motionMapper: IMotionMapper;
+  maxPoints?: number;
+  pointSize?: number;
+  maxDim?: number;
+  color?: string;
+}) => {
   const nPerSide = Math.max(1, Math.floor(Math.cbrt(maxPoints)));
   const nPoints = Math.pow(nPerSide, 3);
   const refPoints = useRef<Points>(null!);

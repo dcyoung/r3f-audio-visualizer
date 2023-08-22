@@ -1,4 +1,4 @@
-import { useFrame } from "@react-three/fiber";
+import { type GroupProps, useFrame } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 import { useRef } from "react";
 import { type PointLight } from "three";
@@ -6,7 +6,10 @@ import { type PointLight } from "three";
 import { type VisualProps } from "../common";
 import BaseGrid from "../grid/base";
 
-const PinGridVisual = ({ coordinateMapper }: VisualProps) => {
+const PinGridVisual = ({
+  coordinateMapper,
+  ...props
+}: GroupProps & VisualProps) => {
   const { nPinGridRows, nPinGridCols, pinGridUnitSideLength } = useControls({
     "Visual - Grid": folder(
       {
@@ -47,27 +50,25 @@ const PinGridVisual = ({ coordinateMapper }: VisualProps) => {
   });
 
   return (
-    <>
-      <group>
-        <BaseGrid
-          coordinateMapper={coordinateMapper}
-          nGridCols={nPinGridCols}
-          nGridRows={nPinGridRows}
-          cubeSideLength={pinGridUnitSideLength}
-          cubeSpacingScalar={1.1}
-          pinStyle={true}
-          palette={undefined}
-          color={"black"}
-        />
-        <pointLight position={[0, 0, 5 * radius]} intensity={5.0} />
-        <pointLight
-          ref={lightRef}
-          intensity={5}
-          distance={3 * radius}
-          decay={1.0}
-        />
-      </group>
-    </>
+    <group {...props}>
+      <BaseGrid
+        coordinateMapper={coordinateMapper}
+        nGridCols={nPinGridCols}
+        nGridRows={nPinGridRows}
+        cubeSideLength={pinGridUnitSideLength}
+        cubeSpacingScalar={1.1}
+        pinStyle={true}
+        palette={undefined}
+        color={"black"}
+      />
+      <pointLight position={[0, 0, 5 * radius]} intensity={5.0} />
+      <pointLight
+        ref={lightRef}
+        intensity={5}
+        distance={3 * radius}
+        decay={1.0}
+      />
+    </group>
   );
 };
 

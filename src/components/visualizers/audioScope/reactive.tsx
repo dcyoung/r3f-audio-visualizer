@@ -2,10 +2,7 @@ import { folder, useControls } from "leva";
 
 import BaseScopeVisual, { type TextureMapper } from "./base";
 
-interface ScopeVisualProps {
-  textureMapper: TextureMapper;
-}
-const ScopeVisual = ({ textureMapper }: ScopeVisualProps) => {
+const ScopeVisual = ({ textureMapper }: { textureMapper: TextureMapper }) => {
   const { usePoints, color } = useControls({
     "Visual - Scope": folder(
       {

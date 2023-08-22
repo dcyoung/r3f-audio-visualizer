@@ -36,16 +36,15 @@ const ColorsControl = () => {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue
-              placeholder="Select a color palette"
-              defaultValue={palette}
-            />
+            <SelectValue placeholder={palette} defaultValue={palette} />
           </SelectTrigger>
           <SelectContent className="max-h-36">
             <SelectGroup>
               <SelectLabel>Color Palette</SelectLabel>
               {AVAILABLE_COLOR_PALETTES.map((palette) => (
-                <SelectItem value={palette}>{palette}</SelectItem>
+                <SelectItem value={palette} key={palette}>
+                  {palette}
+                </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>

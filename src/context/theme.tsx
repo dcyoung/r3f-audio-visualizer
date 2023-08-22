@@ -1,11 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: string;
-  storageKey?: string;
-}
-
 interface ThemeProviderState {
   theme: string;
   setTheme: (theme: string) => void;
@@ -23,7 +17,11 @@ export function ThemeProvider({
   defaultTheme = "dark",
   storageKey = "vite-ui-theme",
   ...props
-}: ThemeProviderProps) {
+}: {
+  children: React.ReactNode;
+  defaultTheme?: string;
+  storageKey?: string;
+}) {
   const [theme, setTheme] = useState(
     defaultTheme
     // () => localStorage.getItem(storageKey) ?? defaultTheme

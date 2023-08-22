@@ -32,7 +32,17 @@ const computeNormals = (vertices: Vector2[], weighted = false): Vector2[] => {
   return vertexNormals;
 };
 
-interface BaseTraceParticlesProps {
+const BaseTraceParticles = ({
+  coordinateMapper,
+  polyStates,
+  parametricMin = 0.0,
+  parametricMax = 1.0,
+  power = 2.0,
+  useNoise = false,
+  pointSize = 0.2,
+  nPoints = 5000,
+  transitionSpeedSec = 2.5,
+}: {
   coordinateMapper: ICoordinateMapper;
   polyStates: Vector2[][];
   parametricMin?: number;
@@ -42,20 +52,7 @@ interface BaseTraceParticlesProps {
   nPoints?: number;
   pointSize?: number;
   transitionSpeedSec?: number;
-}
-
-const BaseTraceParticles = ({
-  coordinateMapper,
-  polyStates,
-
-  parametricMin = 0.0,
-  parametricMax = 1.0,
-  power = 2.0,
-  useNoise = false,
-  pointSize = 0.2,
-  nPoints = 5000,
-  transitionSpeedSec = 2.5,
-}: BaseTraceParticlesProps) => {
+}) => {
   const scale = 25.0;
   const noise = Array.from({ length: nPoints }).map(gaussianRandom);
   const referencePositionsByPoly = polyStates.map((poly) =>

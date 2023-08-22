@@ -1,22 +1,22 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef, useEffect, useMemo } from "react";
-import { BoxGeometry, type InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+import {
+  BoxGeometry,
+  type InstancedMesh,
+  Matrix4,
+  MeshBasicMaterial,
+} from "three";
 
 import {
   type ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
 } from "../../mappers/coordinateMappers/common";
-import { ColorPalette, type ColorPaletteType, COLOR_PALETTE } from "../palettes";
-
-interface BaseCubeProps {
-  coordinateMapper: ICoordinateMapper;
-  nPerSide?: number;
-  cubeSideLength?: number;
-  cubeSpacingScalar?: number;
-  volume?: boolean;
-  palette?: ColorPaletteType;
-}
+import {
+  ColorPalette,
+  type ColorPaletteType,
+  COLOR_PALETTE,
+} from "../palettes";
 
 const BaseCube = ({
   coordinateMapper,
@@ -25,7 +25,14 @@ const BaseCube = ({
   cubeSpacingScalar = 0.1,
   volume = true,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: BaseCubeProps) => {
+}: {
+  coordinateMapper: ICoordinateMapper;
+  nPerSide?: number;
+  cubeSideLength?: number;
+  cubeSpacingScalar?: number;
+  volume?: boolean;
+  palette?: ColorPaletteType;
+}) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const inputCoordinateType = volume

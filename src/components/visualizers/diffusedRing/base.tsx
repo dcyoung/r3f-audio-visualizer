@@ -9,21 +9,19 @@ import {
   TWO_PI,
 } from "../../mappers/coordinateMappers/common";
 
-interface BaseDiffusedRingProps {
-  coordinateMapper: ICoordinateMapper;
-  radius?: number;
-  nPoints?: number;
-  pointSize?: number;
-  mirrorEffects?: boolean;
-}
-
 const BaseDiffusedRing = ({
   coordinateMapper,
   radius = 2.0,
   pointSize = 0.2,
   nPoints = 1000,
   mirrorEffects = false,
-}: BaseDiffusedRingProps) => {
+}: {
+  coordinateMapper: ICoordinateMapper;
+  radius?: number;
+  nPoints?: number;
+  pointSize?: number;
+  mirrorEffects?: boolean;
+}) => {
   const noise = Array.from({ length: nPoints }).map(gaussianRandom);
   const refPoints = useRef<Points>(null!);
 

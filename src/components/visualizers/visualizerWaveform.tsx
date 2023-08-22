@@ -4,15 +4,13 @@ import { Suspense, useEffect, lazy } from "react";
 import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
 import { CoordinateMapper_WaveformSuperposition } from "../mappers/coordinateMappers/waveform";
 
-interface WaveformVisualizerProps {
-  visual: string;
-  palette?: ColorPaletteType;
-}
-
 const WaveformVisual = ({
   visual,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: WaveformVisualizerProps) => {
+}: {
+  visual: string;
+  palette?: ColorPaletteType;
+}) => {
   const VisualComponent = lazy(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     async () => await import(`./${visual}/reactive.tsx`)

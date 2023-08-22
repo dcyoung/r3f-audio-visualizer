@@ -69,7 +69,13 @@ export class TextureMapper {
   }
 }
 
-interface BaseAudioScopeVisualProps {
+const BaseScopeVisual = ({
+  textureMapper,
+  nParticles = 512,
+  usePoints = true,
+  interpolate = false,
+  color = { r: 0, g: 255, b: 0, a: 255 },
+}: {
   textureMapper: TextureMapper;
   nParticles?: number;
   usePoints?: boolean;
@@ -80,15 +86,7 @@ interface BaseAudioScopeVisualProps {
     g: number;
     a: number;
   };
-}
-
-const BaseScopeVisual = ({
-  textureMapper,
-  nParticles = 512,
-  usePoints = true,
-  interpolate = false,
-  color = { r: 0, g: 255, b: 0, a: 255 },
-}: BaseAudioScopeVisualProps) => {
+}) => {
   const { tex, textureData } = textureMapper.generateSupportedTextureAndData();
   tex.needsUpdate = true;
   const matRef = useRef<ShaderMaterial>(null!);

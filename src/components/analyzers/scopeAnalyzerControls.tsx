@@ -7,12 +7,11 @@ import {
   useVisualSourceDataY,
 } from "../../appState";
 
-export interface AudioScopeAnalyzerControlsProps {
-  analyzer: ScopeAnalyzer;
-}
 const AudioScopeAnalyzerControls = ({
   analyzer,
-}: AudioScopeAnalyzerControlsProps) => {
+}: {
+  analyzer: ScopeAnalyzer;
+}) => {
   const timeData = useVisualSourceDataX();
   const quadData = useVisualSourceDataY();
   const { resizeVisualSourceData } = useAppStateActions();

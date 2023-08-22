@@ -17,8 +17,11 @@ const getAnalyzerComponent = (mode: ApplicationMode) => {
       return <AudioFFTAnalyzer />;
     case APPLICATION_MODE.AUDIO_SCOPE:
       return <AudioScopeAnalyzer />;
-    default:
+    case APPLICATION_MODE.WAVE_FORM:
+    case APPLICATION_MODE.NOISE:
       return null;
+    default:
+      return mode satisfies never;
   }
 };
 
@@ -26,8 +29,12 @@ const getCanvasComponent = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO_SCOPE:
       return <AudioScopeCanvas />;
-    default:
+    case APPLICATION_MODE.WAVE_FORM:
+    case APPLICATION_MODE.NOISE:
+    case APPLICATION_MODE.AUDIO:
       return <Visual3DCanvas mode={mode} />;
+    default:
+      return mode satisfies never;
   }
 };
 

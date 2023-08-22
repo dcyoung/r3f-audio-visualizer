@@ -1,17 +1,14 @@
 import { MeshReflectorMaterial } from "@react-three/drei";
-import { Vector3 } from "three";
+import { type MeshProps } from "@react-three/fiber";
 
-interface GroundProps {
-  size?: number;
-  position: Vector3;
-}
 const Ground = ({
   size = 250,
-  position = new Vector3(0, 0, 0),
   ...props
-}: GroundProps) => {
+}: MeshProps & {
+  size?: number;
+}) => {
   return (
-    <mesh position={position} {...props}>
+    <mesh {...props}>
       <planeGeometry args={[size, size]} />
       <MeshReflectorMaterial
         mirror={1}

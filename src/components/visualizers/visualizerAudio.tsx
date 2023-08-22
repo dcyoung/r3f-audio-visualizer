@@ -6,15 +6,13 @@ import { useEnergyInfo, useVisualSourceDataX } from "../../appState";
 import { CoordinateMapper_Data } from "../mappers/coordinateMappers/data";
 import { EnergyTracker } from "../mappers/valueTracker/energyTracker";
 
-interface AudioVisualProps {
-  visual: string;
-  palette?: ColorPaletteType;
-}
-
 const AudioVisual = ({
   visual,
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: AudioVisualProps) => {
+}: {
+  visual: string;
+  palette?: ColorPaletteType;
+}) => {
   const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
 

@@ -4,9 +4,7 @@ import { Euler, type Group, MathUtils, Vector3 } from "three";
 
 import BaseDoubleHelix, { type BaseDoubleHelixProps } from "./base";
 
-type MultiStrandProps = BaseDoubleHelixProps;
-
-const MultiStrand = ({ ...props }: MultiStrandProps) => {
+const MultiStrand = (props: BaseDoubleHelixProps) => {
   const strandCount = 5;
   const bounds = 15;
   const strandRefs = Array.from({ length: strandCount }).map(() =>
@@ -55,7 +53,7 @@ const MultiStrand = ({ ...props }: MultiStrandProps) => {
   return (
     <>
       {strandRefs.map((ref, i) => (
-        <group
+        <BaseDoubleHelix
           key={i}
           ref={ref}
           position={strandPositions[i]}
@@ -66,9 +64,8 @@ const MultiStrand = ({ ...props }: MultiStrandProps) => {
               )
             )
           }
-        >
-          <BaseDoubleHelix {...props} />
-        </group>
+          {...props}
+        />
       ))}
     </>
   );

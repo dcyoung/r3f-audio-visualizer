@@ -1,23 +1,21 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef, useEffect, useMemo } from "react";
-import { BoxGeometry, type InstancedMesh, Matrix4, MeshBasicMaterial } from "three";
+import {
+  BoxGeometry,
+  type InstancedMesh,
+  Matrix4,
+  MeshBasicMaterial,
+} from "three";
 
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
 } from "../../mappers/coordinateMappers/common";
-import { ColorPalette, type ColorPaletteType, COLOR_PALETTE } from "../palettes";
-
-interface BaseGridProps {
-  coordinateMapper: ICoordinateMapper;
-  nGridRows?: number;
-  nGridCols?: number;
-  cubeSideLength?: number;
-  cubeSpacingScalar?: number;
-  palette?: ColorPaletteType | undefined;
-  pinStyle?: boolean;
-  color?: string;
-}
+import {
+  ColorPalette,
+  type ColorPaletteType,
+  COLOR_PALETTE,
+} from "../palettes";
 
 const BaseGrid = ({
   coordinateMapper,
@@ -28,7 +26,16 @@ const BaseGrid = ({
   palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
   pinStyle = false,
   color = "white",
-}: BaseGridProps) => {
+}: {
+  coordinateMapper: ICoordinateMapper;
+  nGridRows?: number;
+  nGridCols?: number;
+  cubeSideLength?: number;
+  cubeSpacingScalar?: number;
+  palette?: ColorPaletteType | undefined;
+  pinStyle?: boolean;
+  color?: string;
+}) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const lut = palette ? ColorPalette.getPalette(palette).buildLut() : null;

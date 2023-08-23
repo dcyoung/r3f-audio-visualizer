@@ -1,4 +1,4 @@
-import { Info, Palette } from "lucide-react";
+import { Grab, Palette, Rotate3d } from "lucide-react";
 
 import {
   Select,
@@ -9,9 +9,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  CAMERA_CONTROLS_MODE,
+  useCameraControlsContext,
+  useCameraControlsContextSetters,
+} from "@/context/cameraControls";
+import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 
 import { ToolbarItem, ToolbarPopover } from "./common";
+import { isCameraMode } from "../applicationModes";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { AVAILABLE_COLOR_PALETTES } from "../visualizers/palettes";
@@ -64,30 +71,36 @@ const ColorsControl = () => {
   );
 };
 
-const ExampleControl = () => {
-  return (
-    <ToolbarPopover
-      trigger={
-        <ToolbarItem>
-          <Info />
+const CameraControls = () => {
+  const { mode } = useCameraControlsContext();
+  const { setMode } = useCameraControlsContextSetters();
+
+  switch (mode) {
+    case CAMERA_CONTROLS_MODE.ORBIT_CONTROLS:
+      return (
+        <ToolbarItem onClick={() => setMode(CAMERA_CONTROLS_MODE.AUTO_ORBIT)}>
+          <Rotate3d />
         </ToolbarItem>
-      }
-    >
-      <div className="flex flex-col">
-        <p>Test A</p>
-        <p>Test B</p>
-        <p>Test C</p>
-      </div>
-    </ToolbarPopover>
-  );
+      );
+    case CAMERA_CONTROLS_MODE.AUTO_ORBIT:
+      return (
+        <ToolbarItem
+          onClick={() => setMode(CAMERA_CONTROLS_MODE.ORBIT_CONTROLS)}
+        >
+          <Grab />
+        </ToolbarItem>
+      );
+    default:
+      return mode satisfies never;
+  }
 };
 
 export const SettingsToolbar = () => {
+  const { mode } = useModeContext();
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center gap-4">
       <ColorsControl />
-      <ExampleControl />
-      <ExampleControl />
+      {isCameraMode(mode) && <CameraControls />}
     </div>
   );
 };

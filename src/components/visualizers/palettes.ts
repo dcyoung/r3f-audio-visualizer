@@ -124,6 +124,12 @@ export class ColorPalette implements IColorPalette {
     return bkg;
   };
 
+  public lerpColor = (norm: number) => {
+    const alpha = Math.min(1, Math.max(0, norm));
+    const gradient = new GradientLinear(this);
+    return gradient.getAt(alpha);
+  }
+
   public static getPalette(type: ColorPaletteType) {
     /**
      * Wonderful color combos taken from https://github.com/spite/genuary-2022

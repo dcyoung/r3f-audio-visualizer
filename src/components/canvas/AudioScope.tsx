@@ -1,11 +1,12 @@
 import { Canvas } from "@react-three/fiber";
 
+import { CanvasBackground } from "./common";
 import AudioScopeVisual from "../visualizers/visualizerAudioScope";
 
 const AudioScopeCanvas = () => {
   return (
     <Canvas>
-      <color attach="background" args={["black"]} />
+      <CanvasBackground />
       <AudioScopeVisual />
     </Canvas>
   );

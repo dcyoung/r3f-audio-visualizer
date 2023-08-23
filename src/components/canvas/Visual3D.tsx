@@ -7,8 +7,8 @@ import {
 } from "@/context/cameraControls";
 import { useVisualContext } from "@/context/visual";
 
+import { BackgroundFog, CanvasBackground } from "./common";
 import { APPLICATION_MODE } from "../applicationModes";
-import { ColorPalette, type ColorPaletteType } from "../visualizers/palettes";
 import AudioVisual from "../visualizers/visualizerAudio";
 import NoiseVisual from "../visualizers/visualizerNoise";
 // import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
@@ -25,11 +25,12 @@ export const AVAILABLE_VISUALS = [
   // "particleSwarm",
 ] as const;
 
-const getVisualizerComponent = (
-  mode: "WAVE_FORM" | "NOISE" | "AUDIO",
-  visual: (typeof AVAILABLE_VISUALS)[number],
-  palette: ColorPaletteType
-) => {
+const VisualizerComponent = ({
+  mode,
+}: {
+  mode: "WAVE_FORM" | "NOISE" | "AUDIO";
+}) => {
+  const { visual, palette } = useVisualContext();
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
       return <WaveformVisual visual={visual} palette={palette} />;
@@ -88,10 +89,6 @@ const Visual3DCanvas = ({
 }: {
   mode: "WAVE_FORM" | "NOISE" | "AUDIO";
 }) => {
-  const { visual, palette, colorBackground } = useVisualContext();
-  const backgroundColor = colorBackground
-    ? ColorPalette.getPalette(palette).calcBackgroundColor(0)
-    : "#010204";
   return (
     <Canvas
       camera={{
@@ -102,10 +99,10 @@ const Visual3DCanvas = ({
         up: [0, 0, 1],
       }}
     >
-      <color attach="background" args={[backgroundColor]} />
+      <CanvasBackground />
       <ambientLight />
-      <fog attach="fog" args={[backgroundColor, 0, 100]} />
-      {getVisualizerComponent(mode, visual, palette)}
+      <BackgroundFog />
+      <VisualizerComponent mode={mode} />
       {/* <Stats /> */}
       <CameraControls />
     </Canvas>

@@ -31,3 +31,16 @@ export const getPlatformSupportedApplicationModes = (): ApplicationMode[] => {
     APPLICATION_MODE.AUDIO_SCOPE,
   ];
 };
+
+export const isCameraMode = (mode: ApplicationMode) => {
+  switch (mode) {
+    case APPLICATION_MODE.WAVE_FORM:
+    case APPLICATION_MODE.NOISE:
+    case APPLICATION_MODE.AUDIO:
+      return true;
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return false;
+    default:
+      return mode satisfies never;
+  }
+} 

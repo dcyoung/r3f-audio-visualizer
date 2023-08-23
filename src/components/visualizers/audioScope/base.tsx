@@ -6,6 +6,7 @@ import {
   DataTexture,
   RGBAFormat,
   Vector3,
+  Color,
 } from "three";
 
 import fragmentShader from "./shaders/fragment";
@@ -74,18 +75,13 @@ const BaseScopeVisual = ({
   nParticles = 512,
   usePoints = true,
   interpolate = false,
-  color = { r: 0, g: 255, b: 0, a: 255 },
+  color = new Color("green"),
 }: {
   textureMapper: TextureMapper;
   nParticles?: number;
   usePoints?: boolean;
   interpolate?: boolean;
-  color?: {
-    r: number;
-    b: number;
-    g: number;
-    a: number;
-  };
+  color?: Color;
 }) => {
   const { tex, textureData } = textureMapper.generateSupportedTextureAndData();
   tex.needsUpdate = true;
@@ -101,7 +97,7 @@ const BaseScopeVisual = ({
     () => ({
       // FRAGMENT
       color: {
-        value: new Vector3(color.r, color.g, color.b),
+        value: new Vector3(),
       },
       // VERTEX
       max_amplitude: {
@@ -143,11 +139,11 @@ const BaseScopeVisual = ({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.b_should_interpolate.value = interpolate;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      matRef.current.uniforms.color.value.x = color.r / 255.0;
+      matRef.current.uniforms.color.value.x = color.r;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      matRef.current.uniforms.color.value.y = color.g / 255.0;
+      matRef.current.uniforms.color.value.y = color.g;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      matRef.current.uniforms.color.value.z = color.b / 255.0;
+      matRef.current.uniforms.color.value.z = color.b;
     }
   }, [interpolate, color]);
 

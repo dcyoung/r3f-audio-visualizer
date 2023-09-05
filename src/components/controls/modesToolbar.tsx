@@ -1,12 +1,22 @@
-import { Activity, Music, Shell, Waves } from "lucide-react";
-import { useMemo } from "react";
+import {
+  Activity,
+  MoreHorizontal,
+  MoreVertical,
+  Music,
+  Shell,
+  Waves,
+} from "lucide-react";
+import { HTMLAttributes, useMemo } from "react";
 
 import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
+  APPLICATION_MODE,
 } from "@/components/applicationModes";
-import { ToolbarItem } from "@/components/controls/common";
-import { useModeContextSetters } from "@/context/mode";
+import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
+import { useModeContext, useModeContextSetters } from "@/context/mode";
+import { cn } from "@/lib/utils";
+import classnames from "classnames";
 
 const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
   switch (mode) {
@@ -24,38 +34,95 @@ const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
 };
 
 const ModeSelectButton = ({ mode }: { mode: ApplicationMode }) => {
+  const { mode: currentMode } = useModeContext();
   const { setMode } = useModeContextSetters();
   return (
-    <ToolbarItem onClick={() => setMode(mode)}>
-      <ModeIcon mode={mode} />
-    </ToolbarItem>
+    <div className="flex flex-col items-center justify-start">
+      <ToolbarItem
+        onClick={() => setMode(mode)}
+        className={classnames({
+          "bg-white/50": mode === currentMode,
+        })}
+      >
+        <ModeIcon mode={mode} />
+      </ToolbarItem>
+      {mode === currentMode && <ModeSettingsPopover />}
+    </div>
   );
 };
 
-// const modeParam = new URLSearchParams(document.location.search).get(
-//   "mode"
-// ) as ApplicationMode | null;
-// const { mode } = useControls({
-//   mode: {
-//     value:
-//       modeParam && AVAILABLE_MODES.includes(modeParam)
-//         ? modeParam
-//         : AVAILABLE_MODES[0],
-//     options: AVAILABLE_MODES.reduce(
-//       (o, mode) => ({ ...o, [getAppModeDisplayName(mode)]: mode }),
-//       {}
-//     ),
-//     order: -100,
-//   },
-// });
+const WaveformModeControls = () => {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <span>Wave Form</span>
+      <p>...</p>
+    </div>
+  );
+};
 
-export const ModesToolbar = () => {
+const NoiseGeneratorModeControls = () => {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <span>Noise Generator</span>
+      <p>...</p>
+    </div>
+  );
+};
+
+const AudioModeControls = () => {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <span>Audio</span>
+      <p>...</p>
+    </div>
+  );
+};
+
+const ModeSettingsInputs = () => {
+  const { mode } = useModeContext();
+  switch (mode) {
+    case APPLICATION_MODE.WAVE_FORM:
+      return <WaveformModeControls />;
+    case APPLICATION_MODE.NOISE:
+      return <NoiseGeneratorModeControls />;
+    case APPLICATION_MODE.AUDIO:
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return <AudioModeControls />;
+    default:
+      return mode satisfies never;
+  }
+};
+
+const ModeSettingsPopover = () => {
+  return (
+    <ToolbarPopover
+      trigger={
+        <MoreHorizontal className="pointer-events-auto cursor-pointer" />
+      }
+      align="start"
+      className="bg-background/50 border-0 border-transparent p-0 w-fit"
+    >
+      <ModeSettingsInputs />
+    </ToolbarPopover>
+  );
+};
+
+export const ModesToolbar = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => {
   const availableModes = useMemo(() => {
     return getPlatformSupportedApplicationModes();
   }, []);
 
   return (
-    <div className="pointer-events-none flex flex-row items-center justify-center gap-4">
+    <div
+      className={cn(
+        "pointer-events-none flex flex-row items-center justify-center gap-4",
+        className
+      )}
+      {...props}
+    >
       {availableModes.map((mode) => (
         <ModeSelectButton mode={mode} key={mode} />
       ))}

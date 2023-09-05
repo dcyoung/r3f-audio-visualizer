@@ -1,4 +1,8 @@
-import { type HTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
+import {
+  type HTMLAttributes,
+  type PropsWithChildren,
+  type ReactNode,
+} from "react";
 
 import {
   Popover,
@@ -27,18 +31,15 @@ export const ToolbarItem = ({
 
 export const ToolbarPopover = ({
   trigger,
-  children,
-  className,
-}: PropsWithChildren<{
+  ...props
+}: HTMLAttributes<HTMLDivElement> & {
   trigger: ReactNode;
-  className?: string;
-}>) => {
+  align?: "start" | "end" | "center";
+}) => {
   return (
     <Popover>
       <PopoverTrigger>{trigger}</PopoverTrigger>
-      <PopoverContent align="center" className={className}>
-        {children}
-      </PopoverContent>
+      <PopoverContent {...props} />
     </Popover>
   );
 };

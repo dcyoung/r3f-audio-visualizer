@@ -24,18 +24,25 @@ export const ControlsPanel = () => {
         />
       </div>
       {visible && (
+        // <div className="pointer-events-none absolute sm:top-0 bottom-0 flex h-24 w-full flex-row items-center justify-start sm:justify-center p-4 gap-12 overflow-x-scroll">
+        //   <ModesToolbar className="flex-row" />
+        //   {mode !== APPLICATION_MODE.AUDIO_SCOPE && (
+        //     <VisualsToolbar className="flex-row" />
+        //   )}
+        //   <SettingsToolbar className="flex-row" />
+        // </div>
         <>
-          <div className="pointer-events-none absolute top-0 flex h-24 w-full flex-row items-center justify-center p-4">
+          <div className="pointer-events-none absolute top-0 flex h-24 w-full flex-row items-start justify-start p-4">
             <ModesToolbar />
           </div>
-          {mode !== APPLICATION_MODE.AUDIO_SCOPE && (
+          {/* {mode !== APPLICATION_MODE.AUDIO_SCOPE && (
             <div className="pointer-events-none absolute bottom-0 flex h-24 w-full flex-row items-center justify-center p-4">
               <VisualsToolbar />
             </div>
           )}
           <div className="pointer-events-none absolute right-0 flex h-full w-24 flex-col items-center justify-center p-4">
             <SettingsToolbar />
-          </div>
+          </div> */}
         </>
       )}
     </>

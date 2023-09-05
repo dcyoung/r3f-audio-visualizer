@@ -1,4 +1,4 @@
-import { Grab, Palette, Rotate3d } from "lucide-react";
+import { Grab, Info, Palette, Rotate3d } from "lucide-react";
 
 import {
   Select,
@@ -22,6 +22,8 @@ import { isCameraMode } from "../applicationModes";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { AVAILABLE_COLOR_PALETTES } from "../visualizers/palettes";
+import { HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
 const ColorsControl = () => {
   const { colorBackground, palette } = useVisualContext();
@@ -95,12 +97,40 @@ const CameraControls = () => {
   }
 };
 
-export const SettingsToolbar = () => {
+// const TestControl = () => {
+//   return (
+//     <ToolbarPopover
+//       trigger={
+//         <ToolbarItem>
+//           <Info />
+//         </ToolbarItem>
+//       }
+//       align="end"
+//       className="bg-background/50 border-0 border-transparent p-0 w-fit"
+//     >
+//       <div className="pointer-events-none flex flex-row items-center justify-center gap-4">
+//         Test
+//       </div>
+//     </ToolbarPopover>
+//   );
+// };
+
+export const SettingsToolbar = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => {
   const { mode } = useModeContext();
   return (
-    <div className="pointer-events-none flex flex-col items-center justify-center gap-4">
+    <div
+      className={cn(
+        "pointer-events-none flex flex-col items-center justify-center gap-4",
+        className
+      )}
+      {...props}
+    >
       <ColorsControl />
       {isCameraMode(mode) && <CameraControls />}
+      {/* <TestControl /> */}
     </div>
   );
 };

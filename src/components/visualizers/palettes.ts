@@ -72,11 +72,12 @@ export class GradientLinear implements IGradient {
     const fc = this.colors[from];
     const ft = this.colors[to];
     const p = (t - from / this.colors.length) / (1 / this.colors.length);
-    const res = new Color();
-    res.r = mix(fc.r, ft.r, p);
-    res.g = mix(fc.g, ft.g, p);
-    res.b = mix(fc.b, ft.b, p);
-    return res;
+    return new Color().setRGB(
+      mix(fc.r, ft.r, p),
+      mix(fc.g, ft.g, p),
+      mix(fc.b, ft.b, p),
+      SRGBColorSpace,
+    );
   };
 }
 

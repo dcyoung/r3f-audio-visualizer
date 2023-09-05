@@ -4,6 +4,8 @@ import { useVisualContextSetters } from "@/context/visual";
 
 import { ToolbarItem } from "./common";
 import { AVAILABLE_VISUALS } from "../canvas/Visual3D";
+import { HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
 const VisualIcon = ({
   visual,
@@ -41,9 +43,18 @@ const VisualSelectButton = ({
   );
 };
 
-export const VisualsToolbar = () => {
+export const VisualsToolbar = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className="pointer-events-none flex flex-row items-center justify-center gap-4">
+    <div
+      className={cn(
+        "pointer-events-none flex flex-row items-center justify-center gap-4",
+        className
+      )}
+      {...props}
+    >
       {AVAILABLE_VISUALS.map((visual) => (
         <VisualSelectButton visual={visual} key={visual} />
       ))}

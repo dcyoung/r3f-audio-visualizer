@@ -21,6 +21,7 @@
     "@react-three/postprocessing": "^2.15.0",
     "@types/three": "^0.154.0",
     "class-variance-authority": "^0.7.0",
+    "classnames": "^2.3.2",
     "clsx": "^2.0.0",
     "leva": "^0.9.35",
     "lucide-react": "^0.268.0",
@@ -31,6 +32,7 @@
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.6",
     "three": "^0.154.0",
+    "zod": "^3.22.2",
     "zustand": "^4.4.1"
   },
   "devDependencies": {

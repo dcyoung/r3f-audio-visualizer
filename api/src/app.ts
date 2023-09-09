@@ -3,8 +3,13 @@ import proxy from 'express-http-proxy';
 
 import { getSoundcloudToken } from './soundcloud';
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const app = express();
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+});
 
 /*
 Example: 

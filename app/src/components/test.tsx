@@ -5,12 +5,12 @@ export const TestInternal = () => {
   const { data } = useSuspenseQuery({
     queryKey: ["test"],
     queryFn: async () => {
-      //   const url = `https://api.soundcloud.com/playlists?${new URLSearchParams(
+      // const url = `http://localhost:3000/proxy/playlists?${new URLSearchParams({
       const url = `https://soundcloud-api-proxy.fly.dev/proxy/playlists?${new URLSearchParams(
         {
-          q: "house",
+          q: "test",
           access: "playable",
-          limit: "1",
+          limit: "5",
         }
       )}`;
       try {
@@ -18,12 +18,11 @@ export const TestInternal = () => {
           method: "GET",
           headers: {},
         });
-        console.log(response);
-        // return await response.json();
-        return "SUCCESS";
+        console.log(await response.json());
+        return `SUCCESS retrieving playlists`;
       } catch (err) {
         console.error(err);
-        return "FAILED";
+        return "FAILED retrieving playlists";
       }
     },
   });

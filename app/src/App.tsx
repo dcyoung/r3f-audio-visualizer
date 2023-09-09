@@ -1,11 +1,8 @@
 import { Suspense } from "react";
 
+import { type ApplicationMode, APPLICATION_MODE } from "@/applicationModes";
 import AudioFFTAnalyzer from "@/components/analyzers/audioFFTAnalyzer";
 import AudioScopeAnalyzer from "@/components/analyzers/audioScopeAnalyzer";
-import {
-  type ApplicationMode,
-  APPLICATION_MODE,
-} from "@/components/applicationModes";
 import AudioScopeCanvas from "@/components/canvas/AudioScope";
 import Visual3DCanvas from "@/components/canvas/Visual3D";
 import { ControlsPanel } from "@/components/controls/main";
@@ -38,10 +35,28 @@ const getCanvasComponent = (mode: ApplicationMode) => {
   }
 };
 
+// export const TestInternal = () => {
+//   const [playlists] = trpcReact.soundcloud.getPlaylists.useSuspenseQuery(
+//     {
+//       query: "house",
+//     },
+//     {}
+//   );
+//   console.log(playlists);
+//   return <span className="text-5xl text-white">{playlists.length}</span>;
+// };
+
+// export const Test = () => {
+//   return (
+//     <Suspense fallback={null}>
+//       <TestInternal />
+//     </Suspense>
+//   );
+// };
 const App = () => {
   const { mode } = useModeContext();
   return (
-    <div className="relative h-[100dvh] w-[100dvw] bg-background">
+    <main className="relative h-[100dvh] w-[100dvw] bg-black">
       <div className="absolute h-[100dvh] w-[100dvw]">
         <Suspense fallback={<span>loading...</span>}>
           {getAnalyzerComponent(mode)}
@@ -49,7 +64,7 @@ const App = () => {
         </Suspense>
       </div>
       <ControlsPanel />
-    </div>
+    </main>
   );
 };
 

@@ -50,9 +50,9 @@ export const getPlatformSupportedAudioSources = (): AudioSource[] => {
     ];
 };
 
-const AVAILABLE_SOURCES = getPlatformSupportedAudioSources();
 
 export function useSelectAudioSource() {
+  const available = getPlatformSupportedAudioSources();
   const audioSourceParam = new URLSearchParams(document.location.search).get(
     "audioSource"
   ) as AudioSource | null;
@@ -60,10 +60,10 @@ export function useSelectAudioSource() {
     Audio: folder({
       audioSource: {
         value:
-          audioSourceParam && AVAILABLE_SOURCES.includes(audioSourceParam)
+          audioSourceParam && available.includes(audioSourceParam)
             ? audioSourceParam
-            : AVAILABLE_SOURCES[0],
-        options: AVAILABLE_SOURCES.reduce(
+            : available[0],
+        options: available.reduce(
           (o, src) => ({ ...o, [getAnalyzerSourceDisplayName(src)]: src }),
           {}
         ),

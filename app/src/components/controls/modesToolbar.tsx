@@ -1,22 +1,15 @@
-import {
-  Activity,
-  MoreHorizontal,
-  MoreVertical,
-  Music,
-  Shell,
-  Waves,
-} from "lucide-react";
-import { HTMLAttributes, useMemo } from "react";
+import classnames from "classnames";
+import { Activity, MoreHorizontal, Music, Shell, Waves } from "lucide-react";
+import { type HTMLAttributes, useMemo } from "react";
 
 import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
   APPLICATION_MODE,
-} from "@/components/applicationModes";
+} from "@/applicationModes";
 import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
 import { cn } from "@/lib/utils";
-import classnames from "classnames";
 
 const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
   switch (mode) {
@@ -100,7 +93,7 @@ const ModeSettingsPopover = () => {
         <MoreHorizontal className="pointer-events-auto cursor-pointer" />
       }
       align="start"
-      className="bg-background/50 border-0 border-transparent p-0 w-fit"
+      className="w-fit border-0 border-transparent bg-background/50 p-0"
     >
       <ModeSettingsInputs />
     </ToolbarPopover>

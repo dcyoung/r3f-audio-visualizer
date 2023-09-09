@@ -17,6 +17,7 @@ git clone https://github.com/dcyoung/r3f-audio-visualizer.git
 
 cd r3f-audio-visualizer
 
-npm install
-npm run dev
+cd app/
+pnpm i
+pnpm dev
 ```

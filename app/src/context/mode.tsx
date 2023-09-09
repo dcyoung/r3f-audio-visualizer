@@ -7,10 +7,7 @@ import {
   type SetStateAction,
 } from "react";
 
-import {
-  type ApplicationMode,
-  APPLICATION_MODE,
-} from "@/components/applicationModes";
+import { type ApplicationMode, APPLICATION_MODE } from "@/applicationModes";
 
 export interface ModeConfig {
   mode: ApplicationMode;

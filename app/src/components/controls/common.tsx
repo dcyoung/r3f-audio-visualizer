@@ -1,8 +1,4 @@
-import {
-  type HTMLAttributes,
-  type PropsWithChildren,
-  type ReactNode,
-} from "react";
+import { type HTMLAttributes, type ReactNode } from "react";
 
 import {
   Popover,

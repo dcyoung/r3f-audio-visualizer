@@ -1,5 +1,8 @@
-import { Grab, Info, Palette, Rotate3d } from "lucide-react";
+import { Grab, Palette, Rotate3d } from "lucide-react";
+import { type HTMLAttributes } from "react";
 
+import { isCameraMode } from "@/applicationModes";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -9,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { AVAILABLE_COLOR_PALETTES } from "@/components/visualizers/palettes";
 import {
   CAMERA_CONTROLS_MODE,
   useCameraControlsContext,
@@ -16,14 +21,9 @@ import {
 } from "@/context/cameraControls";
 import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
+import { cn } from "@/lib/utils";
 
 import { ToolbarItem, ToolbarPopover } from "./common";
-import { isCameraMode } from "../applicationModes";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
-import { AVAILABLE_COLOR_PALETTES } from "../visualizers/palettes";
-import { HTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
 
 const ColorsControl = () => {
   const { colorBackground, palette } = useVisualContext();

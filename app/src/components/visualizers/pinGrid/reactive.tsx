@@ -61,12 +61,16 @@ const PinGridVisual = ({
         palette={undefined}
         color={"black"}
       />
-      <pointLight position={[0, 0, 5 * radius]} intensity={5.0} />
+      <pointLight
+        position={[0, 0, 2 * 5 * radius]}
+        intensity={Math.PI * 5.0}
+        decay={1}
+      />
       <pointLight
         ref={lightRef}
-        intensity={5}
-        distance={3 * radius}
-        decay={1.0}
+        intensity={Math.PI * 5}
+        distance={2 * 3 * radius}
+        decay={0.5}
       />
     </group>
   );

@@ -8,11 +8,13 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - name: Install and Build
         run: |
-          npm install
-          npm run build
+          cd app
+          pnpm i
+          pnpm build
         env:
           CI: ""
-
-

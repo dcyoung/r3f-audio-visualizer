@@ -1,14 +1,6 @@
 import { create } from "zustand";
 
-import { getRadioStations } from "./radio";
-
-export interface RadioStation {
-  title: string;
-  streamUrl: string;
-}
-
 interface IAppState {
-  radioStations: RadioStation[] | null;
   visualSourceData: {
     x: Float32Array;
     y: Float32Array;
@@ -44,8 +36,6 @@ const useAppState = create<IAppState>((set, _) => ({
   },
 }));
 
-export const useAvailableRadioStations = () =>
-  useAppState((state) => state.radioStations);
 export const useVisualSourceDataX = () =>
   useAppState((state) => state.visualSourceData.x);
 export const useVisualSourceDataY = () =>
@@ -54,6 +44,3 @@ export const useVisualSourceDataY = () =>
 //   useAppState((state) => state.visualSourceData.z);
 export const useEnergyInfo = () => useAppState((state) => state.energyInfo);
 export const useAppStateActions = () => useAppState((state) => state.actions);
-
-
-getRadioStations().then((stations) => useAppState.setState({ radioStations: stations })).catch((e) => console.error(e));

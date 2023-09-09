@@ -1,4 +1,5 @@
+.env
 .vscode/
 scratch.sh
 scratch/
-.env
+notes/

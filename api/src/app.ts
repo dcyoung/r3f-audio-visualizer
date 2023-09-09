@@ -3,8 +3,8 @@ import proxy from 'express-http-proxy';
 
 import { getSoundcloudToken } from './soundcloud';
 
+const port = process.env.PORT;
 const app = express();
-const port = process.env.port || 3000;
 
 /*
 Example: 

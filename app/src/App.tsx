@@ -8,6 +8,8 @@ import { ControlsPanel } from "@/components/controls/main";
 import { useModeContext } from "@/context/mode";
 import { type ApplicationMode, APPLICATION_MODE } from "@/lib/applicationModes";
 
+import { Test } from "./components/test";
+
 const getAnalyzerComponent = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO:
@@ -35,24 +37,6 @@ const getCanvasComponent = (mode: ApplicationMode) => {
   }
 };
 
-// export const TestInternal = () => {
-//   const [playlists] = trpcReact.soundcloud.getPlaylists.useSuspenseQuery(
-//     {
-//       query: "house",
-//     },
-//     {}
-//   );
-//   console.log(playlists);
-//   return <span className="text-5xl text-white">{playlists.length}</span>;
-// };
-
-// export const Test = () => {
-//   return (
-//     <Suspense fallback={null}>
-//       <TestInternal />
-//     </Suspense>
-//   );
-// };
 const App = () => {
   const { mode } = useModeContext();
   return (
@@ -62,6 +46,9 @@ const App = () => {
           {getAnalyzerComponent(mode)}
           {getCanvasComponent(mode)}
         </Suspense>
+      </div>
+      <div className="absolute flex h-[100dvh] w-[100dvw] flex-row items-center justify-center">
+        <Test />
       </div>
       <ControlsPanel />
     </main>

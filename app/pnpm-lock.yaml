@@ -25,6 +25,9 @@ dependencies:
   '@react-three/postprocessing':
     specifier: ^2.15.1
     version: 2.15.1(@react-three/fiber@8.14.1)(@types/three@0.155.1)(react@18.2.0)(three@0.156.1)
+  '@tanstack/react-query':
+    specifier: 5.0.0-beta.23
+    version: 5.0.0-beta.23(react-dom@18.2.0)(react@18.2.0)
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -1473,6 +1476,28 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@tanstack/query-core@5.0.0-beta.23:
+    resolution: {integrity: sha512-Qp+U4EltOl7y8VZIhxy4eZR5xFnXll28Urp28e6ag10D69yYKRApS2O+ufcVCxOcm1GFv4rpp19gYrpoqHeWgA==}
+    dev: false
+
+  /@tanstack/react-query@5.0.0-beta.23(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-iaqcgUEf1aSVy60wxMt/p9joWyQYKa9eXn0TMdNmPUpH/SwiDeomiHFgvp1sP4vq+s32/BnygeNzbYFqG9ppJg==}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@tanstack/query-core': 5.0.0-beta.23
+      client-only: 0.0.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /@tweenjs/tween.js@18.6.4:
     resolution: {integrity: sha512-lB9lMjuqjtuJrx7/kOkqQBtllspPIN+96OvTCeJ2j5FEzinoAXTdAMFnDAQT1KVPRlnYfBrqxtqP66vDM40xxQ==}
 
@@ -2027,6 +2052,10 @@ packages:
 
   /classnames@2.3.2:
     resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+    dev: false
+
+  /client-only@0.0.1:
+    resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
     dev: false
 
   /clsx@2.0.0:

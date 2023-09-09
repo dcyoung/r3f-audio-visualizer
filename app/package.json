@@ -26,6 +26,7 @@
     "lucide-react": "^0.274.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
     "simplex-noise": "^4.0.1",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.6",

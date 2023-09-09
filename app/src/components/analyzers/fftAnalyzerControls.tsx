@@ -1,13 +1,13 @@
 import { folder, useControls } from "leva";
 import { useEffect, useRef } from "react";
 
-import { type EnergyMeasure } from "./analyzers/fft";
-import type FFTAnalyzer from "./analyzers/fft";
+import { type EnergyMeasure } from "@/lib/analyzers/fft";
+import type FFTAnalyzer from "@/lib/analyzers/fft";
 import {
   useAppStateActions,
   useEnergyInfo,
   useVisualSourceDataX,
-} from "../../appState";
+} from "@/lib/appState";
 
 const FFTAnalyzerControls = ({ analyzer }: { analyzer: FFTAnalyzer }) => {
   const { octaveBands, energyMeasure } = useControls({

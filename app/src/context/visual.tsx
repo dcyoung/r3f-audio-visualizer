@@ -14,7 +14,7 @@ import {
   type AVAILABLE_COLOR_PALETTES,
   COLOR_PALETTE,
   ColorPalette,
-} from "@/components/visualizers/palettes";
+} from "@/lib/palettes";
 
 import { useTheme } from "./theme";
 

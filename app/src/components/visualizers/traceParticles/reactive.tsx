@@ -1,11 +1,12 @@
 import { folder, useControls } from "leva";
 import { Vector3 } from "three";
 
+import { type VisualProps } from "@/components/visualizers/common";
+import Ground from "@/components/visualizers/ground";
+
 import BaseTraceParticles from "./base";
 import { getPoly2D as getPoly2D_DIAG } from "./polys/diagonal";
 import { getPoly2D as getPoly2D_OWL } from "./polys/owl";
-import Ground from "../../ground";
-import { type VisualProps } from "../common";
 
 const TraceParticlesVisual = ({ coordinateMapper }: VisualProps) => {
   const { pointSize, power, bounds, transitionSpeed } = useControls({

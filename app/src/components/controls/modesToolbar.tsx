@@ -2,13 +2,13 @@ import classnames from "classnames";
 import { Activity, MoreHorizontal, Music, Shell, Waves } from "lucide-react";
 import { type HTMLAttributes, useMemo } from "react";
 
+import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
+import { useModeContext, useModeContextSetters } from "@/context/mode";
 import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
   APPLICATION_MODE,
-} from "@/applicationModes";
-import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
-import { useModeContext, useModeContextSetters } from "@/context/mode";
+} from "@/lib/applicationModes";
 import { cn } from "@/lib/utils";
 
 const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {

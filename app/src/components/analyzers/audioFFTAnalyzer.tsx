@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 
-import { useMicrophoneLink } from "./analyzers/common";
-import FFTAnalyzer from "./analyzers/fft";
-import FFTAnalyzerControls from "./fftAnalyzerControls";
-import ControlledAudioSource from "../audio/audioSource";
+import FFTAnalyzerControls from "@/components/analyzers/fftAnalyzerControls";
+import ControlledAudioSource from "@/components/audio/audioSource";
 import {
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
   useSelectAudioSource,
-} from "../audio/sourceControls/common";
-import MicrophoneAudioControls from "../audio/sourceControls/mic";
+} from "@/components/audio/sourceControls/common";
+import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
+import { useMicrophoneLink } from "@/lib/analyzers/common";
+import FFTAnalyzer from "@/lib/analyzers/fft";
 
 const InternalAudioFFTAnalyzer = ({
   audioSource,

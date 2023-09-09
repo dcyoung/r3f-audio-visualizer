@@ -7,7 +7,7 @@ import {
   gaussianRandom,
   type ICoordinateMapper,
   TWO_PI,
-} from "../../mappers/coordinateMappers/common";
+} from "@/lib/mappers/coordinateMappers/common";
 
 const BaseDiffusedRing = ({
   coordinateMapper,

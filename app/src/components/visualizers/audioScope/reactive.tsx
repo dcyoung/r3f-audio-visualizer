@@ -2,10 +2,9 @@ import { folder, useControls } from "leva";
 import { useEffect } from "react";
 
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
+import { ColorPalette } from "@/lib/palettes";
 
 import BaseScopeVisual, { type TextureMapper } from "./base";
-import { ColorPalette } from "../palettes";
-
 
 const ScopeVisual = ({ textureMapper }: { textureMapper: TextureMapper }) => {
   const { palette } = useVisualContext();

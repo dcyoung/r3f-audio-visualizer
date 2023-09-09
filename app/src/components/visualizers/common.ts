@@ -1,7 +1,7 @@
-import { type ColorPaletteType } from "./palettes";
-import { type ICoordinateMapper } from "../mappers/coordinateMappers/common";
-import { type IMotionMapper } from "../mappers/motionMappers/common";
-import { type IScalarTracker } from "../mappers/valueTracker/common";
+import { type ICoordinateMapper } from "@/lib/mappers/coordinateMappers/common";
+import { type IMotionMapper } from "@/lib/mappers/motionMappers/common";
+import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
+import { type ColorPaletteType } from "@/lib/palettes";
 
 export interface VisualProps {
   coordinateMapper: ICoordinateMapper;

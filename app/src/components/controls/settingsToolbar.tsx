@@ -1,7 +1,6 @@
 import { Grab, Palette, Rotate3d } from "lucide-react";
 import { type HTMLAttributes } from "react";
 
-import { isCameraMode } from "@/applicationModes";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -13,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { AVAILABLE_COLOR_PALETTES } from "@/components/visualizers/palettes";
 import {
   CAMERA_CONTROLS_MODE,
   useCameraControlsContext,
@@ -21,6 +19,8 @@ import {
 } from "@/context/cameraControls";
 import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
+import { isCameraMode } from "@/lib/applicationModes";
+import { AVAILABLE_COLOR_PALETTES } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
 
 import { ToolbarItem, ToolbarPopover } from "./common";

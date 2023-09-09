@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 
-import { useMicrophoneLink } from "./analyzers/common";
-import ScopeAnalyzer from "./analyzers/scope";
-import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";
-import ControlledAudioSource from "../audio/audioSource";
+import AudioScopeAnalyzerControls from "@/components/analyzers/scopeAnalyzerControls";
+import ControlledAudioSource from "@/components/audio/audioSource";
 import {
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
   useSelectAudioSource,
-} from "../audio/sourceControls/common";
-import MicrophoneAudioControls from "../audio/sourceControls/mic";
+} from "@/components/audio/sourceControls/common";
+import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
+import { useMicrophoneLink } from "@/lib/analyzers/common";
+import ScopeAnalyzer from "@/lib/analyzers/scope";
 
 const InternalAudioScopeAnalyzer = ({
   audioSource,

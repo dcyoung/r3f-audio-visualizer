@@ -1,9 +1,10 @@
 import { folder, useControls } from "leva";
 import { Vector3 } from "three";
 
+import { type MotionVisualProps } from "@/components/visualizers/common";
+import Ground from "@/components/visualizers/ground";
+
 import BaseParticleSwarm from "./base";
-import Ground from "../../ground";
-import { type MotionVisualProps } from "../common";
 
 const ParticleSwarmVisual = ({ motionMapper }: MotionVisualProps) => {
   const { maxDim, pointSize } = useControls({

@@ -1,7 +1,7 @@
 // import { folder, useControls } from "leva";
 // import { useEffect } from "react";
 
-import { type AudioSourceControlsProps } from "./common";
+import { type AudioSourceControlsProps } from "@/components/audio/sourceControls/common";
 
 // const InternalLivestreamAudioControls = ({
 //   audio,

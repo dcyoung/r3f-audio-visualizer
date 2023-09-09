@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { type AudioSourceControlsProps } from "./common";
+import { type AudioSourceControlsProps } from "@/components/audio/sourceControls/common";
 
 export interface MicrophoneAudioControlsProps extends AudioSourceControlsProps {
   onDisabled: () => void;

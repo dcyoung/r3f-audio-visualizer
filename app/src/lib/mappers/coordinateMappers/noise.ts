@@ -7,7 +7,7 @@ import {
   type NoiseFunction4D,
 } from "simplex-noise";
 
-import { CoordinateMapperBase, cubeFaceCenterRadialOffset } from "./common";
+import { CoordinateMapperBase, cubeFaceCenterRadialOffset } from "@/lib/mappers/coordinateMappers/common";
 
 /**
  * Maps input coordinates to output values based on the noise functions.

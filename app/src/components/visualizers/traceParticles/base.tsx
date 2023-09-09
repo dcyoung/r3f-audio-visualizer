@@ -12,7 +12,7 @@ import {
   COORDINATE_TYPE,
   gaussianRandom,
   type ICoordinateMapper,
-} from "../../mappers/coordinateMappers/common";
+} from "@/lib/mappers/coordinateMappers/common";
 
 const computeNormals = (vertices: Vector2[], weighted = false): Vector2[] => {
   const n = vertices.length;

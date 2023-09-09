@@ -1,10 +1,11 @@
 import { folder, useControls } from "leva";
 import { Vector3 } from "three";
 
+import { type VisualProps } from "@/components/visualizers/common";
+import Ground from "@/components/visualizers/ground";
+import { COLOR_PALETTE } from "@/lib/palettes";
+
 import BaseGrid from "./base";
-import Ground from "../../ground";
-import { type VisualProps } from "../common";
-import { COLOR_PALETTE } from "../palettes";
 
 const GridVisual = ({
   coordinateMapper,

@@ -2,9 +2,10 @@ import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
 import { folder, useControls } from "leva";
 import { Vector3 } from "three";
 
+import { type VisualProps } from "@/components/visualizers/common";
+import Ground from "@/components/visualizers/ground";
+
 import BaseDiffusedRing from "./base";
-import Ground from "../../ground";
-import { type VisualProps } from "../common";
 
 const DiffusedRingVisual = ({ coordinateMapper }: VisualProps) => {
   const { radius, pointSize, mirrorEffects } = useControls({

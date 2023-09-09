@@ -5,9 +5,9 @@ export interface AudioSourceControlsProps {
 }
 
 export const AUDIO_SOURCE = {
-  LIVE_STREAM: "LIVE_STREAM",
-  MICROPHONE: "MICROPHONE",
   FILE_UPLOAD: "FILE_UPLOAD",
+  MICROPHONE: "MICROPHONE",
+  LIVE_STREAM: "LIVE_STREAM",
 } as const;
 
 type ObjectValues<T> = T[keyof T];
@@ -44,9 +44,9 @@ export const getPlatformSupportedAudioSources = (): AudioSource[] => {
   return iOS()
     ? [AUDIO_SOURCE.FILE_UPLOAD, AUDIO_SOURCE.MICROPHONE]
     : [
-      AUDIO_SOURCE.LIVE_STREAM,
       AUDIO_SOURCE.FILE_UPLOAD,
       AUDIO_SOURCE.MICROPHONE,
+      AUDIO_SOURCE.LIVE_STREAM,
     ];
 };
 

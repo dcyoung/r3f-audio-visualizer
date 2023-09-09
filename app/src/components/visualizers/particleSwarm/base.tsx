@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { useRef, useEffect, useMemo } from "react";
 import { type Points, Vector3 } from "three";
 
-import { type IMotionMapper } from "../../mappers/motionMappers/common";
+import { type IMotionMapper } from "@/lib/mappers/motionMappers/common";
 
 const BaseGrid = ({
   motionMapper,

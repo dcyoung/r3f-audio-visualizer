@@ -18,12 +18,12 @@ import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
   TWO_PI,
-} from "../../mappers/coordinateMappers/common";
+} from "@/lib/mappers/coordinateMappers/common";
 import {
   ColorPalette,
   type ColorPaletteType,
   COLOR_PALETTE,
-} from "../palettes";
+} from "@/lib/palettes";
 
 const clipAngleRad = (rad: number) => {
   return ((rad % TWO_PI) + TWO_PI) % TWO_PI;

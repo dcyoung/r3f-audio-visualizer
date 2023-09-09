@@ -1,10 +1,10 @@
 import { folder, useControls } from "leva";
 import { Suspense, lazy } from "react";
 
-import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
-import { useEnergyInfo, useVisualSourceDataX } from "../../appState";
-import { CoordinateMapper_Data } from "../mappers/coordinateMappers/data";
-import { EnergyTracker } from "../mappers/valueTracker/energyTracker";
+import { useEnergyInfo, useVisualSourceDataX } from "@/lib/appState";
+import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
+import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
+import { type ColorPaletteType, COLOR_PALETTE } from "@/lib/palettes";
 
 const AudioVisual = ({
   visual,

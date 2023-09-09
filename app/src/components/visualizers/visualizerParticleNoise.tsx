@@ -1,7 +1,7 @@
 import { folder, useControls } from "leva";
 
-import ParticleSwarmVisual from "./particleSwarm/reactive";
-import { MotionMapper_Noise } from "../mappers/motionMappers/curlNoise";
+import ParticleSwarmVisual from "@/components/visualizers/particleSwarm/reactive";
+import { MotionMapper_Noise } from "@/lib/mappers/motionMappers/curlNoise";
 
 const ParticleNoiseVisual = () => {
   const { spatialScale, curlAmount } = useControls({

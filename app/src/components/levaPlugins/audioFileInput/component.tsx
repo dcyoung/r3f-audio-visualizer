@@ -34,7 +34,7 @@ export function AudioFileInputComponent() {
   const { getRootProps, getInputProps, isDragAccept, open } = useDropzone({
     maxFiles: 1,
     accept: {
-      "audio/": [],
+      // "audio/": [],
       "audio/mpeg": [],
       "audio/ogg": [],
       "application/ogg": [],

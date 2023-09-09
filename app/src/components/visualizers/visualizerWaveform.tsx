@@ -1,8 +1,8 @@
 import { useControls } from "leva";
 import { Suspense, useEffect, lazy } from "react";
 
-import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
-import { CoordinateMapper_WaveformSuperposition } from "../mappers/coordinateMappers/waveform";
+import { CoordinateMapper_WaveformSuperposition } from "@/lib/mappers/coordinateMappers/waveform";
+import { type ColorPaletteType, COLOR_PALETTE } from "@/lib/palettes";
 
 const WaveformVisual = ({
   visual,

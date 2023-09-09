@@ -6,7 +6,7 @@ import {
   HALF_DIAGONAL_UNIT_SQUARE,
   type ICoordinateMapper,
   TWO_PI,
-} from "./common";
+} from "@/lib/mappers/coordinateMappers/common";
 
 /**
  * Maps input coordinates to output values based on a time varying waveform.
@@ -78,8 +78,7 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
  * Maps input coordinates to output values based on the superposition of multiple time varying waveforms.
  */
 export class CoordinateMapper_WaveformSuperposition
-  implements ICoordinateMapper
-{
+  implements ICoordinateMapper {
   private mappers: CoordinateMapper_Waveform[];
   public readonly amplitude: number;
 

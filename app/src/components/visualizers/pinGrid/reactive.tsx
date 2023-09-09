@@ -3,8 +3,8 @@ import { folder, useControls } from "leva";
 import { useRef } from "react";
 import { type PointLight } from "three";
 
-import { type VisualProps } from "../common";
-import BaseGrid from "../grid/base";
+import { type VisualProps } from "@/components/visualizers/common";
+import BaseGrid from "@/components/visualizers/grid/base";
 
 const PinGridVisual = ({
   coordinateMapper,

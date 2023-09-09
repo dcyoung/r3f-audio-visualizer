@@ -1,8 +1,8 @@
 import { folder, useControls } from "leva";
 import { Suspense, lazy } from "react";
 
-import { type ColorPaletteType, COLOR_PALETTE } from "./palettes";
-import { CoordinateMapper_Noise } from "../mappers/coordinateMappers/noise";
+import { CoordinateMapper_Noise } from "@/lib/mappers/coordinateMappers/noise";
+import { type ColorPaletteType, COLOR_PALETTE } from "@/lib/palettes";
 
 const NoiseVisual = ({
   visual,

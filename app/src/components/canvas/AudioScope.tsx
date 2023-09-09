@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 
-import { CanvasBackground } from "./common";
-import AudioScopeVisual from "../visualizers/visualizerAudioScope";
+import { CanvasBackground } from "@/components/canvas/common";
+import AudioScopeVisual from "@/components/visualizers/visualizerAudioScope";
 
 const AudioScopeCanvas = () => {
   return (

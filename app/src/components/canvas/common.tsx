@@ -1,6 +1,5 @@
 import { useVisualContext } from "@/context/visual";
-
-import { ColorPalette } from "../visualizers/palettes";
+import { ColorPalette } from "@/lib/palettes";
 
 const useBackgroundColor = () => {
   const { palette, colorBackground } = useVisualContext();

@@ -1,19 +1,17 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
-
-import { APPLICATION_MODE } from "@/applicationModes";
+import { BackgroundFog, CanvasBackground } from "@/components/canvas/common";
 import AudioVisual from "@/components/visualizers/visualizerAudio";
 import NoiseVisual from "@/components/visualizers/visualizerNoise";
-// import ParticleNoiseVisual from "../visualizers/visualizerParticleNoise";
+// import ParticleNoiseVisual from "@/components/visualizers/visualizerParticleNoise";
 import WaveformVisual from "@/components/visualizers/visualizerWaveform";
 import {
   CAMERA_CONTROLS_MODE,
   useCameraControlsContext,
 } from "@/context/cameraControls";
 import { useVisualContext } from "@/context/visual";
-
-import { BackgroundFog, CanvasBackground } from "./common";
+import { APPLICATION_MODE } from "@/lib/applicationModes";
 
 export const AVAILABLE_VISUALS = [
   "grid",

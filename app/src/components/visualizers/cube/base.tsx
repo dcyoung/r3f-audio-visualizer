@@ -11,12 +11,12 @@ import {
   type ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
-} from "../../mappers/coordinateMappers/common";
+} from "@/lib/mappers/coordinateMappers/common";
 import {
   ColorPalette,
   type ColorPaletteType,
   COLOR_PALETTE,
-} from "../palettes";
+} from "@/lib/palettes";
 
 const BaseCube = ({
   coordinateMapper,

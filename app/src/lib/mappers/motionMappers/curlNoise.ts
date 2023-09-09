@@ -1,7 +1,7 @@
 import { createNoise3D, type NoiseFunction3D } from "simplex-noise";
 import { Vector3 } from "three";
 
-import { type IMotionMapper } from "./common";
+import { type IMotionMapper } from "@/lib/mappers//motionMappers/common";
 
 /**
  * Maps input coordinates to output values based on the noise functions.

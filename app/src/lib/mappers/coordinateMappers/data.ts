@@ -3,7 +3,7 @@ import {
   cubeFaceCenterRadialOffset,
   HALF_DIAGONAL_UNIT_CUBE,
   HALF_DIAGONAL_UNIT_SQUARE,
-} from "./common";
+} from "@/lib/mappers/coordinateMappers/common";
 
 /**
  * Maps input coordinates to output values based on pre-existing 1D data.

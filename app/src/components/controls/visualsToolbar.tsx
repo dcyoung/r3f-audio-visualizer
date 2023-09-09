@@ -2,10 +2,9 @@ import { Box, CircleDashed, Dna, Globe, Grid3x3, Pin } from "lucide-react";
 import { type HTMLAttributes } from "react";
 
 import { AVAILABLE_VISUALS } from "@/components/canvas/Visual3D";
+import { ToolbarItem } from "@/components/controls/common";
 import { useVisualContextSetters } from "@/context/visual";
 import { cn } from "@/lib/utils";
-
-import { ToolbarItem } from "./common";
 
 
 const VisualIcon = ({

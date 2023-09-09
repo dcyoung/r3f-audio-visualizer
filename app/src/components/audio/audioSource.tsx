@@ -1,6 +1,6 @@
-import { AUDIO_SOURCE } from "./sourceControls/common";
-import FileAudioControls from "./sourceControls/file";
-import LivestreamAudioControls from "./sourceControls/livestream";
+import { AUDIO_SOURCE } from "@/components/audio/sourceControls/common";
+import FileAudioControls from "@/components/audio/sourceControls/file";
+import LivestreamAudioControls from "@/components/audio/sourceControls/livestream";
 
 const ControlledAudioSource = ({
   audio,

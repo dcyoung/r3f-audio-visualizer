@@ -7,10 +7,11 @@ import {
 } from "@react-three/postprocessing";
 import { folder, useControls } from "leva";
 
+import { type VisualProps } from "@/components/visualizers/common";
+import { COLOR_PALETTE } from "@/lib/palettes";
+
 import BaseDoubleHelix from "./base";
 import MultiStrand from "./multi";
-import { type VisualProps } from "../common";
-import { COLOR_PALETTE } from "../palettes";
 
 const DNAVisual = ({
   coordinateMapper,

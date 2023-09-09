@@ -1,12 +1,11 @@
 import { useState } from "react";
 
-import { APPLICATION_MODE } from "@/applicationModes";
 import { ModesToolbar } from "@/components/controls/modesToolbar";
 import { SettingsToolbar } from "@/components/controls/settingsToolbar";
 import { VisualsToolbar } from "@/components/controls/visualsToolbar";
 import { Switch } from "@/components/ui/switch";
 import { useModeContext } from "@/context/mode";
-
+import { APPLICATION_MODE } from "@/lib/applicationModes";
 
 export const ControlsPanel = () => {
   const [visible, setVisible] = useState(true);

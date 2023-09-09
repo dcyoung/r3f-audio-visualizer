@@ -10,12 +10,12 @@ import {
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
-} from "../../mappers/coordinateMappers/common";
+} from "@/lib/mappers/coordinateMappers/common";
 import {
   ColorPalette,
   type ColorPaletteType,
   COLOR_PALETTE,
-} from "../palettes";
+} from "@/lib/palettes";
 
 const BaseGrid = ({
   coordinateMapper,

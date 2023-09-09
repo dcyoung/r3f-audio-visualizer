@@ -1,0 +1,5 @@
+**
+!package*.json
+!src/
+!tsconfig.json
+!.esclintrc.js

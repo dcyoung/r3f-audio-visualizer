@@ -1,3 +1,4 @@
 .vscode/
 scratch.sh
 scratch/
+.env

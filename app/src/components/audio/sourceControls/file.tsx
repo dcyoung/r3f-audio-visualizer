@@ -1,8 +1,9 @@
 import { folder, useControls } from "leva";
 import { useEffect, useState } from "react";
 
+import { audioFileInput } from "@/components/levaPlugins/audioFileInput";
+
 import { type AudioSourceControlsProps, iOS } from "./common";
-import { audioFileInput } from "../../levaPlugins/audioFileInput";
 import "./overlay.css";
 
 const useAudioFile = (audio: HTMLAudioElement) => {

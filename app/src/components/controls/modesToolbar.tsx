@@ -1,15 +1,27 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import classnames from "classnames";
 import { Activity, MoreHorizontal, Music, Shell, Waves } from "lucide-react";
-import { type HTMLAttributes, useMemo } from "react";
+import { type HTMLAttributes, useMemo, Suspense, useState } from "react";
 
 import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
+import {
+  SearchFiltersContextProvider,
+  useSearchFiltersContext,
+} from "@/context/searchFilters";
 import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
   APPLICATION_MODE,
 } from "@/lib/applicationModes";
+import { useAppStateActions } from "@/lib/appState";
+import { getUsers } from "@/lib/soundcloud/api";
+import { type SoundcloudUser } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
+
+import { SearchFilterInput } from "./searchFilterInput";
+import { UserTrackList } from "./soundcloud/track";
+import { UserList } from "./soundcloud/user";
 
 const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
   switch (mode) {
@@ -62,11 +74,58 @@ const NoiseGeneratorModeControls = () => {
   );
 };
 
+const SouncloudUserSearch = ({ query }: { query: string }) => {
+  const { data: users } = useSuspenseQuery({
+    queryKey: ["soundcloud-user-search", query],
+    queryFn: async () => {
+      return await getUsers({
+        query: query,
+        limit: 5,
+      });
+    },
+  });
+
+  const [user, setUser] = useState<SoundcloudUser | null>(null);
+  const { setSoundcloudTrack } = useAppStateActions();
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-2">
+      <UserList users={users} onUserSelected={setUser} />
+      {user && (
+        <UserTrackList userId={user.id} onTrackSelected={setSoundcloudTrack} />
+      )}
+    </div>
+  );
+};
+
+const SearchedUserList = () => {
+  const { query } = useSearchFiltersContext();
+
+  if (!query) {
+    return <span className="text-foreground">No results...</span>;
+  }
+  return (
+    <Suspense fallback={<span className="text-foreground">Searching...</span>}>
+      <SouncloudUserSearch query={query} />
+    </Suspense>
+  );
+};
+
+const SoundcloudUserSearch = () => {
+  return (
+    <SearchFiltersContextProvider>
+      <SearchFilterInput placeholder="Search Soundcloud users..." />
+      <SearchedUserList />
+    </SearchFiltersContextProvider>
+  );
+};
+
 const AudioModeControls = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <span>Audio</span>
       <p>...</p>
+      <SoundcloudUserSearch />
     </div>
   );
 };

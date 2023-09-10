@@ -1,6 +1,6 @@
 import { AUDIO_SOURCE } from "@/components/audio/sourceControls/common";
 import FileAudioControls from "@/components/audio/sourceControls/file";
-import LivestreamAudioControls from "@/components/audio/sourceControls/livestream";
+import { CurrentTrackPlayer } from "@/components/controls/soundcloud/player";
 
 const ControlledAudioSource = ({
   audio,
@@ -11,7 +11,7 @@ const ControlledAudioSource = ({
 }) => {
   switch (audioSource) {
     case AUDIO_SOURCE.LIVE_STREAM:
-      return <LivestreamAudioControls audio={audio} />;
+      return <CurrentTrackPlayer audio={audio} />;
     case AUDIO_SOURCE.FILE_UPLOAD:
       return <FileAudioControls audio={audio} />;
     default:

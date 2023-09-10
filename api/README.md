@@ -24,13 +24,14 @@ Then, the equivalent of:
 
 ```bash
 curl "https://api.soundcloud.com/playlists?q=test" \
-      -H "Authorization: OAuth <AUTH_TOKEN>"
+      -H "Authorization: OAuth <AUTH_TOKEN>" \
+      | jq
 ```
 
 becomes...
 
 ```bash
-curl "localhost:3000/proxy/playlists?q=test"
+curl "localhost:3000/proxy/playlists?q=test" | jq
 ```
 
 ## Fly Deployment

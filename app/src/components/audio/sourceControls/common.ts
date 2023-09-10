@@ -39,15 +39,20 @@ export const iOS = (): boolean => {
 };
 
 export const getPlatformSupportedAudioSources = (): AudioSource[] => {
+  return [
+    AUDIO_SOURCE.LIVE_STREAM,
+    AUDIO_SOURCE.MICROPHONE,
+    AUDIO_SOURCE.FILE_UPLOAD,
+  ];
   // Apple devices/browsers using WebKit do NOT support CrossOrigin Audio
   // see: https://bugs.webkit.org/show_bug.cgi?id=195043
-  return iOS()
-    ? [AUDIO_SOURCE.FILE_UPLOAD, AUDIO_SOURCE.MICROPHONE]
-    : [
-      AUDIO_SOURCE.FILE_UPLOAD,
-      AUDIO_SOURCE.MICROPHONE,
-      AUDIO_SOURCE.LIVE_STREAM,
-    ];
+  // return iOS()
+  //   ? [AUDIO_SOURCE.FILE_UPLOAD, AUDIO_SOURCE.MICROPHONE]
+  //   : [
+  //     AUDIO_SOURCE.LIVE_STREAM,
+  //     AUDIO_SOURCE.MICROPHONE,
+  //     AUDIO_SOURCE.FILE_UPLOAD,
+  //   ];
 };
 
 

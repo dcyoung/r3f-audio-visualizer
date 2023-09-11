@@ -11,19 +11,19 @@ const ScreenShareControls = ({
   onDisabled,
   onStreamCreated,
 }: ScreenShareControlsProps) => {
-  const micStream = useRef<null | MediaStreamAudioSourceNode>(null);
+  const mediaStream = useRef<null | MediaStreamAudioSourceNode>(null);
 
   /**
-   * Make sure the microphone is enabled
+   * Make sure the share is enabled
    */
   useEffect(() => {
-    console.log("Disabling mic...");
+    console.log("Disabling share...");
     onDisabled();
-    if (micStream?.current) {
-      micStream.current = null;
+    if (mediaStream?.current) {
+      mediaStream.current = null;
     }
 
-    console.log("Enabling mic...");
+    console.log("Enabling share...");
     if (navigator.mediaDevices) {
       navigator.mediaDevices
         .getDisplayMedia({
@@ -43,7 +43,7 @@ const ScreenShareControls = ({
         })
         .catch((err) => {
           console.error(err);
-          alert("Microphone access denied by user");
+          alert("Share access denied by user");
         });
     } else {
       alert("User mediaDevices not available");
@@ -51,8 +51,8 @@ const ScreenShareControls = ({
 
     return () => {
       audio.pause();
-      if (micStream?.current) {
-        micStream.current = null;
+      if (mediaStream?.current) {
+        mediaStream.current = null;
       }
     };
   }, [audio, onDisabled, onStreamCreated]);

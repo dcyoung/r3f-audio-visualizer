@@ -7,10 +7,10 @@ const ControlledAudioSource = ({
   audioSource,
 }: {
   audio: HTMLAudioElement;
-  audioSource: "LIVE_STREAM" | "FILE_UPLOAD";
+  audioSource: "SOUNDCLOUD" | "FILE_UPLOAD";
 }) => {
   switch (audioSource) {
-    case AUDIO_SOURCE.LIVE_STREAM:
+    case AUDIO_SOURCE.SOUNDCLOUD:
       return <CurrentTrackPlayer audio={audio} />;
     case AUDIO_SOURCE.FILE_UPLOAD:
       return <FileAudioControls audio={audio} />;

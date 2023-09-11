@@ -11,7 +11,7 @@ const MicrophoneAudioControls = ({
   onDisabled,
   onStreamCreated,
 }: MicrophoneAudioControlsProps) => {
-  const micStream = useRef<null | MediaStreamAudioSourceNode>(null);
+  const mediaStream = useRef<null | MediaStreamAudioSourceNode>(null);
 
   /**
    * Make sure the microphone is enabled
@@ -19,8 +19,8 @@ const MicrophoneAudioControls = ({
   useEffect(() => {
     console.log("Disabling mic...");
     onDisabled();
-    if (micStream?.current) {
-      micStream.current = null;
+    if (mediaStream?.current) {
+      mediaStream.current = null;
     }
 
     console.log("Enabling mic...");
@@ -41,8 +41,8 @@ const MicrophoneAudioControls = ({
 
     return () => {
       audio.pause();
-      if (micStream?.current) {
-        micStream.current = null;
+      if (mediaStream?.current) {
+        mediaStream.current = null;
       }
     };
   }, [audio, onDisabled, onStreamCreated]);

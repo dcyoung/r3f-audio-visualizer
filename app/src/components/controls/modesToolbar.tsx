@@ -1,9 +1,28 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import classnames from "classnames";
-import { Activity, MoreHorizontal, Music, Shell, Waves } from "lucide-react";
+import {
+  Activity,
+  MoreHorizontal,
+  Music,
+  Shell,
+  Waves,
+  Mic,
+  ScreenShare,
+  FileUp,
+  type LucideProps,
+} from "lucide-react";
 import { type HTMLAttributes, useMemo, Suspense, useState } from "react";
 
+import {
+  AUDIO_SOURCE,
+  type AudioSource,
+  getPlatformSupportedAudioSources,
+} from "@/components/audio/sourceControls/common";
 import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
+import {
+  useAudioSourceContext,
+  useAudioSourceContextSetters,
+} from "@/context/audioSource";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
 import {
   SearchFiltersContextProvider,
@@ -23,18 +42,39 @@ import { SearchFilterInput } from "./searchFilterInput";
 import { UserTrackList } from "./soundcloud/track";
 import { UserList } from "./soundcloud/user";
 
-const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
+const ModeIcon = ({
+  mode,
+  ...props
+}: { mode: ApplicationMode } & LucideProps) => {
   switch (mode) {
     case "WAVE_FORM":
-      return <Activity />;
+      return <Activity {...props} />;
     case "NOISE":
-      return <Waves />;
+      return <Waves {...props} />;
     case "AUDIO":
-      return <Music />;
+      return <Music {...props} />;
     case "AUDIO_SCOPE":
-      return <Shell />;
+      return <Shell {...props} />;
     default:
       return mode satisfies never;
+  }
+};
+
+const AudioSourceIcon = ({
+  audioSource,
+  ...props
+}: { audioSource: AudioSource } & LucideProps) => {
+  switch (audioSource) {
+    case AUDIO_SOURCE.SOUNDCLOUD:
+      return <Music {...props} />;
+    case AUDIO_SOURCE.MICROPHONE:
+      return <Mic {...props} />;
+    case AUDIO_SOURCE.SCREEN_SHARE:
+      return <ScreenShare {...props} />;
+    case AUDIO_SOURCE.FILE_UPLOAD:
+      return <FileUp {...props} />;
+    default:
+      return audioSource satisfies never;
   }
 };
 
@@ -118,11 +158,66 @@ const SoundcloudUserSearch = () => {
   );
 };
 
+const SoundcloudControls = ({}) => {
+  return <SoundcloudUserSearch />;
+};
+
+const AudioSourceControls = () => {
+  const { audioSource } = useAudioSourceContext();
+  switch (audioSource) {
+    case AUDIO_SOURCE.SOUNDCLOUD:
+      return <SoundcloudControls />;
+    case AUDIO_SOURCE.MICROPHONE:
+    case AUDIO_SOURCE.SCREEN_SHARE:
+    case AUDIO_SOURCE.FILE_UPLOAD:
+      // TODO: Add controls
+      return null;
+    default:
+      return audioSource satisfies never;
+  }
+};
+
+const AudioSourceSelect = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => {
+  const { audioSource } = useAudioSourceContext();
+  const { setAudioSource } = useAudioSourceContextSetters();
+  const available = useMemo(() => {
+    return getPlatformSupportedAudioSources();
+  }, []);
+
+  return (
+    <div
+      className={cn(
+        "flex flex-row items-center justify-center gap-2",
+        className
+      )}
+      {...props}
+    >
+      {available.map((source) => (
+        <div
+          key={source}
+          onClick={() => setAudioSource(source)}
+          className={classnames({
+            "pointer-events-auto flex h-4 w-4 cursor-pointer flex-row items-center justify-center duration-300 ease-in-out hover:scale-150":
+              true,
+            "scale-150": source === audioSource,
+          })}
+        >
+          <AudioSourceIcon audioSource={source} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AudioModeControls = () => {
   return (
     <div className="flex flex-col items-start justify-center gap-4">
       <span>Audio</span>
-      <SoundcloudUserSearch />
+      <AudioSourceSelect />
+      <AudioSourceControls />
     </div>
   );
 };

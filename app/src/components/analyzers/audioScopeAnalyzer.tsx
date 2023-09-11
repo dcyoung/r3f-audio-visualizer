@@ -9,13 +9,13 @@ import {
 } from "@/components/audio/sourceControls/common";
 import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
 import { useAudioSourceContext } from "@/context/audioSource";
-import { useMicrophoneLink } from "@/lib/analyzers/common";
+import { useMediaStreamLink } from "@/lib/analyzers/common";
 import ScopeAnalyzer from "@/lib/analyzers/scope";
 
 const InternalAudioScopeAnalyzer = ({
   audioSource,
 }: {
-  audioSource: "LIVE_STREAM" | "FILE_UPLOAD";
+  audioSource: "SOUNDCLOUD" | "FILE_UPLOAD";
 }) => {
   const audioCtx = useMemo(() => buildAudioContext(), []);
   const audio = useMemo(() => buildAudio(), []);
@@ -38,7 +38,7 @@ const InternalMicrophoneScopeAnalyzer = () => {
     return new ScopeAnalyzer(audio, audioCtx);
   }, [audio, audioCtx]);
 
-  const { onDisabled, onStreamCreated } = useMicrophoneLink(audio, analyzer);
+  const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
 
   return (
     <>

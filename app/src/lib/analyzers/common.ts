@@ -5,7 +5,7 @@ export interface AnalyzerInputControl {
   volume: number;
 }
 
-export function useMicrophoneLink(
+export function useMediaStreamLink(
   audio: HTMLAudioElement,
   analyzer: AnalyzerInputControl
 ) {

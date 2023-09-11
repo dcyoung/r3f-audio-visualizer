@@ -32,14 +32,30 @@ export interface FreqRange {
   end: number;
 }
 
-export type EnergyMeasure =
-  | "overall"
-  | "peak"
-  | "bass"
-  | "lowMid"
-  | "mid"
-  | "highMid"
-  | "treble";
+export const OctaveBandModeMap = {
+  1: "1/24th octave bands",
+  2: "1/12th octave bands",
+  3: "1/8th octave bands",
+  4: "1/6th octave bands",
+  5: "1/4th octave bands",
+  6: "1/3rd octave bands",
+  7: "Half octave bands",
+  8: "Full octave bands",
+} as const;
+export type OctaveBandMode = keyof typeof OctaveBandModeMap;
+
+
+export const EnergyMeasureOptions = [
+  "overall",
+  "peak",
+  "bass",
+  "lowMid",
+  "mid",
+  "highMid",
+  "treble",
+] as const;
+
+export type EnergyMeasure = typeof EnergyMeasureOptions[number];
 
 // internal constants
 const ROOT24 = 2 ** (1 / 24), // 24th root of 2
@@ -60,11 +76,11 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
   private _energy: EnergyInfo = { val: 0, peak: 0, hold: 0 };
   private readonly _minFreq: number = 20;
   private readonly _maxFreq: number = 22000;
-  private _mode = 2;
+  private _mode: OctaveBandMode = 2;
   public get mode(): number {
     return this._mode;
   }
-  public set mode(value: number) {
+  public set mode(value: OctaveBandMode) {
     this._mode = value;
     this._updateFreqBins();
   }

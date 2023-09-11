@@ -17,6 +17,7 @@ import {
 } from "@/lib/palettes";
 
 import { useTheme } from "./theme";
+import { CombinedVisualsConfigContextProvider } from "./visualConfig/combined";
 
 type Visual = (typeof AVAILABLE_VISUALS)[number];
 type Palette = (typeof AVAILABLE_COLOR_PALETTES)[number];
@@ -29,6 +30,7 @@ export interface VisualConfig {
 export const VisualContext = createContext<{
   config: VisualConfig;
   setters: {
+    resetConfig: Dispatch<void>;
     setVisual: Dispatch<SetStateAction<Visual>>;
     setPalette: Dispatch<SetStateAction<Palette>>;
     setColorBackground: Dispatch<SetStateAction<boolean>>;
@@ -37,6 +39,7 @@ export const VisualContext = createContext<{
 
 export const VisualContextProvider = ({ children }: PropsWithChildren) => {
   const { setTheme } = useTheme();
+  const [key, setKey] = useState<number>(0); // used to reset the context
   const [visual, setVisual] = useState<Visual>(AVAILABLE_VISUALS[0]);
   const [palette, setPalette] = useState<Palette>(
     COLOR_PALETTE.THREE_COOL_TO_WARM
@@ -64,13 +67,16 @@ export const VisualContextProvider = ({ children }: PropsWithChildren) => {
           colorBackground: colorBackground,
         },
         setters: {
+          resetConfig: () => setKey((key) => key + 1),
           setVisual: setVisual,
           setPalette: setPalette,
           setColorBackground: setColorBackground,
         },
       }}
     >
-      {children}
+      <CombinedVisualsConfigContextProvider key={key}>
+        {children}
+      </CombinedVisualsConfigContextProvider>
     </VisualContext.Provider>
   );
 };

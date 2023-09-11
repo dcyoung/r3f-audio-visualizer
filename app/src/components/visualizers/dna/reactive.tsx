@@ -5,9 +5,9 @@ import {
   Noise,
   Vignette,
 } from "@react-three/postprocessing";
-import { folder, useControls } from "leva";
 
 import { type VisualProps } from "@/components/visualizers/common";
+import { useDnaVisualConfigContext } from "@/context/visualConfig/dna";
 import { COLOR_PALETTE } from "@/lib/palettes";
 
 import BaseDoubleHelix from "./base";
@@ -27,27 +27,38 @@ const DNAVisual = ({
     strandOffsetRad,
     mirrorEffects,
     fixedBaseGap,
-  } = useControls({
-    "Visual - DNA": folder(
-      {
-        multi: true,
-        helixLength: { value: 50, min: 5, max: 100, step: 5 },
-        helixRadius: { value: 1, min: 1, max: 5, step: 1 },
-        helixWindingSeparation: { value: 10, min: 5, max: 50, step: 1 },
-        strandRadius: { value: 0.1, min: 0.1, max: 0.3, step: 0.1 },
-        baseSpacing: { value: 0.35, min: 0.1, max: 2.0, step: 0.05 },
-        strandOffsetRad: {
-          value: Math.PI / 2,
-          min: Math.PI / 4,
-          max: Math.PI,
-          step: Math.PI / 8,
-        },
-        mirrorEffects: true,
-        fixedBaseGap: false,
-      },
-      { collapsed: true }
-    ),
-  });
+  } = useDnaVisualConfigContext();
+  // const {
+  //   multi,
+  //   helixLength,
+  //   helixRadius,
+  //   helixWindingSeparation,
+  //   strandRadius,
+  //   baseSpacing,
+  //   strandOffsetRad,
+  //   mirrorEffects,
+  //   fixedBaseGap,
+  // } = useControls({
+  //   "Visual - DNA": folder(
+  //     {
+  //       multi: true,
+  //       helixLength: { value: 50, min: 5, max: 100, step: 5 },
+  //       helixRadius: { value: 1, min: 1, max: 5, step: 1 },
+  //       helixWindingSeparation: { value: 10, min: 5, max: 50, step: 1 },
+  //       strandRadius: { value: 0.1, min: 0.1, max: 0.3, step: 0.1 },
+  //       baseSpacing: { value: 0.35, min: 0.1, max: 2.0, step: 0.05 },
+  //       strandOffsetRad: {
+  //         value: Math.PI / 2,
+  //         min: Math.PI / 4,
+  //         max: Math.PI,
+  //         step: Math.PI / 8,
+  //       },
+  //       mirrorEffects: true,
+  //       fixedBaseGap: false,
+  //     },
+  //     { collapsed: true }
+  //   ),
+  // });
 
   return multi ? (
     <MultiStrand

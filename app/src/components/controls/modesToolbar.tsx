@@ -9,12 +9,12 @@ import {
   SearchFiltersContextProvider,
   useSearchFiltersContext,
 } from "@/context/searchFilters";
+import { useSoundcloudContextSetters } from "@/context/soundcloud";
 import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
   APPLICATION_MODE,
 } from "@/lib/applicationModes";
-import { useAppStateActions } from "@/lib/appState";
 import { getUsers } from "@/lib/soundcloud/api";
 import { type SoundcloudUser } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
@@ -86,14 +86,12 @@ const SouncloudUserSearch = ({ query }: { query: string }) => {
   });
 
   const [user, setUser] = useState<SoundcloudUser | null>(null);
-  const { setSoundcloudTrack } = useAppStateActions();
+  const { setTrack } = useSoundcloudContextSetters();
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       <UserList users={users} onUserSelected={setUser} />
-      {user && (
-        <UserTrackList userId={user.id} onTrackSelected={setSoundcloudTrack} />
-      )}
+      {user && <UserTrackList userId={user.id} onTrackSelected={setTrack} />}
     </div>
   );
 };
@@ -122,9 +120,8 @@ const SoundcloudUserSearch = () => {
 
 const AudioModeControls = () => {
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex flex-col items-start justify-center gap-4">
       <span>Audio</span>
-      <p>...</p>
       <SoundcloudUserSearch />
     </div>
   );

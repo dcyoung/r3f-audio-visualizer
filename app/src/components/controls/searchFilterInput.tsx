@@ -22,7 +22,7 @@ export const SearchFilterInput = ({
 
   return (
     <div className="flex flex-row items-center justify-start gap-2 rounded-[6px] border-[#4E4E4E] bg-background px-2">
-      <Search fill="#414141" />
+      <Search />
       <input
         type="search"
         placeholder={placeholder}
@@ -30,7 +30,7 @@ export const SearchFilterInput = ({
           setQueryFilter(e.target.value);
         }}
         className={cn(
-          "placeholder:text-muted-foreground search-cancel:appearance-none search-cancel:cursor-pointer search-cancel:h-6 search-cancel:w-6 search-cancel:bg-[url('/search_cancel_white.svg')] hover:search-cancel:bg-[url('/search_cancel_green.svg')] flex-grow bg-transparent text-sm text-white outline-none placeholder:text-xs placeholder:text-[#949494] disabled:cursor-not-allowed disabled:opacity-50",
+          "placeholder:text-muted-foreground search-cancel:appearance-none search-cancel:cursor-pointer flex-grow bg-transparent text-sm text-foreground outline-none placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-50",
           props.className
         )}
       />

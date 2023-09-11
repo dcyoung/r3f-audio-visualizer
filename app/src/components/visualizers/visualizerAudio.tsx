@@ -1,6 +1,6 @@
-import { folder, useControls } from "leva";
 import { Suspense, lazy } from "react";
 
+import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import { useEnergyInfo, useVisualSourceDataX } from "@/lib/appState";
 import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
@@ -15,18 +15,20 @@ const AudioVisual = ({
 }) => {
   const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
+  // TODO: Find a better place to put amplitude settings for this audio visual
+  const { amplitude } = useFFTAnalyzerContext();
 
-  const { amplitude } = useControls({
-    Audio: folder({
-      amplitude: {
-        value: 1.0,
-        order: 74,
-        min: 0.0,
-        max: 5.0,
-        step: 0.01,
-      },
-    }),
-  });
+  // const { amplitude } = useControls({
+  //   Audio: folder({
+  //     amplitude: {
+  //       value: 1.0,
+  //       order: 74,
+  //       min: 0.0,
+  //       max: 5.0,
+  //       step: 0.01,
+  //     },
+  //   }),
+  // });
 
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);

@@ -20,8 +20,8 @@ export const AVAILABLE_VISUALS = [
   "diffusedRing",
   "pinGrid",
   "dna",
-  // "traceParticles",
-  // "particleSwarm",
+  // "stencil",
+  // "swarm",
 ] as const;
 
 const VisualizerComponent = ({
@@ -34,7 +34,7 @@ const VisualizerComponent = ({
     case APPLICATION_MODE.WAVE_FORM:
       return <WaveformVisual visual={visual} palette={palette} />;
     case APPLICATION_MODE.NOISE:
-      // if (visual === "particleSwarm") {
+      // if (visual === "swarm") {
       //   return <ParticleNoiseVisual />;
       // }
       return <NoiseVisual visual={visual} palette={palette} />;

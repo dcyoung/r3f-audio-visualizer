@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { useSoundcloudTrack } from "@/lib/appState";
+import { useSoundcloudContext } from "@/context/soundcloud";
 import { getTrackStreamUrl } from "@/lib/soundcloud/api";
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
@@ -97,11 +97,11 @@ export const TrackPlayer = ({
 export const CurrentTrackPlayer = ({
   ...props
 }: Omit<ComponentPropsWithoutRef<typeof TrackPlayer>, "track">) => {
-  const currentTrack = useSoundcloudTrack();
+  const { track } = useSoundcloudContext();
 
-  if (!currentTrack) {
+  if (!track) {
     return <></>;
   }
 
-  return <TrackPlayer track={currentTrack} {...props} />;
+  return <TrackPlayer track={track} {...props} />;
 };

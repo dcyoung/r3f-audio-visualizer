@@ -6,9 +6,9 @@ import {
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
-  useSelectAudioSource,
 } from "@/components/audio/sourceControls/common";
 import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
+import { useAudioSourceContext } from "@/context/audioSource";
 import { useMicrophoneLink } from "@/lib/analyzers/common";
 import ScopeAnalyzer from "@/lib/analyzers/scope";
 
@@ -53,7 +53,7 @@ const InternalMicrophoneScopeAnalyzer = () => {
 };
 
 const AudioFFTAnalyzer = () => {
-  const { audioSource } = useSelectAudioSource();
+  const { audioSource } = useAudioSourceContext();
 
   if (audioSource === AUDIO_SOURCE.MICROPHONE) {
     return <InternalMicrophoneScopeAnalyzer />;

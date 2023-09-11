@@ -32,7 +32,7 @@ const computeNormals = (vertices: Vector2[], weighted = false): Vector2[] => {
   return vertexNormals;
 };
 
-const BaseTraceParticles = ({
+const BaseStencil = ({
   coordinateMapper,
   polyStates,
   parametricMin = 0.0,
@@ -143,4 +143,4 @@ const BaseTraceParticles = ({
   );
 };
 
-export default BaseTraceParticles;
+export default BaseStencil;

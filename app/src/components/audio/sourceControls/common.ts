@@ -1,5 +1,3 @@
-import { folder, useControls } from "leva";
-
 export interface AudioSourceControlsProps {
   audio: HTMLAudioElement;
 }
@@ -44,6 +42,7 @@ export const getPlatformSupportedAudioSources = (): AudioSource[] => {
     AUDIO_SOURCE.MICROPHONE,
     AUDIO_SOURCE.FILE_UPLOAD,
   ];
+
   // Apple devices/browsers using WebKit do NOT support CrossOrigin Audio
   // see: https://bugs.webkit.org/show_bug.cgi?id=195043
   // return iOS()
@@ -54,32 +53,6 @@ export const getPlatformSupportedAudioSources = (): AudioSource[] => {
   //     AUDIO_SOURCE.FILE_UPLOAD,
   //   ];
 };
-
-
-export function useSelectAudioSource() {
-  const available = getPlatformSupportedAudioSources();
-  const audioSourceParam = new URLSearchParams(document.location.search).get(
-    "audioSource"
-  ) as AudioSource | null;
-  const { audioSource: selectedAudioSource } = useControls({
-    Audio: folder({
-      audioSource: {
-        value:
-          audioSourceParam && available.includes(audioSourceParam)
-            ? audioSourceParam
-            : available[0],
-        options: available.reduce(
-          (o, src) => ({ ...o, [getAnalyzerSourceDisplayName(src)]: src }),
-          {}
-        ),
-        order: -100,
-      },
-    }),
-  });
-  return {
-    audioSource: selectedAudioSource as unknown as AudioSource
-  };
-}
 
 export const buildAudio = () => {
   console.log("Building audio...");

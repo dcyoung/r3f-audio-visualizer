@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 
-import AudioFFTAnalyzer from "@/components/analyzers/audioFFTAnalyzer";
-import AudioScopeAnalyzer from "@/components/analyzers/audioScopeAnalyzer";
+import AudioAnalyzer from "@/components/analyzers/audioAnalyzer";
 import AudioScopeCanvas from "@/components/canvas/AudioScope";
 import Visual3DCanvas from "@/components/canvas/Visual3D";
 import { ControlsPanel } from "@/components/controls/main";
@@ -11,9 +10,8 @@ import { type ApplicationMode, APPLICATION_MODE } from "@/lib/applicationModes";
 const getAnalyzerComponent = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO:
-      return <AudioFFTAnalyzer />;
     case APPLICATION_MODE.AUDIO_SCOPE:
-      return <AudioScopeAnalyzer />;
+      return <AudioAnalyzer mode={mode} />;
     case APPLICATION_MODE.WAVE_FORM:
     case APPLICATION_MODE.NOISE:
       return null;

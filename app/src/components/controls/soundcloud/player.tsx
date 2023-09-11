@@ -72,7 +72,7 @@ export const TrackPlayer = ({
   return (
     <div
       className={cn(
-        "flex flex-row gap-2 items-center justify-start p-8 rounded-lg",
+        "flex flex-row gap-2 items-center justify-start p-4 rounded-lg",
         className
       )}
       {...props}

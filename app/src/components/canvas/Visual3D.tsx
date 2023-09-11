@@ -97,6 +97,7 @@ const Visual3DCanvas = ({
         position: [-17, -6, 6.5],
         up: [0, 0, 1],
       }}
+      linear={true}
     >
       <CanvasBackground />
       <ambientLight intensity={Math.PI} />

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
-import FFTAnalyzerControls from "@/components/analyzers/fftAnalyzerControls";
-import ControlledAudioSource from "@/components/audio/audioSource";
+import { FFTAnalyzerControls } from "@/components/analyzers/fftAnalyzerControls";
+import { ControlledAudioSource } from "@/components/audio/audioSource";
 import {
   AUDIO_SOURCE,
   buildAudio,
@@ -15,7 +15,7 @@ import FFTAnalyzer from "@/lib/analyzers/fft";
 import ScopeAnalyzer from "@/lib/analyzers/scope";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
 
-import AudioScopeAnalyzerControls from "./scopeAnalyzerControls";
+import { AudioScopeAnalyzerControls } from "./scopeAnalyzerControls";
 
 const InternalAudioAnalyzer = ({
   mode,

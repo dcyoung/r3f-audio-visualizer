@@ -1,3 +1,4 @@
+import { Image } from "lucide-react";
 import { type Dispatch, type HTMLAttributes } from "react";
 
 import { type SoundcloudUser } from "@/lib/soundcloud/models";
@@ -16,10 +17,14 @@ export const UserCard = ({
       )}
       {...props}
     >
-      <img
-        src={user.avatar_url}
-        className="aspect-square w-full rounded-full"
-      />
+      {user.avatar_url ? (
+        <img
+          src={user.avatar_url}
+          className="aspect-square w-full rounded-full"
+        />
+      ) : (
+        <Image />
+      )}
       <span className="w-full truncate text-xs text-foreground">
         {user.username}
       </span>

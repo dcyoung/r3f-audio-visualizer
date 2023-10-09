@@ -1,19 +1,16 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useMemo } from "react";
 
 import { useWaveGeneratorContext } from "@/context/waveGenerator";
 import { CoordinateMapper_WaveformSuperposition } from "@/lib/mappers/coordinateMappers/waveform";
-import { type ColorPaletteType, COLOR_PALETTE } from "@/lib/palettes";
 
-const WaveformVisual = ({
-  visual,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: {
-  visual: string;
-  palette?: ColorPaletteType;
-}) => {
-  const VisualComponent = lazy(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    async () => await import(`./${visual}/reactive.tsx`)
+const WaveformVisual = ({ visual }: { visual: string }) => {
+  const VisualComponent = useMemo(
+    () =>
+      lazy(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        async () => await import(`./${visual}/reactive.tsx`)
+      ),
+    [visual]
   );
 
   const { maxAmplitude, waveformFrequenciesHz, amplitudeSplitRatio } =
@@ -73,14 +70,9 @@ const WaveformVisual = ({
   // }, [visual]);
 
   return (
-    <>
-      <Suspense fallback={null}>
-        <VisualComponent
-          coordinateMapper={coordinateMapper}
-          palette={palette}
-        />
-      </Suspense>
-    </>
+    <Suspense fallback={null}>
+      <VisualComponent coordinateMapper={coordinateMapper} />
+    </Suspense>
   );
 };
 

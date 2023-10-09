@@ -7,7 +7,7 @@ import {
   useVisualSourceDataY,
 } from "@/lib/appState";
 
-const AudioScopeAnalyzerControls = ({
+export const AudioScopeAnalyzerControls = ({
   analyzer,
 }: {
   analyzer: ScopeAnalyzer;

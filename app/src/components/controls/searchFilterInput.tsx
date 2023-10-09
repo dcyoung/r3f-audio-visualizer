@@ -24,6 +24,7 @@ export const SearchFilterInput = ({
     <div className="flex flex-row items-center justify-start gap-2 rounded-[6px] border-[#4E4E4E] bg-background px-2">
       <Search />
       <input
+        id="search-filter-input"
         type="search"
         placeholder={placeholder}
         onChange={(e) => {

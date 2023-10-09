@@ -7,6 +7,7 @@ const useBackgroundColor = () => {
     ? ColorPalette.getPalette(palette).calcBackgroundColor(0)
     : "#010204";
 };
+
 export const CanvasBackground = () => {
   const backgroundColor = useBackgroundColor();
   return <color attach="background" args={[backgroundColor]} />;

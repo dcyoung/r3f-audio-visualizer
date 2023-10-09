@@ -3,14 +3,10 @@ import { Vector3 } from "three";
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
 import { useSphereVisualConfigContext } from "@/context/visualConfig/sphere";
-import { COLOR_PALETTE } from "@/lib/palettes";
 
 import BaseSphere from "./base";
 
-const SphereVisual = ({
-  coordinateMapper,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: VisualProps) => {
+const SphereVisual = ({ coordinateMapper }: VisualProps) => {
   const { radius, nPoints, unitSideLength } = useSphereVisualConfigContext();
   // const {
   //   radius,
@@ -48,7 +44,6 @@ const SphereVisual = ({
         radius={radius}
         nPoints={nPoints}
         cubeSideLength={unitSideLength}
-        palette={palette}
       />
       <Ground
         position={

@@ -12,6 +12,7 @@ import "@/components/audio/sourceControls/overlay.css";
 const useAudioFile = (audio: HTMLAudioElement) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  // TODO: Replace w/ new input
   const { audioFile } = useControls({
     Audio: folder({
       audioFile: audioFileInput({ file: undefined }),

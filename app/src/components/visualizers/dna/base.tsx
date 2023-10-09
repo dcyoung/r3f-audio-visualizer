@@ -14,16 +14,13 @@ import {
   type Group,
 } from "three";
 
+import { useVisualContext } from "@/context/visual";
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
   TWO_PI,
 } from "@/lib/mappers/coordinateMappers/common";
-import {
-  ColorPalette,
-  type ColorPaletteType,
-  COLOR_PALETTE,
-} from "@/lib/palettes";
+import { ColorPalette } from "@/lib/palettes";
 
 const clipAngleRad = (rad: number) => {
   return ((rad % TWO_PI) + TWO_PI) % TWO_PI;
@@ -74,7 +71,6 @@ export interface BaseDoubleHelixProps {
   strandOffsetRad?: number;
   mirrorEffects?: boolean;
   fixedBaseGap?: boolean;
-  palette?: ColorPaletteType;
 }
 
 const BaseDoubleHelix = forwardRef<
@@ -92,13 +88,13 @@ const BaseDoubleHelix = forwardRef<
       strandOffsetRad = Math.PI / 2,
       mirrorEffects = true,
       fixedBaseGap = true,
-      palette = COLOR_PALETTE.THREE_RAINBOW,
       ...props
     },
     ref
   ) => {
-    const nBasePairs = Math.floor(helixLength / baseSpacing);
+    const { palette } = useVisualContext();
     const lut = ColorPalette.getPalette(palette).buildLut();
+    const nBasePairs = Math.floor(helixLength / baseSpacing);
     const refBaseMesh = useRef<InstancedMesh>(null!);
     const matBase = useMemo(() => {
       return new MeshBasicMaterial({ color: "#606060" });

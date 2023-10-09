@@ -39,8 +39,12 @@ const App = () => {
     <main className="relative h-[100dvh] w-[100dvw] bg-black">
       <div className="absolute h-[100dvh] w-[100dvw]">
         <Suspense fallback={<span>loading...</span>}>
-          {getAnalyzerComponent(mode)}
           {getCanvasComponent(mode)}
+        </Suspense>
+      </div>
+      <div className="pointer-events-none absolute h-[100dvh] w-[100dvw]">
+        <Suspense fallback={<span>loading...</span>}>
+          {getAnalyzerComponent(mode)}
         </Suspense>
       </div>
       <ControlsPanel />

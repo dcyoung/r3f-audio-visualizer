@@ -7,16 +7,13 @@ import {
   MeshBasicMaterial,
 } from "three";
 
+import { useVisualContext } from "@/context/visual";
 import {
   type ICoordinateMapper,
   HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
 } from "@/lib/mappers/coordinateMappers/common";
-import {
-  ColorPalette,
-  type ColorPaletteType,
-  COLOR_PALETTE,
-} from "@/lib/palettes";
+import { ColorPalette } from "@/lib/palettes";
 
 const BaseCube = ({
   coordinateMapper,
@@ -24,20 +21,19 @@ const BaseCube = ({
   cubeSideLength = 0.5,
   cubeSpacingScalar = 0.1,
   volume = true,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
 }: {
   coordinateMapper: ICoordinateMapper;
   nPerSide?: number;
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
   volume?: boolean;
-  palette?: ColorPaletteType;
 }) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const inputCoordinateType = volume
     ? COORDINATE_TYPE.CARTESIAN_3D
     : COORDINATE_TYPE.CARTESIAN_CUBE_FACES;
+  const { palette } = useVisualContext();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor

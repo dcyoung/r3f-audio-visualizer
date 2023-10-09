@@ -10,12 +10,14 @@ import {
 import { SRGBColorSpace } from "three";
 
 import { AVAILABLE_VISUALS } from "@/components/canvas/Visual3D";
+import { APPLICATION_MODE } from "@/lib/applicationModes";
 import {
   type AVAILABLE_COLOR_PALETTES,
   COLOR_PALETTE,
   ColorPalette,
 } from "@/lib/palettes";
 
+import { useModeContext } from "./mode";
 import { useTheme } from "./theme";
 import { CombinedVisualsConfigContextProvider } from "./visualConfig/combined";
 
@@ -25,6 +27,7 @@ export interface VisualConfig {
   visual: Visual;
   palette: Palette;
   colorBackground: boolean;
+  paletteTrackEnergy: boolean;
 }
 
 export const VisualContext = createContext<{
@@ -34,17 +37,31 @@ export const VisualContext = createContext<{
     setVisual: Dispatch<SetStateAction<Visual>>;
     setPalette: Dispatch<SetStateAction<Palette>>;
     setColorBackground: Dispatch<SetStateAction<boolean>>;
+    setPaletteTrackEnergy: Dispatch<SetStateAction<boolean>>;
   };
 } | null>(null);
 
-export const VisualContextProvider = ({ children }: PropsWithChildren) => {
+export const VisualContextProvider = ({
+  initial,
+  children,
+}: PropsWithChildren<{
+  initial?: Partial<VisualConfig>;
+}>) => {
   const { setTheme } = useTheme();
+  const { mode } = useModeContext();
   const [key, setKey] = useState<number>(0); // used to reset the context
-  const [visual, setVisual] = useState<Visual>(AVAILABLE_VISUALS[0]);
-  const [palette, setPalette] = useState<Palette>(
-    COLOR_PALETTE.THREE_COOL_TO_WARM
+  const [visual, setVisual] = useState<Visual>(
+    initial?.visual ?? AVAILABLE_VISUALS[0]
   );
-  const [colorBackground, setColorBackground] = useState<boolean>(false);
+  const [palette, setPalette] = useState<Palette>(
+    initial?.palette ?? COLOR_PALETTE.THREE_COOL_TO_WARM
+  );
+  const [colorBackground, setColorBackground] = useState<boolean>(
+    initial?.colorBackground ?? true
+  );
+  const [paletteTrackEnergy, setPaletteTrackEnergy] = useState<boolean>(
+    initial?.paletteTrackEnergy ?? false
+  );
 
   useEffect(() => {
     if (!colorBackground) {
@@ -58,6 +75,20 @@ export const VisualContextProvider = ({ children }: PropsWithChildren) => {
     setTheme(bgHsl.l < 0.5 ? "dark" : "light");
   }, [palette, colorBackground]);
 
+  useEffect(() => {
+    switch (mode) {
+      case APPLICATION_MODE.WAVE_FORM:
+      case APPLICATION_MODE.NOISE:
+      case APPLICATION_MODE.AUDIO_SCOPE:
+        setPaletteTrackEnergy(false);
+        break;
+      case APPLICATION_MODE.AUDIO:
+        break;
+      default:
+        return mode satisfies never;
+    }
+  }, [mode, setPaletteTrackEnergy]);
+
   return (
     <VisualContext.Provider
       value={{
@@ -65,12 +96,14 @@ export const VisualContextProvider = ({ children }: PropsWithChildren) => {
           visual: visual,
           palette: palette,
           colorBackground: colorBackground,
+          paletteTrackEnergy: paletteTrackEnergy,
         },
         setters: {
           resetConfig: () => setKey((key) => key + 1),
           setVisual: setVisual,
           setPalette: setPalette,
           setColorBackground: setColorBackground,
+          setPaletteTrackEnergy: setPaletteTrackEnergy,
         },
       }}
     >

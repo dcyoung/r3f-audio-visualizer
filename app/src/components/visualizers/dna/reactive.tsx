@@ -8,15 +8,11 @@ import {
 
 import { type VisualProps } from "@/components/visualizers/common";
 import { useDnaVisualConfigContext } from "@/context/visualConfig/dna";
-import { COLOR_PALETTE } from "@/lib/palettes";
 
 import BaseDoubleHelix from "./base";
 import MultiStrand from "./multi";
 
-const DNAVisual = ({
-  coordinateMapper,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: VisualProps) => {
+const DNAVisual = ({ coordinateMapper }: VisualProps) => {
   const {
     multi,
     helixLength,
@@ -71,7 +67,6 @@ const DNAVisual = ({
       strandOffsetRad={strandOffsetRad}
       mirrorEffects={mirrorEffects}
       fixedBaseGap={fixedBaseGap}
-      palette={palette}
     />
   ) : (
     <BaseDoubleHelix
@@ -84,7 +79,6 @@ const DNAVisual = ({
       strandOffsetRad={strandOffsetRad}
       mirrorEffects={mirrorEffects}
       fixedBaseGap={fixedBaseGap}
-      palette={palette}
     />
   );
 };

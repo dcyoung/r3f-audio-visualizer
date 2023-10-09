@@ -1,19 +1,16 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useMemo } from "react";
 
 import { useNoiseGeneratorContext } from "@/context/noiseGenerator";
 import { CoordinateMapper_Noise } from "@/lib/mappers/coordinateMappers/noise";
-import { type ColorPaletteType, COLOR_PALETTE } from "@/lib/palettes";
 
-const NoiseVisual = ({
-  visual,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: {
-  visual: string;
-  palette?: ColorPaletteType;
-}) => {
-  const VisualComponent = lazy(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    async () => await import(`./${visual}/reactive.tsx`)
+const NoiseVisual = ({ visual }: { visual: string }) => {
+  const VisualComponent = useMemo(
+    () =>
+      lazy(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        async () => await import(`./${visual}/reactive.tsx`)
+      ),
+    [visual]
   );
 
   const { amplitude, spatialScale, timeScale, nIterations } =
@@ -57,10 +54,7 @@ const NoiseVisual = ({
   return (
     <>
       <Suspense fallback={null}>
-        <VisualComponent
-          coordinateMapper={coordinateMapper}
-          palette={palette}
-        />
+        <VisualComponent coordinateMapper={coordinateMapper} />
       </Suspense>
     </>
   );

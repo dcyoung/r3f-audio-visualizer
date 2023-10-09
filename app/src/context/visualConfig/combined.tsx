@@ -4,7 +4,6 @@ import { CubeVisualConfigContextProvider } from "./cube";
 import { RingVisualConfigContextProvider } from "./diffusedRing";
 import { DnaVisualConfigContextProvider } from "./dna";
 import { GridVisualConfigContextProvider } from "./grid";
-import { PinGridVisualConfigContextProvider } from "./pinGrid";
 import { SphereVisualConfigContextProvider } from "./sphere";
 import { StencilVisualConfigContextProvider } from "./stencil";
 import { SwarmVisualConfigContextProvider } from "./swarm";
@@ -18,13 +17,11 @@ export const CombinedVisualsConfigContextProvider = ({
         <RingVisualConfigContextProvider>
           <DnaVisualConfigContextProvider>
             <SwarmVisualConfigContextProvider>
-              <PinGridVisualConfigContextProvider>
-                <SphereVisualConfigContextProvider>
-                  <StencilVisualConfigContextProvider>
-                    {children}
-                  </StencilVisualConfigContextProvider>
-                </SphereVisualConfigContextProvider>
-              </PinGridVisualConfigContextProvider>
+              <SphereVisualConfigContextProvider>
+                <StencilVisualConfigContextProvider>
+                  {children}
+                </StencilVisualConfigContextProvider>
+              </SphereVisualConfigContextProvider>
             </SwarmVisualConfigContextProvider>
           </DnaVisualConfigContextProvider>
         </RingVisualConfigContextProvider>

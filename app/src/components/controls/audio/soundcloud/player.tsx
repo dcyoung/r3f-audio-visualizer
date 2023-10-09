@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 
+import { useModeContext } from "@/context/mode";
 import { useSoundcloudContext } from "@/context/soundcloud";
 import { getTrackStreamUrl } from "@/lib/soundcloud/api";
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
@@ -21,6 +22,8 @@ export const TrackPlayer = ({
   audio: HTMLAudioElement;
   track: SoundcloudTrack;
 }) => {
+  const { showUI } = useModeContext();
+
   const { data: streamUrl } = useSuspenseQuery({
     queryKey: ["soundcloud-stream-url", track.id],
     queryFn: async () => {
@@ -72,20 +75,23 @@ export const TrackPlayer = ({
   return (
     <div
       className={cn(
-        "flex flex-row gap-2 items-center justify-start p-4 rounded-lg",
-        className
+        "flex flex-row gap-2 items-center justify-start p-4 rounded-lg sm:bg-black/25 w-fit max-w-xs",
+        className,
+        !showUI && "hidden"
       )}
       {...props}
     >
       <div
-        className="cursor-pointer rounded-full p-2 hover:scale-110"
+        className="pointer-events-auto cursor-pointer rounded-full p-2 hover:scale-110"
         onClick={() => setPlay((curr) => !curr)}
       >
         {/* TODO: Artwork */}
         {play ? <PauseCircle /> : <PlayCircle />}
       </div>
-      <div className="flex flex-col items-start justify-center gap-1">
-        <span className="truncate text-sm text-foreground">{track.title}</span>
+      <div className="hidden flex-col items-start justify-center gap-1 sm:flex">
+        <span className="max-w-64 w-64 truncate text-sm text-foreground">
+          {track.title}
+        </span>
         <span className="truncate text-xs text-foreground/50">
           {track.user?.username ?? "Unknown Artist"}
         </span>

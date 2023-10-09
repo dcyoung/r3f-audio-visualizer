@@ -1,18 +1,11 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useMemo } from "react";
 
 import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import { useEnergyInfo, useVisualSourceDataX } from "@/lib/appState";
 import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
-import { type ColorPaletteType, COLOR_PALETTE } from "@/lib/palettes";
 
-const AudioVisual = ({
-  visual,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: {
-  visual: string;
-  palette?: ColorPaletteType;
-}) => {
+const AudioVisual = ({ visual }: { visual: string }) => {
   const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
   // TODO: Find a better place to put amplitude settings for this audio visual
@@ -32,9 +25,13 @@ const AudioVisual = ({
 
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);
-  const VisualComponent = lazy(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    async () => await import(`./${visual}/reactive.tsx`)
+  const VisualComponent = useMemo(
+    () =>
+      lazy(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        async () => await import(`./${visual}/reactive.tsx`)
+      ),
+    [visual]
   );
 
   return (
@@ -42,7 +39,6 @@ const AudioVisual = ({
       <VisualComponent
         coordinateMapper={coordinateMapper}
         scalarTracker={energyTracker}
-        palette={palette}
       />
     </Suspense>
   );

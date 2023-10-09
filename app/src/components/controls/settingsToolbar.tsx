@@ -19,15 +19,17 @@ import {
 } from "@/context/cameraControls";
 import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
-import { isCameraMode } from "@/lib/applicationModes";
+import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
 import { AVAILABLE_COLOR_PALETTES } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
 
 import { ToolbarItem, ToolbarPopover } from "./common";
 
 const ColorsControl = () => {
-  const { colorBackground, palette } = useVisualContext();
-  const { setColorBackground, setPalette } = useVisualContextSetters();
+  const { mode } = useModeContext();
+  const { colorBackground, palette, paletteTrackEnergy } = useVisualContext();
+  const { setColorBackground, setPalette, setPaletteTrackEnergy } =
+    useVisualContextSetters();
 
   return (
     <ToolbarPopover
@@ -68,6 +70,18 @@ const ColorsControl = () => {
           />
           <Label htmlFor="color-background">Color Background</Label>
         </div>
+        {mode === APPLICATION_MODE.AUDIO && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="color-background"
+              defaultChecked={paletteTrackEnergy}
+              onCheckedChange={(e) => {
+                setPaletteTrackEnergy(e);
+              }}
+            />
+            <Label htmlFor="color-background">Follow Music</Label>
+          </div>
+        )}
       </div>
     </ToolbarPopover>
   );
@@ -97,24 +111,6 @@ const CameraControls = () => {
   }
 };
 
-// const TestControl = () => {
-//   return (
-//     <ToolbarPopover
-//       trigger={
-//         <ToolbarItem>
-//           <Info />
-//         </ToolbarItem>
-//       }
-//       align="end"
-//       className="bg-background/50 border-0 border-transparent p-0 w-fit"
-//     >
-//       <div className="pointer-events-none flex flex-row items-center justify-center gap-4">
-//         Test
-//       </div>
-//     </ToolbarPopover>
-//   );
-// };
-
 export const SettingsToolbar = ({
   className,
   ...props
@@ -130,7 +126,6 @@ export const SettingsToolbar = ({
     >
       <ColorsControl />
       {isCameraMode(mode) && <CameraControls />}
-      {/* <TestControl /> */}
     </div>
   );
 };

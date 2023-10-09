@@ -7,16 +7,13 @@ import {
   MeshBasicMaterial,
 } from "three";
 
+import { useVisualContext } from "@/context/visual";
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
   TWO_PI,
 } from "@/lib/mappers/coordinateMappers/common";
-import {
-  ColorPalette,
-  type ColorPaletteType,
-  COLOR_PALETTE,
-} from "@/lib/palettes";
+import { ColorPalette } from "@/lib/palettes";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
 // const MAPPING_MODE_POLAR_PHI = "polar_phi";
@@ -27,24 +24,22 @@ const BaseSphere = ({
   radius = 2,
   nPoints = 800,
   cubeSideLength = 0.05,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
 }: {
   coordinateMapper: ICoordinateMapper;
   radius?: number;
   nPoints?: number;
   cubeSideLength?: number;
-  palette?: ColorPaletteType;
 }) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const { palette } = useVisualContext();
   const lut = ColorPalette.getPalette(palette).buildLut();
-  // Recolor
   useEffect(() => {
     for (let i = 0; i < nPoints; i++) {
       meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  });
+  }, [lut, meshRef]);
 
   useFrame(({ clock }) => {
     // in ms

@@ -3,14 +3,10 @@ import { Vector3 } from "three";
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
 import { useCubeVisualConfigContext } from "@/context/visualConfig/cube";
-import { COLOR_PALETTE } from "@/lib/palettes";
 
 import BaseCube from "./base";
 
-const CubeVisual = ({
-  coordinateMapper,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-}: VisualProps) => {
+const CubeVisual = ({ coordinateMapper }: VisualProps) => {
   const { nPerSide, unitSideLength, unitSpacingScalar, volume } =
     useCubeVisualConfigContext();
   // const { nPerSide, cubeUnitSideLength, cubeUnitSpacingScalar, volume } =
@@ -49,7 +45,6 @@ const CubeVisual = ({
         cubeSideLength={unitSideLength}
         cubeSpacingScalar={unitSpacingScalar}
         volume={volume}
-        palette={palette}
       />
       <Ground
         position={

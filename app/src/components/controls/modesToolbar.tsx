@@ -1,4 +1,3 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import classnames from "classnames";
 import {
   Activity,
@@ -11,7 +10,7 @@ import {
   FileUp,
   type LucideProps,
 } from "lucide-react";
-import { type HTMLAttributes, useMemo, Suspense, useState } from "react";
+import { type HTMLAttributes, useMemo } from "react";
 
 import {
   AUDIO_SOURCE,
@@ -25,22 +24,14 @@ import {
 } from "@/context/audioSource";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
 import {
-  SearchFiltersContextProvider,
-  useSearchFiltersContext,
-} from "@/context/searchFilters";
-import { useSoundcloudContextSetters } from "@/context/soundcloud";
-import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
   APPLICATION_MODE,
 } from "@/lib/applicationModes";
-import { getUsers } from "@/lib/soundcloud/api";
-import { type SoundcloudUser } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
 
-import { SearchFilterInput } from "./searchFilterInput";
-import { UserTrackList } from "./soundcloud/track";
-import { UserList } from "./soundcloud/user";
+import { FileUploadControls } from "./audio/fileUpload";
+import { SoundcloudControls } from "./audio/soundcloud/controls";
 
 const ModeIcon = ({
   mode,
@@ -97,6 +88,10 @@ const ModeSelectButton = ({ mode }: { mode: ApplicationMode }) => {
 };
 
 const WaveformModeControls = () => {
+  // const { maxAmplitude, waveformFrequenciesHz, amplitudeSplitRatio } =
+  //   useWaveGeneratorContext();
+  // const { setMaxAmplitude, setAmplitudeSplitRatio, setWaveformFrequenciesHz } =
+  //   useWaveGeneratorContextSetters();
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <span>Wave Form</span>
@@ -106,6 +101,10 @@ const WaveformModeControls = () => {
 };
 
 const NoiseGeneratorModeControls = () => {
+  // const { amplitude, spatialScale, timeScale, nIterations } =
+  //   useNoiseGeneratorContext();
+  // const { setAmplitude, setSpatialScale, setTimeScale, setNIterations } =
+  //   useNoiseGeneratorContextSetters();
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <span>Noise Generator</span>
@@ -114,62 +113,15 @@ const NoiseGeneratorModeControls = () => {
   );
 };
 
-const SouncloudUserSearch = ({ query }: { query: string }) => {
-  const { data: users } = useSuspenseQuery({
-    queryKey: ["soundcloud-user-search", query],
-    queryFn: async () => {
-      return await getUsers({
-        query: query,
-        limit: 5,
-      });
-    },
-  });
-
-  const [user, setUser] = useState<SoundcloudUser | null>(null);
-  const { setTrack } = useSoundcloudContextSetters();
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-2">
-      <UserList users={users} onUserSelected={setUser} />
-      {user && <UserTrackList userId={user.id} onTrackSelected={setTrack} />}
-    </div>
-  );
-};
-
-const SearchedUserList = () => {
-  const { query } = useSearchFiltersContext();
-
-  if (!query) {
-    return <span className="text-foreground">No results...</span>;
-  }
-  return (
-    <Suspense fallback={<span className="text-foreground">Searching...</span>}>
-      <SouncloudUserSearch query={query} />
-    </Suspense>
-  );
-};
-
-const SoundcloudUserSearch = () => {
-  return (
-    <SearchFiltersContextProvider>
-      <SearchFilterInput placeholder="Search Soundcloud users..." />
-      <SearchedUserList />
-    </SearchFiltersContextProvider>
-  );
-};
-
-const SoundcloudControls = ({}) => {
-  return <SoundcloudUserSearch />;
-};
-
 const AudioSourceControls = () => {
   const { audioSource } = useAudioSourceContext();
   switch (audioSource) {
     case AUDIO_SOURCE.SOUNDCLOUD:
       return <SoundcloudControls />;
+    case AUDIO_SOURCE.FILE_UPLOAD:
+      return <FileUploadControls />;
     case AUDIO_SOURCE.MICROPHONE:
     case AUDIO_SOURCE.SCREEN_SHARE:
-    case AUDIO_SOURCE.FILE_UPLOAD:
       // TODO: Add controls
       return null;
     default:

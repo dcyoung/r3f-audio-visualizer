@@ -1,12 +1,15 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { type ComponentPropsWithoutRef, type Dispatch, type HTMLAttributes } from "react";
+import { Image } from "lucide-react";
+import {
+  type ComponentPropsWithoutRef,
+  type Dispatch,
+  type HTMLAttributes,
+} from "react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getUserTracks } from "@/lib/soundcloud/api";
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
-
-
 
 export const TrackCard = ({
   track,
@@ -21,7 +24,11 @@ export const TrackCard = ({
       )}
       {...props}
     >
-      <img src={track.artwork_url} className="h-8 w-8 rounded-lg" />
+      {track.artwork_url ? (
+        <img src={track.artwork_url} className="h-8 w-8 rounded-lg" />
+      ) : (
+        <Image />
+      )}
       <div className="flex flex-col items-start justify-center gap-1">
         <span className="truncate text-xs text-foreground">{track.title}</span>
         <span className="truncate text-xs text-foreground/50">

@@ -7,15 +7,12 @@ import {
   MeshBasicMaterial,
 } from "three";
 
+import { useVisualContext } from "@/context/visual";
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
-import {
-  ColorPalette,
-  type ColorPaletteType,
-  COLOR_PALETTE,
-} from "@/lib/palettes";
+import { ColorPalette } from "@/lib/palettes";
 
 const BaseGrid = ({
   coordinateMapper,
@@ -23,22 +20,18 @@ const BaseGrid = ({
   nGridCols = 100,
   cubeSideLength = 0.025,
   cubeSpacingScalar = 5,
-  palette = COLOR_PALETTE.THREE_COOL_TO_WARM,
-  pinStyle = false,
-  color = "white",
 }: {
   coordinateMapper: ICoordinateMapper;
   nGridRows?: number;
   nGridCols?: number;
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
-  palette?: ColorPaletteType | undefined;
-  pinStyle?: boolean;
-  color?: string;
 }) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const lut = palette ? ColorPalette.getPalette(palette).buildLut() : null;
+  const { palette } = useVisualContext();
+  const lut = ColorPalette.getPalette(palette).buildLut();
+
   // Recolor
   useEffect(() => {
     if (!lut) {
@@ -64,7 +57,7 @@ const BaseGrid = ({
     const elapsedTimeSec = clock.getElapsedTime();
     const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
     const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;
-    const baseHeight = cubeSideLength + coordinateMapper.amplitude;
+    // const baseHeight = cubeSideLength + coordinateMapper.amplitude;
     let instanceIdx, normGridX, normGridY, x, y, z;
     for (let row = 0; row < nGridRows; row++) {
       for (let col = 0; col < nGridCols; col++) {
@@ -81,14 +74,13 @@ const BaseGrid = ({
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);
 
-        if (pinStyle) {
-          // adjust the position and z-scale of each cube
-          tmpMatrix.setPosition(x, y, (baseHeight + z) / 2);
-          tmpMatrix.elements[10] = (baseHeight + z) / cubeSideLength;
-        } else {
-          // adjust position of each cube
-          tmpMatrix.setPosition(x, y, z);
-        }
+        // if (pinStyle) {
+        //   // adjust the position and z-scale of each cube
+        //   tmpMatrix.setPosition(x, y, (baseHeight + z) / 2);
+        //   tmpMatrix.elements[10] = (baseHeight + z) / cubeSideLength;
+        // } else {
+        // adjust position of each cube
+        tmpMatrix.setPosition(x, y, z);
 
         meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
       }
@@ -109,7 +101,7 @@ const BaseGrid = ({
         attach="geometry"
         args={[cubeSideLength, cubeSideLength, cubeSideLength, 1]}
       />
-      <meshPhongMaterial attach="material" color={color} toneMapped={false} />
+      <meshPhongMaterial attach="material" color="white" toneMapped={false} />
     </instancedMesh>
   );
 };

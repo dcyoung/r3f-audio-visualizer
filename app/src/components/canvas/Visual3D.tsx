@@ -13,12 +13,13 @@ import {
 import { useVisualContext } from "@/context/visual";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
 
+import { MaybePaletteTracker } from "./paletteTracker";
+
 export const AVAILABLE_VISUALS = [
   "grid",
   "sphere",
   "cube",
   "diffusedRing",
-  "pinGrid",
   "dna",
   // "stencil",
   // "swarm",
@@ -29,17 +30,20 @@ const VisualizerComponent = ({
 }: {
   mode: "WAVE_FORM" | "NOISE" | "AUDIO";
 }) => {
-  const { visual, palette } = useVisualContext();
+  const {
+    visual,
+    //palette
+  } = useVisualContext();
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
-      return <WaveformVisual visual={visual} palette={palette} />;
+      return <WaveformVisual visual={visual} />;
     case APPLICATION_MODE.NOISE:
       // if (visual === "swarm") {
       //   return <ParticleNoiseVisual />;
       // }
-      return <NoiseVisual visual={visual} palette={palette} />;
+      return <NoiseVisual visual={visual} />;
     case APPLICATION_MODE.AUDIO:
-      return <AudioVisual visual={visual} palette={palette} />;
+      return <AudioVisual visual={visual} />;
     default:
       return mode satisfies never;
   }
@@ -105,6 +109,7 @@ const Visual3DCanvas = ({
       <VisualizerComponent mode={mode} />
       {/* <Stats /> */}
       <CameraControls />
+      <MaybePaletteTracker />
     </Canvas>
   );
 };

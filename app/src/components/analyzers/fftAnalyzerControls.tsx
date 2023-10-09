@@ -8,7 +8,11 @@ import {
   useVisualSourceDataX,
 } from "@/lib/appState";
 
-const FFTAnalyzerControls = ({ analyzer }: { analyzer: FFTAnalyzer }) => {
+export const FFTAnalyzerControls = ({
+  analyzer,
+}: {
+  analyzer: FFTAnalyzer;
+}) => {
   const { octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
   // const { octaveBands, energyMeasure } = useControls({
   //   Audio: folder({

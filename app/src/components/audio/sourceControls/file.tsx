@@ -10,7 +10,7 @@ import "@/components/audio/sourceControls/overlay.css";
 const useAudioFile = (audio: HTMLAudioElement) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const audioFile = null as null | { name: string };
+  const audioFile = null as null | Blob;
 
   const playAudio = () => {
     if (!audioFile) {

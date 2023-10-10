@@ -34,11 +34,14 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: "pr-build"
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - name: Install and Build
         run: |
-          cd pr-build
-          npm install
-          npm run build -- --base=/${{ env.PR_REPO_NAME }}/
+          cd pr-build/app
+          pnpm i
+          pnpm run build --base=/${{ env.PR_REPO_NAME }}/
         env:
           CI: ""
       - name: Checkout temporary deployment target repo
@@ -50,7 +53,7 @@ jobs:
           token: ${{ secrets.PAT }}
       - name: Push files to target
         run: |
-          cp -r pr-build/dist/* pr-deploy
+          cp -r pr-build/app/dist/* pr-deploy
           cd pr-deploy
           git add .
           git commit -m $GITHUB_SHA

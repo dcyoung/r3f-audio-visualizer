@@ -36,7 +36,7 @@ export const FFTAnalyzerContextProvider = ({
     initial?.octaveBandMode ?? 2
   );
   const [energyMeasure, setEnergyMeasure] = useState<EnergyMeasure>(
-    initial?.energyMeasure ?? "overall"
+    initial?.energyMeasure ?? "bass"
   );
   return (
     <FFTAnalyzerContext.Provider

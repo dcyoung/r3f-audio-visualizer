@@ -20,11 +20,26 @@ import {
 } from "@/components/audio/sourceControls/common";
 import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useAudioSourceContext,
   useAudioSourceContextSetters,
 } from "@/context/audioSource";
+import {
+  useFFTAnalyzerContext,
+  useFFTAnalyzerContextSetters,
+} from "@/context/fftAnalyzer";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
 import {
   useNoiseGeneratorContext,
@@ -35,6 +50,12 @@ import {
   useWaveGeneratorContextSetters,
 } from "@/context/waveGenerator";
 import {
+  type EnergyMeasure,
+  EnergyMeasureOptions,
+  type OctaveBandMode,
+  OctaveBandModeMap,
+} from "@/lib/analyzers/fft";
+import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
   APPLICATION_MODE,
@@ -43,7 +64,6 @@ import { cn } from "@/lib/utils";
 
 import { FileUploadControls } from "./audio/fileUpload";
 import { SoundcloudControls } from "./audio/soundcloud/controls";
-import { Switch } from "../ui/switch";
 
 const ModeIcon = ({
   mode,
@@ -154,6 +174,68 @@ const WaveformModeControls = () => {
   );
 };
 
+const FFTAnalyzerControls = () => {
+  const { amplitude, octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
+  const { setAmplitude, setOctaveBand, setEnergyMeasure } =
+    useFFTAnalyzerContextSetters();
+  return (
+    <>
+      <Label>Amplitude</Label>
+      <Slider
+        defaultValue={[amplitude]}
+        min={0.0}
+        max={5.0}
+        step={0.01}
+        onValueChange={(e) => setAmplitude(e[0])}
+      />
+      <Select
+        onValueChange={(v) => {
+          setOctaveBand(Number(v) as OctaveBandMode);
+        }}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue
+            placeholder={OctaveBandModeMap[octaveBandMode]}
+            defaultValue={octaveBandMode}
+          />
+        </SelectTrigger>
+        <SelectContent className="max-h-36">
+          <SelectGroup>
+            <SelectLabel>Octave Band Mode</SelectLabel>
+            {Object.entries(OctaveBandModeMap).map((v) => (
+              <SelectItem value={v[0]} key={v[1]}>
+                {v[1]}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <Select
+        onValueChange={(v) => {
+          setEnergyMeasure(v as EnergyMeasure);
+        }}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue
+            placeholder={energyMeasure}
+            defaultValue={energyMeasure}
+          />
+        </SelectTrigger>
+        <SelectContent className="max-h-36">
+          <SelectGroup>
+            <SelectLabel>Energy Measure</SelectLabel>
+            {EnergyMeasureOptions.map((v) => (
+              <SelectItem value={v} key={v}>
+                {v}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </>
+  );
+};
+
 const NoiseGeneratorModeControls = () => {
   const { amplitude, spatialScale, timeScale, nIterations } =
     useNoiseGeneratorContext();
@@ -257,8 +339,33 @@ const AudioSourceSelect = ({
 
 const AudioModeControls = () => {
   return (
-    <div className="flex flex-col items-start justify-center gap-4">
-      <span>Audio</span>
+    <Tabs defaultValue="source" className="w-full">
+      <div className="flex w-full flex-row justify-center">
+        <TabsList>
+          <TabsTrigger value="source">Source</TabsTrigger>
+          <TabsTrigger value="analyzer">Analyzer</TabsTrigger>
+        </TabsList>
+      </div>
+      <TabsContent
+        value="source"
+        className="flex flex-col items-start justify-start gap-4 py-2"
+      >
+        <AudioSourceSelect />
+        <AudioSourceControls />
+      </TabsContent>
+      <TabsContent
+        value="analyzer"
+        className="flex flex-col items-start justify-start gap-4"
+      >
+        <FFTAnalyzerControls />
+      </TabsContent>
+    </Tabs>
+  );
+};
+
+const AudioScopeModeControls = () => {
+  return (
+    <div className="flex flex-col items-start justify-start gap-4 py-2">
       <AudioSourceSelect />
       <AudioSourceControls />
     </div>
@@ -273,8 +380,9 @@ const ModeSettingsInputs = () => {
     case APPLICATION_MODE.NOISE:
       return <NoiseGeneratorModeControls />;
     case APPLICATION_MODE.AUDIO:
-    case APPLICATION_MODE.AUDIO_SCOPE:
       return <AudioModeControls />;
+    case APPLICATION_MODE.AUDIO_SCOPE:
+      return <AudioScopeModeControls />;
     default:
       return mode satisfies never;
   }

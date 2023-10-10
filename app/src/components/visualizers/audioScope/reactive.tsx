@@ -1,4 +1,3 @@
-import { folder, useControls } from "leva";
 import { useEffect } from "react";
 
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
@@ -10,14 +9,7 @@ const ScopeVisual = ({ textureMapper }: { textureMapper: TextureMapper }) => {
   const { palette } = useVisualContext();
   const { setColorBackground, setPalette } = useVisualContextSetters();
   const color = ColorPalette.getPalette(palette).lerpColor(0.5);
-  const { usePoints } = useControls({
-    "Visual - Scope": folder(
-      {
-        usePoints: true,
-      },
-      { collapsed: true }
-    ),
-  });
+  const usePoints = true;
 
   useEffect(() => {
     setPalette("rainbow");

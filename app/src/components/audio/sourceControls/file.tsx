@@ -1,23 +1,16 @@
-import { folder, useControls } from "leva";
 import { useEffect, useState } from "react";
 
 import {
   type AudioSourceControlsProps,
   iOS,
 } from "@/components/audio/sourceControls/common";
-import { audioFileInput } from "@/components/levaPlugins/audioFileInput";
 
 import "@/components/audio/sourceControls/overlay.css";
 
 const useAudioFile = (audio: HTMLAudioElement) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  // TODO: Replace w/ new input
-  const { audioFile } = useControls({
-    Audio: folder({
-      audioFile: audioFileInput({ file: undefined }),
-    }),
-  });
+  const audioFile = null as null | { name: string };
 
   const playAudio = () => {
     if (!audioFile) {

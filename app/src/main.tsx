@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Leva } from "leva";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -30,7 +29,6 @@ createRoot(document.getElementById("root")!).render(
                   <SoundcloudContextProvider>
                     <CameraControlsContextProvider>
                       <VisualContextProvider>
-                        <Leva collapsed={true} />
                         <App />
                       </VisualContextProvider>
                     </CameraControlsContextProvider>

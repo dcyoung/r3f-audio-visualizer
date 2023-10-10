@@ -9,6 +9,7 @@ import {
   ScreenShare,
   FileUp,
   type LucideProps,
+  RefreshCcw,
 } from "lucide-react";
 import { type HTMLAttributes, useMemo } from "react";
 
@@ -18,11 +19,21 @@ import {
   getPlatformSupportedAudioSources,
 } from "@/components/audio/sourceControls/common";
 import { ToolbarItem, ToolbarPopover } from "@/components/controls/common";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import {
   useAudioSourceContext,
   useAudioSourceContextSetters,
 } from "@/context/audioSource";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
+import {
+  useNoiseGeneratorContext,
+  useNoiseGeneratorContextSetters,
+} from "@/context/noiseGenerator";
+import {
+  useWaveGeneratorContext,
+  useWaveGeneratorContextSetters,
+} from "@/context/waveGenerator";
 import {
   type ApplicationMode,
   getPlatformSupportedApplicationModes,
@@ -32,6 +43,7 @@ import { cn } from "@/lib/utils";
 
 import { FileUploadControls } from "./audio/fileUpload";
 import { SoundcloudControls } from "./audio/soundcloud/controls";
+import { Switch } from "../ui/switch";
 
 const ModeIcon = ({
   mode,
@@ -88,27 +100,106 @@ const ModeSelectButton = ({ mode }: { mode: ApplicationMode }) => {
 };
 
 const WaveformModeControls = () => {
-  // const { maxAmplitude, waveformFrequenciesHz, amplitudeSplitRatio } =
-  //   useWaveGeneratorContext();
-  // const { setMaxAmplitude, setAmplitudeSplitRatio, setWaveformFrequenciesHz } =
-  //   useWaveGeneratorContextSetters();
+  const { maxAmplitude, waveformFrequenciesHz } = useWaveGeneratorContext();
+  const { setMaxAmplitude, setWaveformFrequenciesHz, reset } =
+    useWaveGeneratorContextSetters();
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <span>Wave Form</span>
-      <p>...</p>
+    <div className="flex w-full flex-col items-start justify-start gap-4">
+      <div className="flex w-full items-center justify-between">
+        <span>Wave Form</span>
+        <RefreshCcw
+          className="pointer-events-auto cursor-pointer"
+          onClick={() => reset()}
+        />
+      </div>
+      <div className="flex w-full items-center justify-between">
+        <Label htmlFor="color-background">Double</Label>
+        <Switch
+          id="waveform-double"
+          defaultChecked={waveformFrequenciesHz.length > 1}
+          onCheckedChange={(e) => {
+            setWaveformFrequenciesHz(e ? [2.0, 10.0] : [2.0]);
+          }}
+        />
+      </div>
+      <Label>Max Amplitude</Label>
+      <Slider
+        defaultValue={[maxAmplitude]}
+        min={0.0}
+        max={5.0}
+        step={0.01}
+        onValueChange={(e) => setMaxAmplitude(e[0])}
+      />
+      {waveformFrequenciesHz.map((hz, i) => (
+        <>
+          <Label>Wave #{i + 1} - Freq (hz)</Label>
+          <Slider
+            defaultValue={[hz]}
+            min={2.0}
+            max={i == 0 ? 10.0 : 30.0}
+            step={0.05}
+            onValueChange={(e) =>
+              setWaveformFrequenciesHz(
+                (prev) =>
+                  prev.map((v, j) => (i == j ? e[0] : v)) as [
+                    number,
+                    ...number[],
+                  ]
+              )
+            }
+          />
+        </>
+      ))}
     </div>
   );
 };
 
 const NoiseGeneratorModeControls = () => {
-  // const { amplitude, spatialScale, timeScale, nIterations } =
-  //   useNoiseGeneratorContext();
-  // const { setAmplitude, setSpatialScale, setTimeScale, setNIterations } =
-  //   useNoiseGeneratorContextSetters();
+  const { amplitude, spatialScale, timeScale, nIterations } =
+    useNoiseGeneratorContext();
+  const { setAmplitude, setSpatialScale, setTimeScale, setNIterations, reset } =
+    useNoiseGeneratorContextSetters();
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <span>Noise Generator</span>
-      <p>...</p>
+    <div className="flex w-full flex-col items-start justify-start gap-4">
+      <div className="flex w-full items-center justify-between">
+        <span>Noise </span>
+        <RefreshCcw
+          className="pointer-events-auto cursor-pointer"
+          onClick={() => reset()}
+        />
+      </div>
+      <Label>Amplitude</Label>
+      <Slider
+        defaultValue={[amplitude]}
+        min={0.0}
+        max={5.0}
+        step={0.01}
+        onValueChange={(e) => setAmplitude(e[0])}
+      />
+      <Label>Spatial Scale</Label>
+      <Slider
+        defaultValue={[spatialScale]}
+        min={0.1}
+        max={5.0}
+        step={0.1}
+        onValueChange={(e) => setSpatialScale(e[0])}
+      />
+      <Label>Time Scale</Label>
+      <Slider
+        defaultValue={[timeScale]}
+        min={0.01}
+        max={2.0}
+        step={0.01}
+        onValueChange={(e) => setTimeScale(e[0])}
+      />
+      <Label>N x Iterations</Label>
+      <Slider
+        defaultValue={[nIterations]}
+        min={1}
+        max={16}
+        step={1}
+        onValueChange={(e) => setNIterations(e[0])}
+      />
     </div>
   );
 };
@@ -196,7 +287,7 @@ const ModeSettingsPopover = () => {
         <MoreHorizontal className="pointer-events-auto cursor-pointer" />
       }
       align="start"
-      className="w-fit border-0 border-transparent bg-background/50 p-0"
+      className="w-fit min-w-[12rem] border-0 border-transparent bg-background/50 p-2"
     >
       <ModeSettingsInputs />
     </ToolbarPopover>

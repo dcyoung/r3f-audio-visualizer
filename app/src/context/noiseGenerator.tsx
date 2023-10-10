@@ -21,6 +21,7 @@ export const NoiseGeneratorContext = createContext<{
     setSpatialScale: Dispatch<SetStateAction<number>>;
     setTimeScale: Dispatch<SetStateAction<number>>;
     setNIterations: Dispatch<SetStateAction<number>>;
+    reset: Dispatch<void>;
   };
 } | null>(null);
 
@@ -52,6 +53,12 @@ export const NoiseGeneratorContextProvider = ({
           setSpatialScale: setSpatialScale,
           setTimeScale: setTimeScale,
           setNIterations: setNIterations,
+          reset: () => {
+            setAmplitude(initial?.amplitude ?? 1.0);
+            setSpatialScale(initial?.spatialScale ?? 2.0);
+            setTimeScale(initial?.timeScale ?? 0.5);
+            setNIterations(initial?.nIterations ?? 10);
+          },
         },
       }}
     >

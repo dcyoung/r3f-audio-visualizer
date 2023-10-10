@@ -1,16 +1,12 @@
 import { Box, CircleDashed, Dna, Globe, Grid3x3 } from "lucide-react";
 import { type HTMLAttributes } from "react";
 
-import { AVAILABLE_VISUALS } from "@/components/canvas/Visual3D";
 import { ToolbarItem } from "@/components/controls/common";
+import { AVAILABLE_VISUALS, type VisualType } from "@/components/visualizers/common";
 import { useVisualContextSetters } from "@/context/visual";
 import { cn } from "@/lib/utils";
 
-const VisualIcon = ({
-  visual,
-}: {
-  visual: (typeof AVAILABLE_VISUALS)[number];
-}) => {
+const VisualIcon = ({ visual }: { visual: VisualType }) => {
   switch (visual) {
     case "grid":
       return <Grid3x3 />;
@@ -27,11 +23,7 @@ const VisualIcon = ({
   }
 };
 
-const VisualSelectButton = ({
-  visual,
-}: {
-  visual: (typeof AVAILABLE_VISUALS)[number];
-}) => {
+const VisualSelectButton = ({ visual }: { visual: VisualType }) => {
   const { setVisual } = useVisualContextSetters();
   return (
     <ToolbarItem onClick={() => setVisual(visual)}>

@@ -15,16 +15,6 @@ import { APPLICATION_MODE } from "@/lib/applicationModes";
 
 import { MaybePaletteTracker } from "./paletteTracker";
 
-export const AVAILABLE_VISUALS = [
-  "grid",
-  "sphere",
-  "cube",
-  "diffusedRing",
-  "dna",
-  // "stencil",
-  // "swarm",
-] as const;
-
 const VisualizerComponent = ({
   mode,
 }: {

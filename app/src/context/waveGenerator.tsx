@@ -19,6 +19,7 @@ export const WaveGeneratorContext = createContext<{
     setMaxAmplitude: Dispatch<SetStateAction<number>>;
     setWaveformFrequenciesHz: Dispatch<SetStateAction<[number, ...number[]]>>;
     setAmplitudeSplitRatio: Dispatch<SetStateAction<number>>;
+    reset: Dispatch<void>;
   };
 } | null>(null);
 
@@ -51,6 +52,11 @@ export const WaveGeneratorContextProvider = ({
           setMaxAmplitude: setMaxAmplitude,
           setWaveformFrequenciesHz: setWaveformFrequenciesHz,
           setAmplitudeSplitRatio: setAmplitudeSplitRatio,
+          reset: () => {
+            setMaxAmplitude(initial?.maxAmplitude ?? 1.0);
+            setWaveformFrequenciesHz(initial?.waveformFrequenciesHz ?? [2.0]);
+            setAmplitudeSplitRatio(initial?.amplitudeSplitRatio ?? 0.75);
+          },
         },
       }}
     >

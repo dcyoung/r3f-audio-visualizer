@@ -9,7 +9,10 @@ import {
 } from "react";
 import { SRGBColorSpace } from "three";
 
-import { AVAILABLE_VISUALS } from "@/components/canvas/Visual3D";
+import {
+  AVAILABLE_VISUALS,
+  type VisualType,
+} from "@/components/visualizers/common";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
 import {
   type AVAILABLE_COLOR_PALETTES,
@@ -20,11 +23,11 @@ import {
 import { useModeContext } from "./mode";
 import { useTheme } from "./theme";
 import { CombinedVisualsConfigContextProvider } from "./visualConfig/combined";
+import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
-type Visual = (typeof AVAILABLE_VISUALS)[number];
 type Palette = (typeof AVAILABLE_COLOR_PALETTES)[number];
 export interface VisualConfig {
-  visual: Visual;
+  visual: VisualType;
   palette: Palette;
   colorBackground: boolean;
   paletteTrackEnergy: boolean;
@@ -34,7 +37,7 @@ export const VisualContext = createContext<{
   config: VisualConfig;
   setters: {
     resetConfig: Dispatch<void>;
-    setVisual: Dispatch<SetStateAction<Visual>>;
+    setVisual: Dispatch<SetStateAction<VisualType>>;
     setPalette: Dispatch<SetStateAction<Palette>>;
     setColorBackground: Dispatch<SetStateAction<boolean>>;
     setPaletteTrackEnergy: Dispatch<SetStateAction<boolean>>;
@@ -50,7 +53,7 @@ export const VisualContextProvider = ({
   const { setTheme } = useTheme();
   const { mode } = useModeContext();
   const [key, setKey] = useState<number>(0); // used to reset the context
-  const [visual, setVisual] = useState<Visual>(
+  const [visual, setVisual] = useState<VisualType>(
     initial?.visual ?? AVAILABLE_VISUALS[0]
   );
   const [palette, setPalette] = useState<Palette>(
@@ -62,6 +65,25 @@ export const VisualContextProvider = ({
   const [paletteTrackEnergy, setPaletteTrackEnergy] = useState<boolean>(
     initial?.paletteTrackEnergy ?? false
   );
+
+  const { setWaveformFrequenciesHz, setMaxAmplitude } =
+    useWaveGeneratorContextSetters();
+
+  // Reset waveform values whenever the visual changes
+  useEffect(() => {
+    if (mode === APPLICATION_MODE.WAVE_FORM) {
+      switch (visual) {
+        case "diffusedRing":
+          setWaveformFrequenciesHz([2.0, 10.0]);
+          setMaxAmplitude(1.0);
+          break;
+        default:
+          setWaveformFrequenciesHz([2.0]);
+          setMaxAmplitude(1.0);
+          break;
+      }
+    }
+  }, [visual, mode, setWaveformFrequenciesHz, setMaxAmplitude]);
 
   useEffect(() => {
     if (!colorBackground) {

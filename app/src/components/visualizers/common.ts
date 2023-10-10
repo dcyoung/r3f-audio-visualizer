@@ -11,3 +11,16 @@ export interface MotionVisualProps {
   motionMapper: IMotionMapper;
   scalarTracker?: IScalarTracker;
 }
+
+
+export const AVAILABLE_VISUALS = [
+  "grid",
+  "sphere",
+  "cube",
+  "diffusedRing",
+  "dna",
+  // "stencil",
+  // "swarm",
+] as const;
+
+export type VisualType = (typeof AVAILABLE_VISUALS)[number]

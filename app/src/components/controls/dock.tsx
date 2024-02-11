@@ -10,14 +10,14 @@ export const DockItem = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
           "grid size-10 flex-none grow cursor-pointer snap-center place-items-center rounded-sm bg-gradient-to-b from-slate-700 to-black text-white shadow-inner duration-300 ease-in-out hover:scale-110 hover:from-slate-500 hover:to-slate-900 aria-selected:from-slate-100 aria-selected:to-slate-500 aria-selected:text-black",
           className,
         )}
-        style={{
-          animationName: "scale, scale",
-          animationFillMode: "both",
-          animationTimingFunction: "ease-in-out",
-          animationDirection: "normal, reverse",
-          animationTimeline: "view(inline)",
-          animationRange: "entry 0% entry 150%, exit -50% exit 100%",
-        }}
+        // style={{
+        //   animationName: "scale, scale",
+        //   animationFillMode: "both",
+        //   animationTimingFunction: "ease-in-out",
+        //   animationDirection: "normal, reverse",
+        //   animationTimeline: "view(inline)",
+        //   animationRange: "entry 0% entry 150%, exit -50% exit 100%",
+        // }}
         {...props}
       />
     );

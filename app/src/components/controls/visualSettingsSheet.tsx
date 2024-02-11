@@ -67,6 +67,7 @@ const VisualSettingsControls = () => {
     case "diffusedRing":
       return DiffusedRingVisualSettingsControls();
     case "dna":
+    case "boxes":
       return null;
     default:
       return visual satisfies never;

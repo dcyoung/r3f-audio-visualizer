@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
+import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/eventDetector";
 import { useEnergyInfo } from "@/lib/appState";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
@@ -11,24 +11,18 @@ const PaletteUpdater = ({
 }: {
   scalarTracker: IScalarTracker;
 }) => {
-  const threshold = 0.5;
-  const frameSpan = 10;
+  const detector = new ScalarMovingAvgEventDetector(0.5, 150, 500);
   const { setPalette } = useVisualContextSetters();
-  const [movingAvg, setMovingAvg] = useState(0);
 
   useFrame(() => {
-    const curr = scalarTracker.getNormalizedValue();
-    if (movingAvg < threshold && curr > threshold) {
+    detector.observe(scalarTracker.getNormalizedValue());
+    if (detector.triggered()) {
       setPalette((prev) => {
         const currIdx = AVAILABLE_COLOR_PALETTES.indexOf(prev) ?? 0;
         const nextIdx = (currIdx + 1) % AVAILABLE_COLOR_PALETTES.length;
         return AVAILABLE_COLOR_PALETTES[nextIdx];
       });
-      setMovingAvg(1);
-    } else {
-      setMovingAvg((prev) => {
-        return (prev * (frameSpan - 1) + curr) / frameSpan;
-      });
+      detector.reset();
     }
   });
 

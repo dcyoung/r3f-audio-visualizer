@@ -50,7 +50,11 @@ export const getUserTracks = async ({
   });
 
   // Sort descending by playback count
-  return tracks.sort((a, b) => b.playback_count - a.playback_count);
+  return tracks.sort(
+    (a, b) =>
+      (b.playback_count ?? Number.POSITIVE_INFINITY) -
+      (a.playback_count ?? Number.POSITIVE_INFINITY),
+  );
 };
 
 export const getTrackStreamUrl = async (id: number) => {

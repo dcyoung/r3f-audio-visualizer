@@ -83,6 +83,7 @@ export const VisualContextProvider = ({
       case APPLICATION_MODE.WAVE_FORM:
       case APPLICATION_MODE.NOISE:
       case APPLICATION_MODE.AUDIO_SCOPE:
+      case APPLICATION_MODE.PARTICLE_NOISE:
         setPaletteTrackEnergy(false);
         break;
       case APPLICATION_MODE.AUDIO:

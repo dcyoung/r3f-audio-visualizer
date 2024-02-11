@@ -21,6 +21,7 @@ export const GridVisualConfigContext = createContext<{
     setNCols: Dispatch<SetStateAction<number>>;
     setUnitSideLength: Dispatch<SetStateAction<number>>;
     setUnitSpacingScalar: Dispatch<SetStateAction<number>>;
+    reset: Dispatch<void>;
   };
 } | null>(null);
 
@@ -53,6 +54,12 @@ export const GridVisualConfigContextProvider = ({
           setNRows: setNRows,
           setUnitSideLength: setUnitSideLength,
           setUnitSpacingScalar: setUnitSpacingScalar,
+          reset: () => {
+            setNCols(initial?.nCols ?? 100);
+            setNRows(initial?.nRows ?? 100);
+            setUnitSideLength(initial?.unitSideLength ?? 0.025);
+            setUnitSpacingScalar(initial?.unitSpacingScalar ?? 5);
+          },
         },
       }}
     >

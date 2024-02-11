@@ -15,7 +15,14 @@ import {
   isAudioMode,
   type ApplicationMode,
 } from "@/lib/applicationModes";
-import { Activity, Music, Shell, Waves } from "lucide-react";
+import {
+  AudioWaveform,
+  Drum,
+  HelpCircle,
+  Music,
+  Shell,
+  Waves,
+} from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
@@ -25,15 +32,18 @@ import { WaveformModeControls } from "./mode/waveform";
 const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
   switch (mode) {
     case "WAVE_FORM":
-      return <Activity />;
+      return <AudioWaveform />;
     case "NOISE":
       return <Waves />;
     case "AUDIO":
       return <Music />;
     case "AUDIO_SCOPE":
       return <Shell />;
+    case "PARTICLE_NOISE":
+      return <Drum />;
     default:
-      return mode satisfies never;
+      return <HelpCircle />;
+    // return mode satisfies never;
   }
 };
 const ModeSelectEntry = ({ mode }: { mode: ApplicationMode }) => {

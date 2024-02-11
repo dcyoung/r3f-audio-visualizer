@@ -88,20 +88,18 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
                 }}
               />
             </div>
-            {mode === APPLICATION_MODE.AUDIO && (
-              <div className="flex items-center justify-between gap-2">
-                <Switch
-                  id="color-background"
-                  defaultChecked={paletteTrackEnergy}
-                  onCheckedChange={(e) => {
-                    setPaletteTrackEnergy(e);
-                  }}
-                />
-                <Label htmlFor="color-background">Track Beat</Label>
-              </div>
-            )}
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="color-background">Follow Music</Label>
+              <Switch
+                disabled={mode !== APPLICATION_MODE.AUDIO}
+                id="color-background"
+                defaultChecked={paletteTrackEnergy}
+                onCheckedChange={(e) => {
+                  setPaletteTrackEnergy(e);
+                }}
+              />
+            </div>
           </div>
-          {/* <Separator /> */}
         </div>
       </SheetContent>
     </Sheet>

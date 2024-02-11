@@ -1,19 +1,18 @@
-import { useFrame } from "@react-three/fiber";
-import { useRef, useEffect, useMemo } from "react";
-import {
-  BoxGeometry,
-  type InstancedMesh,
-  Matrix4,
-  MeshBasicMaterial,
-} from "three";
-
+import { useEffect, useMemo, useRef } from "react";
 import { useVisualContext } from "@/context/visual";
 import {
-  type ICoordinateMapper,
-  HALF_DIAGONAL_UNIT_SQUARE,
   COORDINATE_TYPE,
+  HALF_DIAGONAL_UNIT_SQUARE,
+  type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 import { ColorPalette } from "@/lib/palettes";
+import { useFrame } from "@react-three/fiber";
+import {
+  BoxGeometry,
+  Matrix4,
+  MeshBasicMaterial,
+  type InstancedMesh,
+} from "three";
 
 const BaseCube = ({
   coordinateMapper,
@@ -66,7 +65,7 @@ const BaseCube = ({
           }
           meshRef.current.setColorAt(
             instanceIdx,
-            lut.getColor(normRadialOffset)
+            lut.getColor(normRadialOffset),
           );
         }
       }
@@ -101,7 +100,7 @@ const BaseCube = ({
                 normCubeX,
                 normCubeY,
                 normCubeZ,
-                elapsedTimeSec
+                elapsedTimeSec,
               );
           tmpMatrix.elements[0] = normalizedScale;
           tmpMatrix.elements[5] = normalizedScale;

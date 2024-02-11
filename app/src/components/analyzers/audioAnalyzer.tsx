@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-
 import { FFTAnalyzerControls } from "@/components/analyzers/fftAnalyzerControls";
 import { ControlledAudioSource } from "@/components/audio/audioSource";
 import {
@@ -24,15 +23,13 @@ const InternalAudioAnalyzer = ({
   mode: "AUDIO" | "AUDIO_SCOPE";
   audioSource: "SOUNDCLOUD" | "FILE_UPLOAD";
 }) => {
-  const audioCtx = useMemo(() => buildAudioContext(), [mode]);
-  const audio = useMemo(() => buildAudio(), [mode]);
+  const audioCtx = useMemo(() => buildAudioContext(), []);
+  const audio = useMemo(() => buildAudio(), []);
   const analyzer = useMemo(() => {
     console.log("Creating analyzer...");
     switch (mode) {
       case APPLICATION_MODE.AUDIO:
-        const out = new FFTAnalyzer(audio, audioCtx);
-        out.volume = 1.0;
-        return out;
+        return new FFTAnalyzer(audio, audioCtx, 1.0);
       case APPLICATION_MODE.AUDIO_SCOPE:
         return new ScopeAnalyzer(audio, audioCtx);
       default:
@@ -67,15 +64,13 @@ const InternalMediaStreamAnalyzer = ({
     console.log("Creating analyzer...");
     switch (mode) {
       case APPLICATION_MODE.AUDIO:
-        const out = new FFTAnalyzer(audio, audioCtx);
-        out.volume = 0.0;
-        return out;
+        return new FFTAnalyzer(audio, audioCtx, 0.0);
       case APPLICATION_MODE.AUDIO_SCOPE:
         return new ScopeAnalyzer(audio, audioCtx);
       default:
         return mode satisfies never;
     }
-  }, [audio, audioCtx]);
+  }, [audio, audioCtx, mode]);
 
   const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
 

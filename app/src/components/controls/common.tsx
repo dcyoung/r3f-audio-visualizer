@@ -1,5 +1,4 @@
 import { type HTMLAttributes, type ReactNode } from "react";
-
 import {
   Popover,
   PopoverContent,
@@ -15,8 +14,8 @@ export const ToolbarItem = ({
   return (
     <div
       className={cn(
-        "flex flex-row items-center justify-center w-8 h-8 rounded-full bg-white/20 hover:scale-150 ease-in-out duration-300 hover:bg-white/50 pointer-events-auto cursor-pointer",
-        className
+        "pointer-events-auto flex h-8 w-8 cursor-pointer flex-row items-center justify-center rounded-full bg-white/20 duration-300 ease-in-out hover:scale-150 hover:bg-white/50",
+        className,
       )}
       {...props}
     >

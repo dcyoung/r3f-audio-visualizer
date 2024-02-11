@@ -1,11 +1,10 @@
 import { Suspense } from "react";
-
 import AudioAnalyzer from "@/components/analyzers/audioAnalyzer";
 import AudioScopeCanvas from "@/components/canvas/AudioScope";
 import Visual3DCanvas from "@/components/canvas/Visual3D";
 import { ControlsPanel } from "@/components/controls/main";
 import { useModeContext } from "@/context/mode";
-import { type ApplicationMode, APPLICATION_MODE } from "@/lib/applicationModes";
+import { APPLICATION_MODE, type ApplicationMode } from "@/lib/applicationModes";
 
 const getAnalyzerComponent = (mode: ApplicationMode) => {
   switch (mode) {

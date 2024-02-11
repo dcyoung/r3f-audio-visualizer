@@ -1,3 +1,5 @@
+import { type VisualProps } from "@/components/visualizers/common";
+import { useDnaVisualConfigContext } from "@/context/visualConfig/dna";
 import {
   Bloom,
   DepthOfField,
@@ -5,9 +7,6 @@ import {
   Noise,
   Vignette,
 } from "@react-three/postprocessing";
-
-import { type VisualProps } from "@/components/visualizers/common";
-import { useDnaVisualConfigContext } from "@/context/visualConfig/dna";
 
 import BaseDoubleHelix from "./base";
 import MultiStrand from "./multi";

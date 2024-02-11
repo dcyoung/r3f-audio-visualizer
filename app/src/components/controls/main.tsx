@@ -1,9 +1,10 @@
-import { ModesToolbar } from "@/components/controls/modesToolbar";
-import { SettingsToolbar } from "@/components/controls/settingsToolbar";
-import { VisualsToolbar } from "@/components/controls/visualsToolbar";
+import VisualsDock from "@/components/controls/visualsDock";
 import { Switch } from "@/components/ui/switch";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { cn } from "@/lib/utils";
+
+import SettingsDock from "./settingsDock";
 
 export const ControlsPanel = () => {
   const { mode, showUI } = useModeContext();
@@ -21,19 +22,16 @@ export const ControlsPanel = () => {
         />
       </div>
       {showUI && (
-        <>
-          <div className="pointer-events-none absolute top-0 flex h-24 w-full flex-row items-start justify-center p-4">
-            <ModesToolbar />
+        <div className="pointer-events-none absolute bottom-0 flex w-full items-end justify-center gap-4 p-4">
+          {mode !== APPLICATION_MODE.AUDIO_SCOPE && <VisualsDock />}
+          <div
+            className={cn({
+              "absolute bottom-24 right-0 sm:static sm:bottom-0": true,
+            })}
+          >
+            <SettingsDock />
           </div>
-          {mode !== APPLICATION_MODE.AUDIO_SCOPE && (
-            <div className="pointer-events-none absolute bottom-0 flex h-24 w-full flex-row items-center justify-center p-4">
-              <VisualsToolbar />
-            </div>
-          )}
-          <div className="pointer-events-none absolute right-0 flex h-full w-24 flex-col items-center justify-center p-4">
-            <SettingsToolbar />
-          </div>
-        </>
+        </div>
       )}
     </>
   );

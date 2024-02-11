@@ -32,7 +32,7 @@ export const gaussianRandom = (): number => {
 export const normalizedToRange = (
   vNorm: number,
   a: number,
-  b: number
+  b: number,
 ): number => {
   return Math.min(a, b) + vNorm * Math.abs(b - a);
 };
@@ -49,7 +49,7 @@ export const cubeFaceCenterRadialOffset = (
   xNorm: number,
   yNorm: number,
   zNorm: number,
-  interiorValue = 1.0
+  interiorValue = 1.0,
 ): number => {
   // calculate a radial offset for each face
   // (ie: treat each face as a grid and calculate radial dist from center of grid)
@@ -104,7 +104,7 @@ export interface ICoordinateMapper {
     xNorm: number,
     yNorm?: number,
     zNorm?: number,
-    elapsedTimeSec?: number
+    elapsedTimeSec?: number,
   ) => number;
 }
 
@@ -127,7 +127,7 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
     xNorm: number,
     yNorm = 0.0,
     zNorm = 0.0,
-    elapsedTimeSec = 0.0
+    elapsedTimeSec = 0.0,
   ): number {
     switch (inputCoordinateType) {
       case COORDINATE_TYPE.CARTESIAN_1D:
@@ -148,18 +148,18 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
   abstract map_2D(
     xNorm: number,
     yNorm: number,
-    elapsedTimeSec?: number
+    elapsedTimeSec?: number,
   ): number;
   abstract map_3D(
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec?: number
+    elapsedTimeSec?: number,
   ): number;
   abstract map_3DFaces(
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec?: number
+    elapsedTimeSec?: number,
   ): number;
 }

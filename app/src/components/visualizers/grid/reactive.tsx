@@ -1,8 +1,7 @@
-import { Vector3 } from "three";
-
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
 import { useGridVisualConfigContext } from "@/context/visualConfig/grid";
+import { Vector3 } from "three";
 
 import BaseGrid from "./base";
 

@@ -42,28 +42,28 @@ export const DnaVisualConfigContextProvider = ({
 }>) => {
   const [multi, setMulti] = useState<boolean>(initial?.multi ?? true);
   const [helixLength, setHelixLength] = useState<number>(
-    initial?.helixLength ?? 50
+    initial?.helixLength ?? 50,
   );
   const [helixRadius, setHelixRadius] = useState<number>(
-    initial?.helixRadius ?? 1
+    initial?.helixRadius ?? 1,
   );
   const [helixWindingSeparation, setHelixWindingSeparation] = useState<number>(
-    initial?.helixWindingSeparation ?? 10
+    initial?.helixWindingSeparation ?? 10,
   );
   const [strandRadius, setStrandRadius] = useState<number>(
-    initial?.strandRadius ?? 0.1
+    initial?.strandRadius ?? 0.1,
   );
   const [baseSpacing, setBaseSpacing] = useState<number>(
-    initial?.baseSpacing ?? 0.35
+    initial?.baseSpacing ?? 0.35,
   );
   const [strandOffsetRad, setStrandOffsetRad] = useState<number>(
-    initial?.strandOffsetRad ?? Math.PI / 2
+    initial?.strandOffsetRad ?? Math.PI / 2,
   );
   const [mirrorEffects, setMirrorEffects] = useState<boolean>(
-    initial?.mirrorEffects ?? true
+    initial?.mirrorEffects ?? true,
   );
   const [fixedBaseGap, setFixedBaseGap] = useState<boolean>(
-    initial?.fixedBaseGap ?? false
+    initial?.fixedBaseGap ?? false,
   );
   return (
     <DnaVisualConfigContext.Provider
@@ -101,7 +101,7 @@ export function useDnaVisualConfigContext() {
   const context = useContext(DnaVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useDnaVisualConfigContext must be used within a DnaVisualConfigContextProvider"
+      "useDnaVisualConfigContext must be used within a DnaVisualConfigContextProvider",
     );
   }
   return context.config;
@@ -111,7 +111,7 @@ export function useDnaVisualConfigContextSetters() {
   const context = useContext(DnaVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useDnaVisualConfigContextSetters must be used within a DnaVisualConfigContextProvider"
+      "useDnaVisualConfigContextSetters must be used within a DnaVisualConfigContextProvider",
     );
   }
   return context.setters;

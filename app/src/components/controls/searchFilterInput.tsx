@@ -1,9 +1,8 @@
-import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-
 import { useSearchFiltersContextSetters } from "@/context/searchFilters";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
+import { Search } from "lucide-react";
 
 export const SearchFilterInput = ({
   placeholder = "Search...",
@@ -31,8 +30,8 @@ export const SearchFilterInput = ({
           setQueryFilter(e.target.value);
         }}
         className={cn(
-          "placeholder:text-muted-foreground search-cancel:appearance-none search-cancel:cursor-pointer flex-grow bg-transparent text-sm text-foreground outline-none placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-50",
-          props.className
+          "search-cancel:appearance-none search-cancel:cursor-pointer flex-grow bg-transparent text-sm text-foreground outline-none placeholder:text-xs placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+          props.className,
         )}
       />
     </div>

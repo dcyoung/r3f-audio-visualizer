@@ -23,7 +23,7 @@ export function ThemeProvider({
   storageKey?: string;
 }) {
   const [theme, setTheme] = useState(
-    defaultTheme
+    defaultTheme,
     // () => localStorage.getItem(storageKey) ?? defaultTheme
   );
 

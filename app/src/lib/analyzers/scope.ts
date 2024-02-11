@@ -10,7 +10,7 @@ function createBufferCopy(context: AudioContext, buffer: Float32Array) {
 
 function createHilbertFilter(
   context: AudioContext,
-  filterLength: number
+  filterLength: number,
 ): [DelayNode, ConvolverNode] {
   if (filterLength % 2 === 0) {
     filterLength -= 1;
@@ -32,7 +32,7 @@ function createHilbertFilter(
   const impulseBuffer = context.createBuffer(
     2,
     filterLength,
-    context.sampleRate
+    context.sampleRate,
   );
   impulseBuffer.copyToChannel(impulse, 0);
   impulseBuffer.copyToChannel(impulse, 1);
@@ -59,7 +59,7 @@ export default class ScopeAnalyzer implements AnalyzerInputControl {
     source: HTMLAudioElement,
     audioContext: AudioContext | undefined = undefined,
     n = 512,
-    fftSize = 1024
+    fftSize = 1024,
   ) {
     if (audioContext === undefined) {
       this._audioCtx = new window.AudioContext();

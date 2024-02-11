@@ -1,19 +1,18 @@
-import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import {
-  BoxGeometry,
-  type InstancedMesh,
-  Matrix4,
-  MeshBasicMaterial,
-} from "three";
-
 import { useVisualContext } from "@/context/visual";
 import {
   COORDINATE_TYPE,
-  type ICoordinateMapper,
   TWO_PI,
+  type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 import { ColorPalette } from "@/lib/palettes";
+import { useFrame } from "@react-three/fiber";
+import {
+  BoxGeometry,
+  Matrix4,
+  MeshBasicMaterial,
+  type InstancedMesh,
+} from "three";
 
 // const MAPPING_MODE_POLAR_2D = "polar_2d";
 // const MAPPING_MODE_POLAR_PHI = "polar_phi";
@@ -39,7 +38,7 @@ const BaseSphere = ({
       meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
     }
     meshRef.current.instanceColor!.needsUpdate = true;
-  }, [lut, meshRef]);
+  }, [lut, meshRef, nPoints]);
 
   useFrame(({ clock }) => {
     // in ms
@@ -64,7 +63,7 @@ const BaseSphere = ({
             theta / TWO_PI, // normalize
             phi / Math.PI, // normalize
             0,
-            elapsedTimeSec
+            elapsedTimeSec,
           );
 
       meshRef.current.setMatrixAt(
@@ -72,8 +71,8 @@ const BaseSphere = ({
         tmpMatrix.setPosition(
           x * effectiveRadius,
           y * effectiveRadius,
-          z * effectiveRadius
-        )
+          z * effectiveRadius,
+        ),
       );
     }
 

@@ -1,8 +1,7 @@
-import { useFrame } from "@react-three/fiber";
-import { useRef, useEffect, useMemo } from "react";
-import { type Points, Vector3 } from "three";
-
+import { useEffect, useMemo, useRef } from "react";
 import { type IMotionMapper } from "@/lib/mappers/motionMappers/common";
+import { useFrame } from "@react-three/fiber";
+import { Vector3, type Points } from "three";
 
 const BaseGrid = ({
   motionMapper,
@@ -35,7 +34,7 @@ const BaseGrid = ({
             i,
             -maxDim / 2 + x * spacing,
             -maxDim / 2 + y * spacing,
-            -maxDim / 2 + z * spacing
+            -maxDim / 2 + z * spacing,
           );
         }
       }

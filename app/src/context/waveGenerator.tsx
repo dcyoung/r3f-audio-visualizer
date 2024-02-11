@@ -30,14 +30,14 @@ export const WaveGeneratorContextProvider = ({
   initial?: Partial<WaveGeneratorConfig>;
 }>) => {
   const [maxAmplitude, setMaxAmplitude] = useState<number>(
-    initial?.maxAmplitude ?? 1.0
+    initial?.maxAmplitude ?? 1.0,
   );
   const [waveformFrequenciesHz, setWaveformFrequenciesHz] = useState<
     [number, ...number[]]
   >(initial?.waveformFrequenciesHz ?? [2.0]);
 
   const [amplitudeSplitRatio, setAmplitudeSplitRatio] = useState<number>(
-    initial?.amplitudeSplitRatio ?? 0.75
+    initial?.amplitudeSplitRatio ?? 0.75,
   );
 
   return (
@@ -69,7 +69,7 @@ export function useWaveGeneratorContext() {
   const context = useContext(WaveGeneratorContext);
   if (!context) {
     throw new Error(
-      "useWaveGeneratorContext must be used within a WaveGeneratorContextProvider"
+      "useWaveGeneratorContext must be used within a WaveGeneratorContextProvider",
     );
   }
   return context.config;
@@ -79,7 +79,7 @@ export function useWaveGeneratorContextSetters() {
   const context = useContext(WaveGeneratorContext);
   if (!context) {
     throw new Error(
-      "useWaveGeneratorContext must be used within a WaveGeneratorContextProvider"
+      "useWaveGeneratorContext must be used within a WaveGeneratorContextProvider",
     );
   }
   return context.setters;

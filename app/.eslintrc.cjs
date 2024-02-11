@@ -5,71 +5,62 @@ const config = {
   parserOptions: {
     ecmaVersion: "latest",
     tsconfigRootDir: __dirname,
-    project: [
-      "./tsconfig.json",
-    ],
+    project: ["./tsconfig.json"],
   },
-  plugins: ["@typescript-eslint", "prettier", "import"], // Add "import" plugin
+  ignorePatterns: [
+    "**/.eslintrc.cjs",
+    "**/*.config.js",
+    "**/*.config.cjs",
+    "dist",
+    "pnpm-lock.yaml",
+  ],
+  plugins: ["@typescript-eslint", "import"],
   extends: [
-    "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "prettier",
-    "plugin:tailwindcss/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
   ],
-  settings: {
-    'import/resolver': {
-      typescript: {},
-      alias: {
-        map: [
-          ['@', './src'],
-        ],
-      },
-    }
-  },
   rules: {
-    "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
-      {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_",
-      },
+      { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
     ],
     "@typescript-eslint/consistent-type-imports": [
-      "error",
-      { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      "warn",
+      { prefer: "type-imports", fixStyle: "separate-type-imports" },
     ],
-    // turn on errors for missing imports
-    "import/no-unresolved": "error",
-    // "import/no-named-as-default-member": "off",
-    "import/order": [
-      "error",
-      {
-        groups: [
-          "builtin", // Built-in imports (come from NodeJS native) go first
-          "external", // <- External imports
-          "internal", // <- Absolute imports
-          ["sibling", "parent"], // <- Relative imports, the sibling and parent types they can be mingled together
-          "index", // <- index imports
-          "unknown", // <- unknown
-        ],
-        "newlines-between": "always",
-        alphabetize: {
-          /* sort in ascending order. Options: ["ignore", "asc", "desc"] */
-          order: "asc",
-          /* ignore case. Options: [true, false] */
-          caseInsensitive: true,
-        },
+    "@typescript-eslint/no-misused-promises": [
+      2,
+      { checksVoidReturn: { attributes: false } },
+    ],
+    "import/consistent-type-specifier-style": ["error", "prefer-inline"],
+    "react/prop-types": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/heading-has-content": "off",
+    "react/no-unknown-property": "off",
+  },
+  globals: {
+    React: "writable",
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {},
+      alias: {
+        map: [["@", "./src"]],
       },
-    ],
-    "tailwindcss/no-custom-classname": "off",
+    },
+    react: {
+      version: "detect",
+    },
+  },
+  env: {
+    browser: true,
   },
 };
-
 
 module.exports = config;

@@ -46,7 +46,7 @@ export function useSearchFiltersContext() {
   const context = useContext(SearchFiltersContext);
   if (!context) {
     throw new Error(
-      "useSearchFiltersContext must be used within a SearchFiltersContextProvider"
+      "useSearchFiltersContext must be used within a SearchFiltersContextProvider",
     );
   }
   return context.filters;
@@ -56,7 +56,7 @@ export function useSearchFiltersContextSetters() {
   const context = useContext(SearchFiltersContext);
   if (!context) {
     throw new Error(
-      "useSearchFiltersContextSetters must be used within a SearchFiltersContextProvider"
+      "useSearchFiltersContextSetters must be used within a SearchFiltersContextProvider",
     );
   }
   return context.setters;

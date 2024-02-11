@@ -1,17 +1,16 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { PauseCircle, PlayCircle } from "lucide-react";
 import {
-  type ComponentPropsWithoutRef,
-  type HTMLAttributes,
   useEffect,
   useState,
+  type ComponentPropsWithoutRef,
+  type HTMLAttributes,
 } from "react";
-
 import { useModeContext } from "@/context/mode";
 import { useSoundcloudContext } from "@/context/soundcloud";
 import { getTrackStreamUrl } from "@/lib/soundcloud/api";
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { PauseCircle, PlayCircle } from "lucide-react";
 
 export const TrackPlayer = ({
   audio,
@@ -51,7 +50,7 @@ export const TrackPlayer = ({
     return () => {
       audio.pause();
     };
-  }, [audio, streamUrl]);
+  }, [audio, streamUrl, track]);
 
   useEffect(() => {
     if (play) {
@@ -75,9 +74,9 @@ export const TrackPlayer = ({
   return (
     <div
       className={cn(
-        "flex flex-row gap-2 items-center justify-start p-4 rounded-lg sm:bg-black/25 w-fit max-w-xs",
+        "flex w-fit max-w-xs flex-row items-center justify-start gap-2 rounded-lg p-4 sm:bg-black/25",
         className,
-        !showUI && "hidden"
+        !showUI && "hidden",
       )}
       {...props}
     >
@@ -89,7 +88,7 @@ export const TrackPlayer = ({
         {play ? <PauseCircle /> : <PlayCircle />}
       </div>
       <div className="hidden flex-col items-start justify-center gap-1 sm:flex">
-        <span className="max-w-64 w-64 truncate text-sm text-foreground">
+        <span className="w-64 max-w-64 truncate text-sm text-foreground">
           {track.title}
         </span>
         <span className="truncate text-xs text-foreground/50">

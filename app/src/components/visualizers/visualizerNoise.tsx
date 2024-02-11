@@ -1,5 +1,4 @@
-import { Suspense, lazy, useMemo } from "react";
-
+import { lazy, Suspense, useMemo } from "react";
 import { type VisualType } from "@/components/visualizers/common";
 import { useNoiseGeneratorContext } from "@/context/noiseGenerator";
 import { CoordinateMapper_Noise } from "@/lib/mappers/coordinateMappers/noise";
@@ -9,9 +8,9 @@ const NoiseVisual = ({ visual }: { visual: VisualType }) => {
     () =>
       lazy(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        async () => await import(`./${visual}/reactive.tsx`)
+        async () => await import(`./${visual}/reactive.tsx`),
       ),
-    [visual]
+    [visual],
   );
 
   const { amplitude, spatialScale, timeScale, nIterations } =
@@ -21,7 +20,7 @@ const NoiseVisual = ({ visual }: { visual: VisualType }) => {
     amplitude,
     spatialScale,
     timeScale,
-    nIterations
+    nIterations,
   );
 
   return (

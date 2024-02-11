@@ -29,7 +29,7 @@ export const CameraControlsContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const [mode, setMode] = useState<CameraControlsMode>(
-    CAMERA_CONTROLS_MODE.ORBIT_CONTROLS
+    CAMERA_CONTROLS_MODE.ORBIT_CONTROLS,
   );
 
   return (
@@ -52,7 +52,7 @@ export function useCameraControlsContext() {
   const context = useContext(CameraControlsContext);
   if (!context) {
     throw new Error(
-      "useCameraControlsContext must be used within a CameraControlsContextProvider"
+      "useCameraControlsContext must be used within a CameraControlsContextProvider",
     );
   }
   return context.config;
@@ -62,7 +62,7 @@ export function useCameraControlsContextSetters() {
   const context = useContext(CameraControlsContext);
   if (!context) {
     throw new Error(
-      "useCameraControlsContext must be used within a CameraControlsContextProvider"
+      "useCameraControlsContext must be used within a CameraControlsContextProvider",
     );
   }
   return context.setters;

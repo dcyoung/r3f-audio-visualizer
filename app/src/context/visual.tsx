@@ -1,27 +1,20 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type Dispatch,
   type PropsWithChildren,
   type SetStateAction,
-  useEffect,
 } from "react";
-import { SRGBColorSpace } from "three";
-
 import {
   AVAILABLE_VISUALS,
   type VisualType,
 } from "@/components/visualizers/common";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
-import {
-  type AVAILABLE_COLOR_PALETTES,
-  COLOR_PALETTE,
-  ColorPalette,
-} from "@/lib/palettes";
+import { COLOR_PALETTE, type AVAILABLE_COLOR_PALETTES } from "@/lib/palettes";
 
 import { useModeContext } from "./mode";
-import { useTheme } from "./theme";
 import { CombinedVisualsConfigContextProvider } from "./visualConfig/combined";
 import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
@@ -50,20 +43,20 @@ export const VisualContextProvider = ({
 }: PropsWithChildren<{
   initial?: Partial<VisualConfig>;
 }>) => {
-  const { setTheme } = useTheme();
+  // const { setTheme } = useTheme();
   const { mode } = useModeContext();
   const [key, setKey] = useState<number>(0); // used to reset the context
   const [visual, setVisual] = useState<VisualType>(
-    initial?.visual ?? AVAILABLE_VISUALS[0]
+    initial?.visual ?? AVAILABLE_VISUALS[0],
   );
   const [palette, setPalette] = useState<Palette>(
-    initial?.palette ?? COLOR_PALETTE.THREE_COOL_TO_WARM
+    initial?.palette ?? COLOR_PALETTE.THREE_COOL_TO_WARM,
   );
   const [colorBackground, setColorBackground] = useState<boolean>(
-    initial?.colorBackground ?? true
+    initial?.colorBackground ?? true,
   );
   const [paletteTrackEnergy, setPaletteTrackEnergy] = useState<boolean>(
-    initial?.paletteTrackEnergy ?? false
+    initial?.paletteTrackEnergy ?? false,
   );
 
   const { setWaveformFrequenciesHz, setMaxAmplitude } =
@@ -84,18 +77,6 @@ export const VisualContextProvider = ({
       }
     }
   }, [visual, mode, setWaveformFrequenciesHz, setMaxAmplitude]);
-
-  useEffect(() => {
-    if (!colorBackground) {
-      setTheme("dark");
-      return;
-    }
-
-    const bgColor = ColorPalette.getPalette(palette).calcBackgroundColor(0);
-    const bgHsl = { h: 0, s: 0, l: 0 };
-    bgColor.getHSL(bgHsl, SRGBColorSpace);
-    setTheme(bgHsl.l < 0.5 ? "dark" : "light");
-  }, [palette, colorBackground]);
 
   useEffect(() => {
     switch (mode) {
@@ -140,7 +121,7 @@ export function useVisualContext() {
   const context = useContext(VisualContext);
   if (!context) {
     throw new Error(
-      "useVisualContext must be used within a VisualContextProvider"
+      "useVisualContext must be used within a VisualContextProvider",
     );
   }
   return context.config;
@@ -150,7 +131,7 @@ export function useVisualContextSetters() {
   const context = useContext(VisualContext);
   if (!context) {
     throw new Error(
-      "useVisualContext must be used within a VisualContextProvider"
+      "useVisualContext must be used within a VisualContextProvider",
     );
   }
   return context.setters;

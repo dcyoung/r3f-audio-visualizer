@@ -44,7 +44,6 @@ export const OctaveBandModeMap = {
 } as const;
 export type OctaveBandMode = keyof typeof OctaveBandModeMap;
 
-
 export const EnergyMeasureOptions = [
   "overall",
   "peak",
@@ -55,7 +54,7 @@ export const EnergyMeasureOptions = [
   "treble",
 ] as const;
 
-export type EnergyMeasure = typeof EnergyMeasureOptions[number];
+export type EnergyMeasure = (typeof EnergyMeasureOptions)[number];
 
 // internal constants
 const ROOT24 = 2 ** (1 / 24), // 24th root of 2
@@ -97,7 +96,8 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
 
   constructor(
     source: HTMLAudioElement,
-    audioContext: AudioContext | undefined = undefined
+    audioContext: AudioContext | undefined = undefined,
+    volume = 1,
   ) {
     if (audioContext === undefined) {
       this._audioCtx = new window.AudioContext();
@@ -133,6 +133,8 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
 
     this._updateFreqBins();
     this.toggleAnalyzer(true);
+
+    this.volume = volume;
   }
 
   private _updateFreqBins(): void {
@@ -147,7 +149,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
       freqLo: number,
       freqHi: number,
       ratioLo: number,
-      ratioHi: number
+      ratioHi: number,
     ) =>
       infos.push({
         binLo,
@@ -257,7 +259,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
   private _freqToBin(freq: number, round = true): number {
     const max = this._analyzer.frequencyBinCount - 1,
       bin = (round ? Math.round : Math.floor)(
-        (freq * this._analyzer.fftSize) / this._audioCtx.sampleRate
+        (freq * this._analyzer.fftSize) / this._audioCtx.sampleRate,
       );
 
     return bin < max ? bin : max;
@@ -278,7 +280,7 @@ export default class FFTAnalyzer implements AnalyzerInputControl {
         { binLo, binHi, ratioLo, ratioHi } = binInfo;
       let v = Math.max(
         interpolate(binLo, ratioLo),
-        interpolate(binHi, ratioHi)
+        interpolate(binHi, ratioHi),
       );
       // check additional bins (if any) for this bar and keep the highest value
       for (let j = binLo + 1; j < binHi; j++) {

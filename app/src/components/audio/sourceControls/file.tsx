@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useState } from "react";
 import {
-  type AudioSourceControlsProps,
   iOS,
+  type AudioSourceControlsProps,
 } from "@/components/audio/sourceControls/common";
 
 import "@/components/audio/sourceControls/overlay.css";
@@ -12,7 +11,7 @@ const useAudioFile = (audio: HTMLAudioElement) => {
   const [loaded, setLoaded] = useState(false);
   const audioFile = null as null | Blob;
 
-  const playAudio = () => {
+  const playAudio = useCallback(() => {
     if (!audioFile) {
       return;
     }
@@ -22,15 +21,14 @@ const useAudioFile = (audio: HTMLAudioElement) => {
       promise
         .then(() => {
           setIsPlaying(true);
-          console.log(`Playing ${audioFile.name}`);
+          console.log(`Playing audiofile`);
         })
         .catch((error) => {
           // Auto-play was prevented
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          console.error(`Error playing ${audioFile}`, error);
+          console.error(`Error playing audiofile`, error);
         });
     }
-  };
+  }, [audio, audioFile]);
 
   /**
    * Make sure the correct file is playing
@@ -59,7 +57,7 @@ const useAudioFile = (audio: HTMLAudioElement) => {
       audio.pause();
       setIsPlaying(false);
     };
-  }, [audio, audioFile]);
+  }, [audio, audioFile, playAudio]);
 
   return {
     loaded,

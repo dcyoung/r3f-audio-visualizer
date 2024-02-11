@@ -1,5 +1,4 @@
-import { Suspense, lazy, useMemo } from "react";
-
+import { lazy, Suspense, useMemo } from "react";
 import { type VisualType } from "@/components/visualizers/common";
 import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import { useEnergyInfo, useVisualSourceDataX } from "@/lib/appState";
@@ -30,9 +29,9 @@ const AudioVisual = ({ visual }: { visual: VisualType }) => {
     () =>
       lazy(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        async () => await import(`./${visual}/reactive.tsx`)
+        async () => await import(`./${visual}/reactive.tsx`),
       ),
-    [visual]
+    [visual],
   );
 
   return (

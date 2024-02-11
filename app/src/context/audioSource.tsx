@@ -6,10 +6,9 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-
 import {
-  type AudioSource,
   getPlatformSupportedAudioSources,
+  type AudioSource,
 } from "@/components/audio/sourceControls/common";
 
 export interface AudioSourceConfig {
@@ -30,7 +29,7 @@ export const AudioSourceContextProvider = ({
   initial?: Partial<AudioSourceConfig>;
 }>) => {
   const [audioSource, setAudioSource] = useState<AudioSource>(
-    initial?.audioSource ?? getPlatformSupportedAudioSources()[0]
+    initial?.audioSource ?? getPlatformSupportedAudioSources()[0],
   );
 
   return (
@@ -53,7 +52,7 @@ export function useAudioSourceContext() {
   const context = useContext(AudioSourceContext);
   if (!context) {
     throw new Error(
-      "useAudioSourceContext must be used within a AudioSourceContextProvider"
+      "useAudioSourceContext must be used within a AudioSourceContextProvider",
     );
   }
   return context.config;
@@ -63,7 +62,7 @@ export function useAudioSourceContextSetters() {
   const context = useContext(AudioSourceContext);
   if (!context) {
     throw new Error(
-      "useAudioSourceContext must be used within a AudioSourceContextProvider"
+      "useAudioSourceContext must be used within a AudioSourceContextProvider",
     );
   }
   return context.setters;

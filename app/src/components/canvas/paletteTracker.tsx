@@ -1,11 +1,10 @@
-import { useFrame } from "@react-three/fiber";
 import { useState } from "react";
-
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 import { useEnergyInfo } from "@/lib/appState";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
 import { AVAILABLE_COLOR_PALETTES } from "@/lib/palettes";
+import { useFrame } from "@react-three/fiber";
 
 const PaletteUpdater = ({
   scalarTracker,

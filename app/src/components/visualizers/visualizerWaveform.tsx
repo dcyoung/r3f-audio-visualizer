@@ -1,5 +1,4 @@
-import { Suspense, lazy, useMemo } from "react";
-
+import { lazy, Suspense, useMemo } from "react";
 import { type VisualType } from "@/components/visualizers/common";
 import { useWaveGeneratorContext } from "@/context/waveGenerator";
 import { CoordinateMapper_WaveformSuperposition } from "@/lib/mappers/coordinateMappers/waveform";
@@ -9,9 +8,9 @@ const WaveformVisual = ({ visual }: { visual: VisualType }) => {
     () =>
       lazy(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        async () => await import(`./${visual}/reactive.tsx`)
+        async () => await import(`./${visual}/reactive.tsx`),
       ),
-    [visual]
+    [visual],
   );
 
   const { maxAmplitude, waveformFrequenciesHz, amplitudeSplitRatio } =
@@ -20,7 +19,7 @@ const WaveformVisual = ({ visual }: { visual: VisualType }) => {
   const coordinateMapper = new CoordinateMapper_WaveformSuperposition(
     waveformFrequenciesHz,
     maxAmplitude,
-    amplitudeSplitRatio
+    amplitudeSplitRatio,
   );
 
   return (

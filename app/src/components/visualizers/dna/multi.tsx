@@ -1,21 +1,26 @@
-import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { Euler, type Group, MathUtils, Vector3 } from "three";
+import { useFrame } from "@react-three/fiber";
+import { Euler, MathUtils, Vector3, type Group } from "three";
 
 import BaseDoubleHelix, { type BaseDoubleHelixProps } from "./base";
 
 const MultiStrand = (props: BaseDoubleHelixProps) => {
-  const strandCount = 5;
+  const strandRefs = [
+    useRef<Group>(null!),
+    useRef<Group>(null!),
+    useRef<Group>(null!),
+    useRef<Group>(null!),
+    useRef<Group>(null!),
+  ];
+  const strandCount = strandRefs.length;
   const bounds = 15;
-  const strandRefs = Array.from({ length: strandCount }).map(() =>
-    useRef<Group>(null!)
-  );
+
   const strandPositions = Array.from({ length: strandCount }).map((x, i) => {
     return new Vector3()
       .fromArray(
         Array.from({ length: 3 }).map(
-          (_, j) => 2 * MathUtils.seededRandom(i + j) - 1
-        )
+          (_, j) => 2 * MathUtils.seededRandom(i + j) - 1,
+        ),
       )
       .normalize()
       .multiplyScalar(bounds);
@@ -34,12 +39,12 @@ const MultiStrand = (props: BaseDoubleHelixProps) => {
       tmpVec = strandPositions[strandIdx];
       norm = Math.sin(
         speed * (0.5 + 0.5 * MathUtils.seededRandom(strandIdx)) * t +
-          MathUtils.seededRandom(strandIdx) / speed
+          MathUtils.seededRandom(strandIdx) / speed,
       );
       strandRef.current.position.set(
         tmpVec.x * norm,
         tmpVec.y * norm,
-        tmpVec.z * norm
+        tmpVec.z * norm,
       );
       strandRef.current.rotation.z +=
         amplitude *
@@ -60,8 +65,8 @@ const MultiStrand = (props: BaseDoubleHelixProps) => {
           rotation={
             new Euler(
               ...Array.from({ length: 3 }).map(
-                (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1)
-              )
+                (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1),
+              ),
             )
           }
           {...props}

@@ -51,7 +51,7 @@ export function useSwarmVisualConfigContext() {
   const context = useContext(SwarmVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useSwarmVisualConfigContext must be used within a SwarmVisualConfigContextProvider"
+      "useSwarmVisualConfigContext must be used within a SwarmVisualConfigContextProvider",
     );
   }
   return context.config;
@@ -61,7 +61,7 @@ export function useSwarmVisualConfigContextSetters() {
   const context = useContext(SwarmVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useSwarmVisualConfigContextSetters must be used within a SwarmVisualConfigContextProvider"
+      "useSwarmVisualConfigContextSetters must be used within a SwarmVisualConfigContextProvider",
     );
   }
   return context.setters;

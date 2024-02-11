@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-
+import { useCallback, useEffect, useRef } from "react";
 import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import type FFTAnalyzer from "@/lib/analyzers/fft";
 import {
@@ -53,7 +52,7 @@ export const FFTAnalyzerControls = ({
   /**
    * Transfers data from the analyzer to the target array
    */
-  const animate = (): void => {
+  const mapData = useCallback(() => {
     const bars = analyzer.getBars();
 
     if (freqData.length != bars.length) {
@@ -67,8 +66,7 @@ export const FFTAnalyzerControls = ({
     bars.forEach(({ value }, index) => {
       freqData[index] = value;
     });
-    animationRequestRef.current = requestAnimationFrame(animate);
-  };
+  }, [freqData, analyzer, resizeVisualSourceData, energyInfo, energyMeasure]);
 
   /**
    * Re-Synchronize the animation loop if the target data destination changes.
@@ -77,16 +75,20 @@ export const FFTAnalyzerControls = ({
     if (animationRequestRef.current) {
       cancelAnimationFrame(animationRequestRef.current);
     }
+    const animate = (): void => {
+      mapData();
+      animationRequestRef.current = requestAnimationFrame(animate);
+    };
     animationRequestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRequestRef.current);
-  }, [freqData, energyMeasure]);
+  }, [freqData, energyMeasure, mapData]);
 
   /**
    * Make sure an analyzer exists with the correct mode
    */
   useEffect(() => {
     analyzer.mode = octaveBandMode;
-  }, [octaveBandMode]);
+  }, [octaveBandMode, analyzer]);
   return <></>;
 };
 

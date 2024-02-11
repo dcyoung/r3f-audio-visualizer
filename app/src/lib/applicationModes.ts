@@ -8,16 +8,14 @@ export const APPLICATION_MODE = {
 type ObjectValues<T> = T[keyof T];
 export type ApplicationMode = ObjectValues<typeof APPLICATION_MODE>;
 
-export const getAppModeDisplayName = (mode: ApplicationMode): string => {
+export const isAudioMode = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
-      return "~ waveform";
     case APPLICATION_MODE.NOISE:
-      return "x noise func";
+      return false;
     case APPLICATION_MODE.AUDIO:
-      return "🎧 audio";
     case APPLICATION_MODE.AUDIO_SCOPE:
-      return "🎧 audioscope";
+      return true;
     default:
       return mode satisfies never;
   }
@@ -28,7 +26,8 @@ export const getPlatformSupportedApplicationModes = (): ApplicationMode[] => {
     APPLICATION_MODE.WAVE_FORM,
     APPLICATION_MODE.NOISE,
     APPLICATION_MODE.AUDIO,
-    APPLICATION_MODE.AUDIO_SCOPE,
+    /* Disabled until bugs can be resolved */
+    // APPLICATION_MODE.AUDIO_SCOPE,
   ];
 };
 
@@ -43,4 +42,4 @@ export const isCameraMode = (mode: ApplicationMode) => {
     default:
       return mode satisfies never;
   }
-} 
+};

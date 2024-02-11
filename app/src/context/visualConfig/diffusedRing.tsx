@@ -31,7 +31,7 @@ export const RingVisualConfigContextProvider = ({
   const [radius, setRadius] = useState<number>(initial?.radius ?? 2);
   const [pointSize, setPointSize] = useState<number>(initial?.pointSize ?? 0.2);
   const [mirrorEffects, setMirrorEffects] = useState<boolean>(
-    initial?.mirrorEffects ?? false
+    initial?.mirrorEffects ?? false,
   );
 
   return (
@@ -58,7 +58,7 @@ export function useRingVisualConfigContext() {
   const context = useContext(RingVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useRingVisualConfigContext must be used within a RingVisualConfigContextProvider"
+      "useRingVisualConfigContext must be used within a RingVisualConfigContextProvider",
     );
   }
   return context.config;
@@ -68,7 +68,7 @@ export function useRingVisualConfigContextSetters() {
   const context = useContext(RingVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useRingVisualConfigContextSetters must be used within a RingVisualConfigContextProvider"
+      "useRingVisualConfigContextSetters must be used within a RingVisualConfigContextProvider",
     );
   }
   return context.setters;

@@ -1,12 +1,12 @@
-import { useFrame, useThree } from "@react-three/fiber";
 import { Fragment, useEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import {
-  Vector2,
-  type ShaderMaterial,
+  Color,
   DataTexture,
   RGBAFormat,
+  Vector2,
   Vector3,
-  Color,
+  type ShaderMaterial,
 } from "three";
 
 import fragmentShader from "./shaders/fragment";
@@ -34,15 +34,15 @@ export class TextureMapper {
         0,
         Math.min(
           2 * this.maxAmplitude,
-          0.5 + (0.5 * this.samplesX[i]) / this.maxAmplitude
-        )
+          0.5 + (0.5 * this.samplesX[i]) / this.maxAmplitude,
+        ),
       );
       y = Math.max(
         0,
         Math.min(
           2 * this.maxAmplitude,
-          0.5 + (0.5 * this.samplesY[i]) / this.maxAmplitude
-        )
+          0.5 + (0.5 * this.samplesY[i]) / this.maxAmplitude,
+        ),
       );
 
       x = (x * B) | 0;
@@ -61,7 +61,7 @@ export class TextureMapper {
       textureData,
       this.samplesX.length,
       1,
-      RGBAFormat
+      RGBAFormat,
     );
     return {
       tex: tex,
@@ -113,7 +113,7 @@ const BaseScopeVisual = ({
       resolution: { value: new Vector2(size.width, size.height) },
       b_should_interpolate: { value: interpolate },
     }),
-    [nParticles, textureMapper]
+    [nParticles, textureMapper, interpolate, size, tex],
   );
 
   useFrame(() => {

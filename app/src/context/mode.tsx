@@ -6,8 +6,7 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-
-import { type ApplicationMode, APPLICATION_MODE } from "@/lib/applicationModes";
+import { APPLICATION_MODE, type ApplicationMode } from "@/lib/applicationModes";
 
 export interface ModeConfig {
   mode: ApplicationMode;

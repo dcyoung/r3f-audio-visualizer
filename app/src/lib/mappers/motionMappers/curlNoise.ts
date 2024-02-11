@@ -1,7 +1,6 @@
+import { type IMotionMapper } from "@/lib/mappers//motionMappers/common";
 import { createNoise3D, type NoiseFunction3D } from "simplex-noise";
 import { Vector3 } from "three";
-
-import { type IMotionMapper } from "@/lib/mappers//motionMappers/common";
 
 /**
  * Maps input coordinates to output values based on the noise functions.
@@ -19,7 +18,7 @@ export class MotionMapper_Noise implements IMotionMapper {
    */
   constructor(
     spatialScale = 1.0,
-    curlAmount = 0.5
+    curlAmount = 0.5,
     // timeScale: number = 1.0
   ) {
     this.spatialScale = spatialScale;
@@ -68,13 +67,13 @@ export class MotionMapper_Noise implements IMotionMapper {
     position: Vector3,
     deltaTimeSec: number,
     elapsedTimeSec: number,
-    output: Vector3 = new Vector3()
+    output: Vector3 = new Vector3(),
   ): Vector3 {
     this.computeCurl(
       this.tmpVelocity,
       this.spatialScale * position.x,
       this.spatialScale * position.y,
-      this.spatialScale * position.z
+      this.spatialScale * position.z,
     );
     this.tmpVelocity.multiplyScalar(this.curlAmount * deltaTimeSec);
     output.copy(position);

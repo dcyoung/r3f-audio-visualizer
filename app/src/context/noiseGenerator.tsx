@@ -33,11 +33,11 @@ export const NoiseGeneratorContextProvider = ({
 }>) => {
   const [amplitude, setAmplitude] = useState<number>(initial?.amplitude ?? 1.0);
   const [spatialScale, setSpatialScale] = useState<number>(
-    initial?.spatialScale ?? 2.0
+    initial?.spatialScale ?? 2.0,
   );
   const [timeScale, setTimeScale] = useState<number>(initial?.timeScale ?? 0.5);
   const [nIterations, setNIterations] = useState<number>(
-    initial?.nIterations ?? 10
+    initial?.nIterations ?? 10,
   );
   return (
     <NoiseGeneratorContext.Provider
@@ -71,7 +71,7 @@ export function useNoiseGeneratorContext() {
   const context = useContext(NoiseGeneratorContext);
   if (!context) {
     throw new Error(
-      "useNoiseGeneratorContext must be used within a NoiseGeneratorContextProvider"
+      "useNoiseGeneratorContext must be used within a NoiseGeneratorContextProvider",
     );
   }
   return context.config;
@@ -81,7 +81,7 @@ export function useNoiseGeneratorContextSetters() {
   const context = useContext(NoiseGeneratorContext);
   if (!context) {
     throw new Error(
-      "useNoiseGeneratorContext must be used within a NoiseGeneratorContextProvider"
+      "useNoiseGeneratorContext must be used within a NoiseGeneratorContextProvider",
     );
   }
   return context.setters;

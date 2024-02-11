@@ -1,15 +1,14 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Image } from "lucide-react";
 import {
   type ComponentPropsWithoutRef,
   type Dispatch,
   type HTMLAttributes,
 } from "react";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getUserTracks } from "@/lib/soundcloud/api";
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Image } from "lucide-react";
 
 export const TrackCard = ({
   track,
@@ -19,13 +18,17 @@ export const TrackCard = ({
   return (
     <div
       className={cn(
-        "flex flex-row justify-start items-center gap-2 hover:scale-110",
-        className
+        "flex flex-row items-center justify-start gap-2 hover:scale-110",
+        className,
       )}
       {...props}
     >
       {track.artwork_url ? (
-        <img src={track.artwork_url} className="h-8 w-8 rounded-lg" />
+        <img
+          src={track.artwork_url}
+          className="h-8 w-8 rounded-lg"
+          alt="Artwork"
+        />
       ) : (
         <Image />
       )}
@@ -55,7 +58,10 @@ export const TrackList = ({
 
   return (
     <ScrollArea
-      className={cn("flex flex-col gap-2 items-start justify-start", className)}
+      className={cn(
+        "no-scrollbar flex flex-col items-start justify-start gap-2",
+        className,
+      )}
       {...props}
     >
       {tracks.map((track) => (

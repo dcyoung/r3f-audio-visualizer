@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-
 import { TextureMapper } from "@/components/visualizers/audioScope/base";
 import ScopeVisual from "@/components/visualizers/audioScope/reactive";
 import { useVisualSourceDataX, useVisualSourceDataY } from "@/lib/appState";

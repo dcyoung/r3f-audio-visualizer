@@ -7,7 +7,7 @@ export interface AnalyzerInputControl {
 
 export function useMediaStreamLink(
   audio: HTMLAudioElement,
-  analyzer: AnalyzerInputControl
+  analyzer: AnalyzerInputControl,
 ) {
   return {
     onDisabled: () => {

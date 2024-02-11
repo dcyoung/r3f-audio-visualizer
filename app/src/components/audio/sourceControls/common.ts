@@ -64,7 +64,7 @@ const webAudioTouchUnlock = (context: AudioContext) => {
           },
           function (reason) {
             reject(reason);
-          }
+          },
         );
       };
       unlockTriggerNames.forEach((name) => {
@@ -94,7 +94,7 @@ export const buildAudioContext = () => {
       },
       function (reason) {
         console.error(reason);
-      }
+      },
     );
   }
   return audioCtx;

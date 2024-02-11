@@ -1,11 +1,11 @@
 import {
   CoordinateMapperBase,
-  type CoordinateType,
   cubeFaceCenterRadialOffset,
   HALF_DIAGONAL_UNIT_CUBE,
   HALF_DIAGONAL_UNIT_SQUARE,
-  type ICoordinateMapper,
   TWO_PI,
+  type CoordinateType,
+  type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 
 /**
@@ -30,11 +30,7 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
     return this.amplitude * Math.sin(this.b * xNorm + elapsedTimeSec);
   }
 
-  public map_2D(
-    xNorm: number,
-    yNorm: number,
-    elapsedTimeSec = 0.0
-  ): number {
+  public map_2D(xNorm: number, yNorm: number, elapsedTimeSec = 0.0): number {
     const normRadialOffset =
       Math.hypot(xNorm - 0.5, yNorm - 0.5) / HALF_DIAGONAL_UNIT_SQUARE;
     return (
@@ -46,7 +42,7 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec = 0.0
+    elapsedTimeSec = 0.0,
   ): number {
     const normRadialOffset =
       Math.hypot(xNorm - 0.5, yNorm - 0.5, zNorm - 0.5) /
@@ -60,13 +56,13 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec = 0.0
+    elapsedTimeSec = 0.0,
   ): number {
     const normRadialOffset = cubeFaceCenterRadialOffset(
       xNorm,
       yNorm,
       zNorm,
-      1.0
+      1.0,
     );
     return (
       this.amplitude * Math.sin(this.b * normRadialOffset + elapsedTimeSec)
@@ -78,7 +74,8 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
  * Maps input coordinates to output values based on the superposition of multiple time varying waveforms.
  */
 export class CoordinateMapper_WaveformSuperposition
-  implements ICoordinateMapper {
+  implements ICoordinateMapper
+{
   private mappers: CoordinateMapper_Waveform[];
   public readonly amplitude: number;
 
@@ -90,7 +87,7 @@ export class CoordinateMapper_WaveformSuperposition
   constructor(
     waveformFrequenciesHz: number[],
     maxAmplitude = 1.0,
-    amplitudeSplitRatio = 0.75
+    amplitudeSplitRatio = 0.75,
   ) {
     this.amplitude = maxAmplitude;
     this.mappers = [];
@@ -103,7 +100,7 @@ export class CoordinateMapper_WaveformSuperposition
       maxAmplitude -= amplitude;
 
       this.mappers.push(
-        new CoordinateMapper_Waveform(amplitude, waveformFrequenciesHz[i])
+        new CoordinateMapper_Waveform(amplitude, waveformFrequenciesHz[i]),
       );
     }
   }
@@ -113,7 +110,7 @@ export class CoordinateMapper_WaveformSuperposition
     xNorm: number,
     yNorm = 0.0,
     zNorm = 0.0,
-    elapsedTimeSec = 0.0
+    elapsedTimeSec = 0.0,
   ): number {
     let superposition = 0;
     for (const mapper of this.mappers) {
@@ -122,7 +119,7 @@ export class CoordinateMapper_WaveformSuperposition
         xNorm,
         yNorm,
         zNorm,
-        elapsedTimeSec
+        elapsedTimeSec,
       );
     }
     return superposition;

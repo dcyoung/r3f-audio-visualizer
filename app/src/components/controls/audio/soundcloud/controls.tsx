@@ -1,6 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
-
 import { SearchFilterInput } from "@/components/controls/searchFilterInput";
 import {
   SearchFiltersContextProvider,
@@ -9,7 +7,7 @@ import {
 import { useSoundcloudContextSetters } from "@/context/soundcloud";
 import { getUsers } from "@/lib/soundcloud/api";
 import { type SoundcloudUser } from "@/lib/soundcloud/models";
-
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { UserTrackList } from "./track";
 import { UserList } from "./user";
@@ -20,7 +18,7 @@ const SouncloudUserSearch = ({ query }: { query: string }) => {
     queryFn: async () => {
       return await getUsers({
         query: query,
-        limit: 5,
+        limit: 20,
       });
     },
   });
@@ -29,8 +27,12 @@ const SouncloudUserSearch = ({ query }: { query: string }) => {
   const { setTrack } = useSoundcloudContextSetters();
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2">
-      <UserList users={users} onUserSelected={setUser} />
+    <div className="flex flex-col items-start justify-center gap-2">
+      <UserList
+        users={users.filter((u) => (u.track_count ?? 0) > 0)}
+        onUserSelected={setUser}
+        selectedUserId={user?.id}
+      />
       {user && <UserTrackList userId={user.id} onTrackSelected={setTrack} />}
     </div>
   );
@@ -58,6 +60,6 @@ const SoundcloudUserSearch = () => {
   );
 };
 
-export const SoundcloudControls = ({}) => {
+export const SoundcloudControls = () => {
   return <SoundcloudUserSearch />;
 };

@@ -1,3 +1,3 @@
 # App
 
-An interactive react app. 
+An interactive react app.

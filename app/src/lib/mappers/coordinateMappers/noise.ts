@@ -1,4 +1,8 @@
 import {
+  CoordinateMapperBase,
+  cubeFaceCenterRadialOffset,
+} from "@/lib/mappers/coordinateMappers/common";
+import {
   createNoise2D,
   createNoise3D,
   createNoise4D,
@@ -6,8 +10,6 @@ import {
   type NoiseFunction3D,
   type NoiseFunction4D,
 } from "simplex-noise";
-
-import { CoordinateMapperBase, cubeFaceCenterRadialOffset } from "@/lib/mappers/coordinateMappers/common";
 
 /**
  * Maps input coordinates to output values based on the noise functions.
@@ -30,7 +32,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     spatialScale = 1.0,
     timeScale = 1.0,
     nIterations = 1,
-    persistence = 0.5
+    persistence = 0.5,
   ) {
     super(amplitude);
     this.spatialScale = spatialScale;
@@ -60,11 +62,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     return this.nIterations > 1 ? noise / maxAmp : noise;
   }
 
-  public map_2D(
-    xNorm: number,
-    yNorm: number,
-    elapsedTimeSec = 0.0
-  ): number {
+  public map_2D(xNorm: number, yNorm: number, elapsedTimeSec = 0.0): number {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
@@ -77,7 +75,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
         this.noise3D(
           xNorm * spatialScale,
           yNorm * spatialScale,
-          elapsedTimeSec * timeScale
+          elapsedTimeSec * timeScale,
         );
       maxAmp += amp;
       amp *= this.persistence;
@@ -91,7 +89,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec = 0.0
+    elapsedTimeSec = 0.0,
   ): number {
     let noise = 0,
       maxAmp = 0,
@@ -106,7 +104,7 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
           xNorm * spatialScale,
           yNorm * spatialScale,
           zNorm * spatialScale,
-          elapsedTimeSec * timeScale
+          elapsedTimeSec * timeScale,
         );
       maxAmp += amp;
       amp *= this.persistence;
@@ -120,13 +118,13 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     xNorm: number,
     yNorm: number,
     zNorm: number,
-    elapsedTimeSec = 0.0
+    elapsedTimeSec = 0.0,
   ): number {
     const normRadialOffset = cubeFaceCenterRadialOffset(
       xNorm,
       yNorm,
       zNorm,
-      1.0
+      1.0,
     );
     return this.map_1D(normRadialOffset, elapsedTimeSec);
   }

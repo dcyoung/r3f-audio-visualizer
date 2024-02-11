@@ -31,7 +31,7 @@ export const SphereVisualConfigContextProvider = ({
   const [radius, setRadius] = useState<number>(initial?.radius ?? 2);
   const [nPoints, setNPoints] = useState<number>(initial?.nPoints ?? 800);
   const [unitSideLength, setUnitSideLength] = useState<number>(
-    initial?.unitSideLength ?? 0.05
+    initial?.unitSideLength ?? 0.05,
   );
 
   return (
@@ -58,7 +58,7 @@ export function useSphereVisualConfigContext() {
   const context = useContext(SphereVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useSphereVisualConfigContext must be used within a SphereVisualConfigContextProvider"
+      "useSphereVisualConfigContext must be used within a SphereVisualConfigContextProvider",
     );
   }
   return context.config;
@@ -68,7 +68,7 @@ export function useSphereVisualConfigContextSetters() {
   const context = useContext(SphereVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useSphereVisualConfigContextSetters must be used within a SphereVisualConfigContextProvider"
+      "useSphereVisualConfigContextSetters must be used within a SphereVisualConfigContextProvider",
     );
   }
   return context.setters;

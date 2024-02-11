@@ -32,10 +32,10 @@ export const CubeVisualConfigContextProvider = ({
 }>) => {
   const [nPerSide, setNPerSide] = useState<number>(initial?.nPerSide ?? 10);
   const [unitSideLength, setUnitSideLength] = useState<number>(
-    initial?.unitSideLength ?? 0.5
+    initial?.unitSideLength ?? 0.5,
   );
   const [unitSpacingScalar, setUnitSpacingScalar] = useState<number>(
-    initial?.unitSpacingScalar ?? 0.1
+    initial?.unitSpacingScalar ?? 0.1,
   );
   const [volume, setVolume] = useState<boolean>(initial?.volume ?? true);
 
@@ -65,7 +65,7 @@ export function useCubeVisualConfigContext() {
   const context = useContext(CubeVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useCubeVisualConfigContext must be used within a CubeVisualConfigContextProvider"
+      "useCubeVisualConfigContext must be used within a CubeVisualConfigContextProvider",
     );
   }
   return context.config;
@@ -75,7 +75,7 @@ export function useCubeVisualConfigContextSetters() {
   const context = useContext(CubeVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useCubeVisualConfigContextSetters must be used within a CubeVisualConfigContextProvider"
+      "useCubeVisualConfigContextSetters must be used within a CubeVisualConfigContextProvider",
     );
   }
   return context.setters;

@@ -16,6 +16,6 @@ export interface IMotionMapper {
     position: Vector3,
     deltaTimeSec: number,
     elapsedTimeSec: number,
-    output?: Vector3
+    output?: Vector3,
   ) => Vector3;
 }

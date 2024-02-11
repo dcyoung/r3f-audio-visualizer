@@ -1,6 +1,3 @@
-import { OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-
 import { BackgroundFog, CanvasBackground } from "@/components/canvas/common";
 import AudioVisual from "@/components/visualizers/visualizerAudio";
 import NoiseVisual from "@/components/visualizers/visualizerNoise";
@@ -12,6 +9,8 @@ import {
 } from "@/context/cameraControls";
 import { useVisualContext } from "@/context/visual";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
 import { MaybePaletteTracker } from "./paletteTracker";
 

@@ -1,9 +1,8 @@
-import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
-import { Vector3 } from "three";
-
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
 import { useRingVisualConfigContext } from "@/context/visualConfig/diffusedRing";
+import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
+import { Vector3 } from "three";
 
 import BaseDiffusedRing from "./base";
 

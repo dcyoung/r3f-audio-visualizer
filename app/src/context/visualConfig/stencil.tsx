@@ -33,13 +33,13 @@ export const StencilVisualConfigContextProvider = ({
   initial?: Partial<StencilVisualConfig>;
 }>) => {
   const [bounds, setBounds] = useState<[number, number]>(
-    initial?.bounds ?? [0.15, 0.73]
+    initial?.bounds ?? [0.15, 0.73],
   );
   const [power, setPower] = useState<number>(initial?.power ?? 1.0);
   const [useNoise, setUseNoise] = useState<boolean>(initial?.useNoise ?? false);
   const [pointSize, setPointSize] = useState<number>(initial?.pointSize ?? 0.2);
   const [transitionSpeed, setTransitionSpeed] = useState<number>(
-    initial?.transitionSpeed ?? 10
+    initial?.transitionSpeed ?? 10,
   );
 
   return (
@@ -70,7 +70,7 @@ export function useStencilVisualConfigContext() {
   const context = useContext(StencilVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useStencilVisualConfigContext must be used within a StencilVisualConfigContextProvider"
+      "useStencilVisualConfigContext must be used within a StencilVisualConfigContextProvider",
     );
   }
   return context.config;
@@ -80,7 +80,7 @@ export function useStencilVisualConfigContextSetters() {
   const context = useContext(StencilVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useStencilVisualConfigContextSetters must be used within a StencilVisualConfigContextProvider"
+      "useStencilVisualConfigContextSetters must be used within a StencilVisualConfigContextProvider",
     );
   }
   return context.setters;

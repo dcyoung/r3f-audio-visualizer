@@ -1,26 +1,25 @@
-import { type GroupProps, useFrame } from "@react-three/fiber";
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import {
-  Curve,
-  TubeGeometry,
-  Vector3,
-  type Mesh,
-  MeshBasicMaterial,
-  type InstancedMesh,
-  BoxGeometry,
-  Matrix4,
-  Quaternion,
-  MathUtils,
-  type Group,
-} from "three";
-
 import { useVisualContext } from "@/context/visual";
 import {
   COORDINATE_TYPE,
-  type ICoordinateMapper,
   TWO_PI,
+  type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 import { ColorPalette } from "@/lib/palettes";
+import { useFrame, type GroupProps } from "@react-three/fiber";
+import {
+  BoxGeometry,
+  Curve,
+  MathUtils,
+  Matrix4,
+  MeshBasicMaterial,
+  Quaternion,
+  TubeGeometry,
+  Vector3,
+  type Group,
+  type InstancedMesh,
+  type Mesh,
+} from "three";
 
 const clipAngleRad = (rad: number) => {
   return ((rad % TWO_PI) + TWO_PI) % TWO_PI;
@@ -36,7 +35,7 @@ class HelixCurve extends Curve<Vector3> {
     helixLength: number,
     helixRadius: number,
     helixWindingSeparation: number,
-    helixStartingAngleRad = 0.0
+    helixStartingAngleRad = 0.0,
   ) {
     super();
     this.helixLength = helixLength;
@@ -90,7 +89,7 @@ const BaseDoubleHelix = forwardRef<
       fixedBaseGap = true,
       ...props
     },
-    ref
+    ref,
   ) => {
     const { palette } = useVisualContext();
     const lut = ColorPalette.getPalette(palette).buildLut();
@@ -98,7 +97,7 @@ const BaseDoubleHelix = forwardRef<
     const refBaseMesh = useRef<InstancedMesh>(null!);
     const matBase = useMemo(() => {
       return new MeshBasicMaterial({ color: "#606060" });
-    }, [lut]);
+    }, []);
     const geoBase = useMemo(() => {
       const helixGap = distBetweenPointsOnCircle(helixRadius, strandOffsetRad);
       const baseLength = 0.45 * helixGap;
@@ -114,7 +113,7 @@ const BaseDoubleHelix = forwardRef<
       for (let i = 0; i < geo.attributes.position.count; i++) {
         geo.attributes.position.setZ(
           i,
-          geo.attributes.position.getZ(i) - baseLength / 2
+          geo.attributes.position.getZ(i) - baseLength / 2,
         );
       }
       geo.attributes.position.needsUpdate = true;
@@ -131,13 +130,13 @@ const BaseDoubleHelix = forwardRef<
         helixLength,
         helixRadius,
         helixWindingSeparation,
-        0
+        0,
       );
       const curveB = new HelixCurve(
         helixLength,
         helixRadius,
         helixWindingSeparation,
-        strandOffsetRad
+        strandOffsetRad,
       );
       return [
         curveA,
@@ -185,7 +184,17 @@ const BaseDoubleHelix = forwardRef<
       }
       refBaseMesh.current.instanceMatrix.needsUpdate = true;
       refBaseMesh.current.instanceColor!.needsUpdate = true;
-    }, [curveHelixA, curveHelixB, refBaseMesh, nBasePairs, lut]);
+    }, [
+      curveHelixA,
+      curveHelixB,
+      refBaseMesh,
+      nBasePairs,
+      lut,
+      tmpMatrix,
+      tmpVecA,
+      tmpVecB,
+      upVec,
+    ]);
 
     useFrame(({ clock }) => {
       const elapsedTimeSec = clock.getElapsedTime();
@@ -205,7 +214,7 @@ const BaseDoubleHelix = forwardRef<
             mirrorEffects ? 2 * Math.abs(normBpIdx - 0.5) : normBpIdx,
             0,
             0,
-            elapsedTimeSec
+            elapsedTimeSec,
           ) / coordinateMapper.amplitude;
         // Range 0:1
         targetScale = (1 + targetScale) / 2;
@@ -261,7 +270,8 @@ const BaseDoubleHelix = forwardRef<
         />
       </group>
     );
-  }
+  },
 );
+BaseDoubleHelix.displayName = "BaseDoubleHelix";
 
 export default BaseDoubleHelix;

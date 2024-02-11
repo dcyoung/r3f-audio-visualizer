@@ -6,7 +6,6 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-
 import { type EnergyMeasure, type OctaveBandMode } from "@/lib/analyzers/fft";
 
 interface FFTAnalyzerConfig {
@@ -33,10 +32,10 @@ export const FFTAnalyzerContextProvider = ({
 }>) => {
   const [amplitude, setAmplitude] = useState<number>(initial?.amplitude ?? 1.0);
   const [octaveBandMode, setOctaveBandMode] = useState<OctaveBandMode>(
-    initial?.octaveBandMode ?? 2
+    initial?.octaveBandMode ?? 2,
   );
   const [energyMeasure, setEnergyMeasure] = useState<EnergyMeasure>(
-    initial?.energyMeasure ?? "bass"
+    initial?.energyMeasure ?? "bass",
   );
   return (
     <FFTAnalyzerContext.Provider
@@ -62,7 +61,7 @@ export function useFFTAnalyzerContext() {
   const context = useContext(FFTAnalyzerContext);
   if (!context) {
     throw new Error(
-      "useFFTAnalyzerContext must be used within a FFTAnalyzerContextProvider"
+      "useFFTAnalyzerContext must be used within a FFTAnalyzerContextProvider",
     );
   }
   return context.config;
@@ -72,7 +71,7 @@ export function useFFTAnalyzerContextSetters() {
   const context = useContext(FFTAnalyzerContext);
   if (!context) {
     throw new Error(
-      "useFFTAnalyzerContext must be used within a FFTAnalyzerContextProvider"
+      "useFFTAnalyzerContext must be used within a FFTAnalyzerContextProvider",
     );
   }
   return context.setters;

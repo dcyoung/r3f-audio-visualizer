@@ -6,7 +6,6 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
 
 export interface SoundcloudConfig {
@@ -27,7 +26,7 @@ export const SoundcloudContextProvider = ({
   initial?: Partial<SoundcloudConfig>;
 }>) => {
   const [track, setTrack] = useState<SoundcloudTrack | null>(
-    initial?.track ?? null
+    initial?.track ?? null,
   );
 
   return (
@@ -50,7 +49,7 @@ export function useSoundcloudContext() {
   const context = useContext(SoundcloudContext);
   if (!context) {
     throw new Error(
-      "useSoundcloudContext must be used within a SoundcloudContextProvider"
+      "useSoundcloudContext must be used within a SoundcloudContextProvider",
     );
   }
   return context.config;
@@ -60,7 +59,7 @@ export function useSoundcloudContextSetters() {
   const context = useContext(SoundcloudContext);
   if (!context) {
     throw new Error(
-      "useSoundcloudContext must be used within a SoundcloudContextProvider"
+      "useSoundcloudContext must be used within a SoundcloudContextProvider",
     );
   }
   return context.setters;

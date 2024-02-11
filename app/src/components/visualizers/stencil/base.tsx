@@ -1,18 +1,17 @@
-import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useRef } from "react";
-import {
-  type BufferGeometry,
-  CatmullRomCurve3,
-  type Points,
-  Vector2,
-  Vector3,
-} from "three";
-
 import {
   COORDINATE_TYPE,
   gaussianRandom,
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
+import { useFrame } from "@react-three/fiber";
+import {
+  CatmullRomCurve3,
+  Vector2,
+  Vector3,
+  type BufferGeometry,
+  type Points,
+} from "three";
 
 const computeNormals = (vertices: Vector2[], weighted = false): Vector2[] => {
   const n = vertices.length;
@@ -60,12 +59,12 @@ const BaseStencil = ({
       poly.map((v) => new Vector3(v.x, v.y, 0.0).multiplyScalar(scale)),
       false,
       "catmullrom",
-      0
-    ).getSpacedPoints(nPoints)
+      0,
+    ).getSpacedPoints(nPoints),
   );
   const referenceNormalsByPoly = referencePositionsByPoly.map(
     (referencePositions) =>
-      computeNormals(referencePositions.map((v) => new Vector2(v.x, v.y)))
+      computeNormals(referencePositions.map((v) => new Vector2(v.x, v.y))),
   );
   const refPoints = useRef<Points>(null!);
   const refBufGeo = useRef<BufferGeometry>(null!);
@@ -73,7 +72,8 @@ const BaseStencil = ({
     if (refBufGeo.current) {
       refBufGeo.current.setFromPoints(referencePositionsByPoly[0]);
     }
-  }, []);
+  }, [refBufGeo, referencePositionsByPoly]);
+
   const totalCycleSec = transitionSpeedSec * polyStates.length;
 
   useFrame(({ clock }) => {
@@ -110,7 +110,7 @@ const BaseStencil = ({
           // normIdx,
           0,
           0,
-          elapsedTimeSec
+          elapsedTimeSec,
         );
       if (useNoise) {
         offset *= noise[i];
@@ -120,13 +120,13 @@ const BaseStencil = ({
       tmpVecA.set(
         polyAPos[i].x + offset * polyANorm[i].x, // x
         polyAPos[i].y + offset * polyANorm[i].y, // y
-        polyAPos[i].z // z
+        polyAPos[i].z, // z
       );
       if (currPolyIdx !== nextPolyIdx) {
         tmpVecB.set(
           polyBPos[i].x + offset * polyBNorm[i].x, // x
           polyBPos[i].y + offset * polyBNorm[i].y, // y
-          polyBPos[i].z // z
+          polyBPos[i].z, // z
         );
         tmpVecA.lerp(tmpVecB, transitionAlpha);
       }

@@ -109,7 +109,7 @@ export class ColorPalette implements IColorPalette {
     const lut = new Lut();
     lut.addColorMap(
       this.name,
-      this.colorsHex.map((hex, i) => [i / (this.nColors - 1), hex])
+      this.colorsHex.map((hex, i) => [i / (this.nColors - 1), hex]),
     );
     lut.setColorMap(this.name);
     return lut;
@@ -129,7 +129,7 @@ export class ColorPalette implements IColorPalette {
     const alpha = Math.min(1, Math.max(0, norm));
     const gradient = new GradientLinear(this);
     return gradient.getAt(alpha);
-  }
+  };
 
   public static getPalette(type: ColorPaletteType) {
     /**
@@ -293,10 +293,10 @@ export class ColorPalette implements IColorPalette {
     }
   }
   public static random(
-    options: ColorPaletteType[] = AVAILABLE_COLOR_PALETTES
+    options: ColorPaletteType[] = AVAILABLE_COLOR_PALETTES,
   ): ColorPalette {
     return ColorPalette.getPalette(
-      options[Math.floor(Math.random() * options.length)]
+      options[Math.floor(Math.random() * options.length)],
     );
   }
 }

@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 import { ColorPalette } from "@/lib/palettes";
 
@@ -14,7 +13,7 @@ const ScopeVisual = ({ textureMapper }: { textureMapper: TextureMapper }) => {
   useEffect(() => {
     setPalette("rainbow");
     setColorBackground(false);
-  }, []);
+  }, [setPalette, setColorBackground]);
 
   return (
     <BaseScopeVisual

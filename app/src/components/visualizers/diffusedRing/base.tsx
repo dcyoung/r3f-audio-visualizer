@@ -1,13 +1,12 @@
-import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { type Points } from "three";
-
 import {
   COORDINATE_TYPE,
   gaussianRandom,
-  type ICoordinateMapper,
   TWO_PI,
+  type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
+import { useFrame } from "@react-three/fiber";
+import { type Points } from "three";
 
 const BaseDiffusedRing = ({
   coordinateMapper,
@@ -41,7 +40,7 @@ const BaseDiffusedRing = ({
               mirrorEffects ? 2 * Math.abs(normIdx - 0.5) : normIdx,
               0,
               0,
-              elapsedTimeSec
+              elapsedTimeSec,
             ));
 
       angRad = normIdx * TWO_PI;
@@ -49,7 +48,7 @@ const BaseDiffusedRing = ({
         i,
         effectiveRadius * Math.cos(angRad), // x
         effectiveRadius * Math.sin(angRad), // y
-        0 // z
+        0, // z
       );
     }
     positionsBuffer.needsUpdate = true;

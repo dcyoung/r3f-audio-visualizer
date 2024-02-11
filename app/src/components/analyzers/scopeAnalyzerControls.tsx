@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-
+import { useCallback, useEffect, useRef } from "react";
 import type ScopeAnalyzer from "@/lib/analyzers/scope";
 import {
   useAppStateActions,
@@ -20,7 +19,7 @@ export const AudioScopeAnalyzerControls = ({
   /**
    * Transfers data from the analyzer to the target arrays
    */
-  const animate = (): void => {
+  const mapData = useCallback(() => {
     // Check if the state sizes need to be updated
     const targetLength = analyzer.quadSamples.length;
     if (timeData.length !== targetLength || quadData.length !== targetLength) {
@@ -35,8 +34,7 @@ export const AudioScopeAnalyzerControls = ({
     analyzer.quadSamples.forEach((v, index) => {
       quadData[index] = v;
     });
-    animationRequestRef.current = requestAnimationFrame(animate);
-  };
+  }, [timeData, quadData, analyzer, resizeVisualSourceData]);
 
   /**
    * Re-Synchronize the animation loop if the target data destination changes.
@@ -45,9 +43,13 @@ export const AudioScopeAnalyzerControls = ({
     if (animationRequestRef.current) {
       cancelAnimationFrame(animationRequestRef.current);
     }
+    const animate = (): void => {
+      mapData();
+      animationRequestRef.current = requestAnimationFrame(animate);
+    };
     animationRequestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRequestRef.current);
-  }, [timeData, quadData]);
+  }, [timeData, quadData, mapData]);
 
   return <></>;
 };

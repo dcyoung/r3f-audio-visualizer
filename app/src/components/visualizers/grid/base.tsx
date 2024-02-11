@@ -1,18 +1,17 @@
-import { useFrame } from "@react-three/fiber";
-import { useRef, useEffect, useMemo } from "react";
-import {
-  BoxGeometry,
-  type InstancedMesh,
-  Matrix4,
-  MeshBasicMaterial,
-} from "three";
-
+import { useEffect, useMemo, useRef } from "react";
 import { useVisualContext } from "@/context/visual";
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 import { ColorPalette } from "@/lib/palettes";
+import { useFrame } from "@react-three/fiber";
+import {
+  BoxGeometry,
+  Matrix4,
+  MeshBasicMaterial,
+  type InstancedMesh,
+} from "three";
 
 const BaseGrid = ({
   coordinateMapper,
@@ -69,7 +68,7 @@ const BaseGrid = ({
           normGridX,
           normGridY,
           0,
-          elapsedTimeSec
+          elapsedTimeSec,
         );
         x = gridSizeX * (normGridX - 0.5);
         y = gridSizeY * (normGridY - 0.5);

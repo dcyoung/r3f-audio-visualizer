@@ -1,8 +1,7 @@
-import { Image } from "lucide-react";
 import { type Dispatch, type HTMLAttributes } from "react";
-
 import { type SoundcloudUser } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
+import { Image } from "lucide-react";
 
 export const UserCard = ({
   user,
@@ -12,8 +11,8 @@ export const UserCard = ({
   return (
     <div
       className={cn(
-        "flex flex-col justify-start items-center gap-1 hover:scale-110 w-12",
-        className
+        "flex w-12 flex-col items-center justify-start gap-1 hover:border hover:border-white aria-selected:animate-pulse aria-selected:border aria-selected:border-white",
+        className,
       )}
       {...props}
     >
@@ -21,6 +20,7 @@ export const UserCard = ({
         <img
           src={user.avatar_url}
           className="aspect-square w-full rounded-full"
+          alt="User avatar"
         />
       ) : (
         <Image />
@@ -34,24 +34,27 @@ export const UserCard = ({
 
 export const UserList = ({
   users,
+  selectedUserId = undefined,
   onUserSelected,
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   users: SoundcloudUser[];
+  selectedUserId?: number;
   onUserSelected: Dispatch<SoundcloudUser>;
 }) => {
   return (
     <div
       className={cn(
-        "flex flex-row gap-2 items-center justify-start",
-        className
+        "no-scrollbar flex w-full cursor-pointer flex-row items-center justify-start gap-2 overflow-x-scroll",
+        className,
       )}
       {...props}
     >
       {users?.map((user) => (
         <UserCard
           key={user.id}
+          aria-selected={selectedUserId === user.id}
           user={user}
           onClick={() => {
             onUserSelected(user);

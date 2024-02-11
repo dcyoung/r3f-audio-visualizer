@@ -1,6 +1,6 @@
 import { AUDIO_SOURCE } from "@/components/audio/sourceControls/common";
 import FileAudioControls from "@/components/audio/sourceControls/file";
-import { CurrentTrackPlayer } from "@/components/controls/audio/soundcloud/player";
+import { CurrentTrackPlayer } from "@/components/controls/audioSource/soundcloud/player";
 
 export const ControlledAudioSource = ({
   audio,

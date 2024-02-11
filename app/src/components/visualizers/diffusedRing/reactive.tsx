@@ -8,16 +8,6 @@ import BaseDiffusedRing from "./base";
 
 const DiffusedRingVisual = ({ coordinateMapper }: VisualProps) => {
   const { radius, pointSize, mirrorEffects } = useRingVisualConfigContext();
-  // const { radius, pointSize, mirrorEffects } = useControls({
-  //   "Visual - Ring": folder(
-  //     {
-  //       radius: { value: 2, min: 0.25, max: 3, step: 0.25 },
-  //       pointSize: { value: 0.2, min: 0.01, max: 2, step: 0.01 },
-  //       mirrorEffects: false,
-  //     },
-  //     { collapsed: true }
-  //   ),
-  // });
 
   return (
     <>

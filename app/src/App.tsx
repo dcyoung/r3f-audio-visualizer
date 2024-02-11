@@ -13,6 +13,7 @@ const getAnalyzerComponent = (mode: ApplicationMode) => {
       return <AudioAnalyzer mode={mode} />;
     case APPLICATION_MODE.WAVE_FORM:
     case APPLICATION_MODE.NOISE:
+    case APPLICATION_MODE.PARTICLE_NOISE:
       return null;
     default:
       return mode satisfies never;
@@ -26,6 +27,7 @@ const getCanvasComponent = (mode: ApplicationMode) => {
     case APPLICATION_MODE.WAVE_FORM:
     case APPLICATION_MODE.NOISE:
     case APPLICATION_MODE.AUDIO:
+    case APPLICATION_MODE.PARTICLE_NOISE:
       return <Visual3DCanvas mode={mode} />;
     default:
       return mode satisfies never;

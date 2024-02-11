@@ -1,5 +1,6 @@
 import { useState, type HTMLAttributes, type PropsWithChildren } from "react";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { useModeContext } from "@/context/mode";
@@ -11,6 +12,11 @@ import {
   type ColorPaletteType,
 } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
+
+import { CubeVisualSettingsControls } from "./visual/cube";
+import { DiffusedRingVisualSettingsControls } from "./visual/diffusedRing";
+import { GridVisualSettingsControls } from "./visual/grid";
+import { SphereVisualSettingsControls } from "./visual/sphere";
 
 const PaletteBand = ({
   palette,
@@ -49,6 +55,24 @@ const PaletteIcon = ({
   );
 };
 
+const VisualSettingsControls = () => {
+  const { visual } = useVisualContext();
+  switch (visual) {
+    case "cube":
+      return CubeVisualSettingsControls();
+    case "grid":
+      return GridVisualSettingsControls();
+    case "sphere":
+      return SphereVisualSettingsControls();
+    case "diffusedRing":
+      return DiffusedRingVisualSettingsControls();
+    case "dna":
+      return null;
+    default:
+      return visual satisfies never;
+  }
+};
+
 export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
   const { mode } = useModeContext();
@@ -79,9 +103,8 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
               </div>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="color-background">Color Background</Label>
+              <Label>Color Background</Label>
               <Switch
-                id="color-background"
                 defaultChecked={colorBackground}
                 onCheckedChange={(e) => {
                   setColorBackground(e);
@@ -89,16 +112,19 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
               />
             </div>
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="color-background">Follow Music</Label>
+              <Label>Follow Music</Label>
               <Switch
                 disabled={mode !== APPLICATION_MODE.AUDIO}
-                id="color-background"
                 defaultChecked={paletteTrackEnergy}
                 onCheckedChange={(e) => {
                   setPaletteTrackEnergy(e);
                 }}
               />
             </div>
+          </div>
+          <Separator />
+          <div className="space-y-4">
+            <VisualSettingsControls />
           </div>
         </div>
       </SheetContent>

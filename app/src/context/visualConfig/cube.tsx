@@ -21,6 +21,7 @@ export const CubeVisualConfigContext = createContext<{
     setUnitSideLength: Dispatch<SetStateAction<number>>;
     setUnitSpacingScalar: Dispatch<SetStateAction<number>>;
     setVolume: Dispatch<SetStateAction<boolean>>;
+    reset: Dispatch<void>;
   };
 } | null>(null);
 
@@ -53,6 +54,12 @@ export const CubeVisualConfigContextProvider = ({
           setUnitSideLength: setUnitSideLength,
           setUnitSpacingScalar: setUnitSpacingScalar,
           setVolume: setVolume,
+          reset: () => {
+            setNPerSide(initial?.nPerSide ?? 10);
+            setUnitSideLength(initial?.unitSideLength ?? 0.5);
+            setUnitSpacingScalar(initial?.unitSpacingScalar ?? 0.1);
+            setVolume(initial?.volume ?? true);
+          },
         },
       }}
     >

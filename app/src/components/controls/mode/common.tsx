@@ -4,8 +4,8 @@ import {
   getPlatformSupportedAudioSources,
   type AudioSource,
 } from "@/components/audio/sourceControls/common";
-import { FileUploadControls } from "@/components/controls/audio/fileUpload";
-import { SoundcloudControls } from "@/components/controls/audio/soundcloud/controls";
+import { FileUploadControls } from "@/components/controls/audioSource/fileUpload";
+import { SoundcloudControls } from "@/components/controls/audioSource/soundcloud/controls";
 import { Label } from "@/components/ui/label";
 import {
   useAudioSourceContext,
@@ -27,7 +27,7 @@ export const ValueLabel = ({
   ...props
 }: HTMLProps<HTMLDivElement> & {
   label: string;
-  value: string;
+  value: string | number;
 }) => {
   return (
     <div

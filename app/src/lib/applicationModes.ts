@@ -3,6 +3,7 @@ export const APPLICATION_MODE = {
   NOISE: "NOISE",
   AUDIO: "AUDIO",
   AUDIO_SCOPE: "AUDIO_SCOPE",
+  PARTICLE_NOISE: "PARTICLE_NOISE",
 } as const;
 
 type ObjectValues<T> = T[keyof T];
@@ -12,6 +13,7 @@ export const isAudioMode = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
     case APPLICATION_MODE.NOISE:
+    case APPLICATION_MODE.PARTICLE_NOISE:
       return false;
     case APPLICATION_MODE.AUDIO:
     case APPLICATION_MODE.AUDIO_SCOPE:
@@ -28,6 +30,8 @@ export const getPlatformSupportedApplicationModes = (): ApplicationMode[] => {
     APPLICATION_MODE.AUDIO,
     /* Disabled until bugs can be resolved */
     // APPLICATION_MODE.AUDIO_SCOPE,
+    /* Disabled until IMotionMappers & ICoordinateMappers are more compatible */
+    // APPLICATION_MODE.PARTICLE_NOISE,
   ];
 };
 
@@ -36,6 +40,7 @@ export const isCameraMode = (mode: ApplicationMode) => {
     case APPLICATION_MODE.WAVE_FORM:
     case APPLICATION_MODE.NOISE:
     case APPLICATION_MODE.AUDIO:
+    case APPLICATION_MODE.PARTICLE_NOISE:
       return true;
     case APPLICATION_MODE.AUDIO_SCOPE:
       return false;

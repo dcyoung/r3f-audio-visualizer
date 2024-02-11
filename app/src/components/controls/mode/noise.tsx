@@ -48,7 +48,7 @@ export const NoiseGeneratorModeControls = () => {
         step={0.01}
         onValueChange={(e) => setTimeScale(e[0])}
       />
-      <ValueLabel label="Iteration Count" value={nIterations.toString()} />
+      <ValueLabel label="Iteration Count" value={nIterations} />
       <Slider
         defaultValue={[nIterations]}
         value={[nIterations]}

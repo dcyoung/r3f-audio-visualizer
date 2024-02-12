@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { useAppStateActions, usePalette } from "@/lib/appState";
 import {
   AVAILABLE_COLOR_PALETTES,
   ColorPalette,
@@ -77,9 +78,12 @@ const VisualSettingsControls = () => {
 export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
   const { mode } = useModeContext();
-  const { colorBackground, palette, paletteTrackEnergy } = useVisualContext();
-  const { setColorBackground, setPalette, setPaletteTrackEnergy } =
+  const { colorBackground, paletteTrackEnergy } = useVisualContext();
+  const { setColorBackground, setPaletteTrackEnergy } =
     useVisualContextSetters();
+  const palette = usePalette();
+  const { setPalette } = useAppStateActions();
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>

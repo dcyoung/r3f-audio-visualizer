@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useVisualContext } from "@/context/visual";
+import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
   TWO_PI,
@@ -29,9 +29,9 @@ const BaseSphere = ({
   nPoints?: number;
   cubeSideLength?: number;
 }) => {
+  const palette = usePalette();
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const { palette } = useVisualContext();
   const lut = ColorPalette.getPalette(palette).buildLut();
   useEffect(() => {
     for (let i = 0; i < nPoints; i++) {

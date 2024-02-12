@@ -12,7 +12,7 @@ import { APPLICATION_MODE } from "@/lib/applicationModes";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
-import { MaybePaletteTracker } from "./paletteTracker";
+import { PaletteTracker } from "./paletteTracker";
 
 const VisualizerComponent = ({
   mode,
@@ -94,7 +94,7 @@ const Visual3DCanvas = ({
       <VisualizerComponent mode={mode} />
       {/* <Stats /> */}
       <CameraControls />
-      <MaybePaletteTracker />
+      <PaletteTracker />
     </Canvas>
   );
 };

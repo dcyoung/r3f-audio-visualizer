@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useVisualContext } from "@/context/visual";
 import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/eventDetector";
+import { usePalette } from "@/lib/appState";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 import { ColorPalette } from "@/lib/palettes";
 import { useFrame } from "@react-three/fiber";
@@ -30,7 +30,7 @@ const BaseBoxes = ({
   );
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const { palette } = useVisualContext();
+  const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   const cellAssignments = useMemo(
@@ -58,10 +58,7 @@ const BaseBoxes = ({
   }, [lut, nBoxes]);
 
   useFrame(() => {
-    detector.observe(scalarTracker?.getNormalizedValue() ?? 0);
-
-    if (detector.triggered()) {
-      detector.reset();
+    if (detector.step(scalarTracker?.getNormalizedValue() ?? 0)) {
       // random jitter
       const rowJitter = Math.floor(Math.random() * 3) - 1;
       const colJitter = Math.floor(Math.random() * 3) - 1;

@@ -1,15 +1,13 @@
 import { Clock } from "three";
 
 export interface IEventDetector {
-  reset(): void;
-  observe(scalar: number): void;
-  triggered(): boolean;
+  step(scalar: number): boolean;
 }
 
 export class ScalarMovingAvgEventDetector implements IEventDetector {
   private clock = new Clock(true);
   private bufferSize = 1000;
-  private elapsedTimeMsSinceLastEvent = 0;
+  private lastEventElapsedMs = 0;
   private buffer: {
     value: number;
     elapsedTimeMs: number;
@@ -17,6 +15,7 @@ export class ScalarMovingAvgEventDetector implements IEventDetector {
     value: 0,
     elapsedTimeMs: 0,
   }));
+
   private threshold: number;
   private windowSizeMs: number;
   private cooldownMs: number;
@@ -28,30 +27,12 @@ export class ScalarMovingAvgEventDetector implements IEventDetector {
     this.cooldownMs = cooldownMs;
   }
 
-  public reset() {
-    // reset the delta & old time
-    this.elapsedTimeMsSinceLastEvent = 0;
-    this.observationCount = 0;
-  }
-
-  public observe(scalar: number) {
-    const idx = this.observationCount % this.bufferSize;
-    this.buffer[idx].value = scalar;
-    this.buffer[idx].elapsedTimeMs = this.clock.getElapsedTime() * 1000;
-    this.observationCount++;
-  }
-
-  public triggered(): boolean {
-    const ms = this.clock.getElapsedTime() * 1000;
-    const delta = ms - this.elapsedTimeMsSinceLastEvent;
-
-    if (delta < this.cooldownMs) {
-      return false;
-    }
-
+  private getBufferAvg(windowEndTimestampMs: number) {
+    const start = windowEndTimestampMs - this.windowSizeMs;
+    const end = windowEndTimestampMs;
     const stats = this.buffer.reduce(
       (acc, entry) => {
-        if (entry.elapsedTimeMs < ms - this.windowSizeMs) {
+        if (entry.elapsedTimeMs < start || entry.elapsedTimeMs > end) {
           return acc;
         }
         return {
@@ -61,7 +42,34 @@ export class ScalarMovingAvgEventDetector implements IEventDetector {
       },
       { sum: 0, count: 0 },
     );
-    const avg = stats.count > 0 ? stats.sum / stats.count : 0;
-    return avg > this.threshold;
+    return stats.count > 0 ? stats.sum / stats.count : 0;
+  }
+
+  private onCooldown() {
+    const nowMs = this.clock.elapsedTime * 1000;
+    return nowMs - this.lastEventElapsedMs < this.cooldownMs;
+  }
+
+  public step(scalar: number) {
+    const ms = this.clock.getElapsedTime() * 1000;
+    // Add the observation
+    const idx = this.observationCount % this.bufferSize;
+    this.buffer[idx].value = scalar;
+    this.buffer[idx].elapsedTimeMs = ms;
+    this.observationCount++;
+
+    // Can't trigger in cooldown
+    if (this.onCooldown()) {
+      return false;
+    }
+
+    // Check for trigger
+    const avg = this.getBufferAvg(ms);
+    if (avg > this.threshold) {
+      // reset
+      this.lastEventElapsedMs = ms;
+      return true;
+    }
+    return false;
   }
 }

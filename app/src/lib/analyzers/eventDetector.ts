@@ -1,6 +1,7 @@
 import { Clock } from "three";
 
 export interface IEventDetector {
+  timeSinceLastEventMs: number;
   step(scalar: number): boolean;
 }
 
@@ -8,6 +9,9 @@ export class ScalarMovingAvgEventDetector implements IEventDetector {
   private clock = new Clock(true);
   private bufferSize = 1000;
   private lastEventElapsedMs = 0;
+  public get timeSinceLastEventMs() {
+    return this.clock.elapsedTime * 1000 - this.lastEventElapsedMs;
+  }
   private buffer: {
     value: number;
     elapsedTimeMs: number;
@@ -45,11 +49,6 @@ export class ScalarMovingAvgEventDetector implements IEventDetector {
     return stats.count > 0 ? stats.sum / stats.count : 0;
   }
 
-  private onCooldown() {
-    const nowMs = this.clock.elapsedTime * 1000;
-    return nowMs - this.lastEventElapsedMs < this.cooldownMs;
-  }
-
   public step(scalar: number) {
     const ms = this.clock.getElapsedTime() * 1000;
     // Add the observation
@@ -59,7 +58,7 @@ export class ScalarMovingAvgEventDetector implements IEventDetector {
     this.observationCount++;
 
     // Can't trigger in cooldown
-    if (this.onCooldown()) {
+    if (this.timeSinceLastEventMs < this.cooldownMs) {
       return false;
     }
 

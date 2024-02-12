@@ -22,11 +22,12 @@ const BaseBoxes = ({
   gridSize?: number;
   cellSize?: number;
 }) => {
+  const rotateDurationMs = 250;
   const nRows = gridSize;
   const nCols = gridSize;
   const detector = useMemo(
-    () => new ScalarMovingAvgEventDetector(0.65, 150, 500),
-    [],
+    () => new ScalarMovingAvgEventDetector(0.65, 150, 2 * rotateDurationMs),
+    [rotateDurationMs],
   );
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
@@ -36,11 +37,13 @@ const BaseBoxes = ({
   const cellAssignments = useMemo(
     () =>
       Array.from({ length: nBoxes }, (_) => {
+        const row = Math.floor(nRows * Math.random());
+        const col = Math.floor(nCols * Math.random());
         return {
-          //   row: Math.floor(nRows * (idx / nBoxes)),
-          //   col: Math.floor(nCols * (idx / nBoxes)),
-          row: Math.floor(nRows * Math.random()),
-          col: Math.floor(nCols * Math.random()),
+          fromRow: row,
+          fromCol: col,
+          toRow: row,
+          toCol: col,
         };
       }),
     [nBoxes, nRows, nCols],
@@ -63,25 +66,37 @@ const BaseBoxes = ({
       const rowJitter = Math.floor(Math.random() * 3) - 1;
       const colJitter = Math.floor(Math.random() * 3) - 1;
       for (let i = 0; i < nBoxes; i++) {
-        cellAssignments[i].col += (Math.random() > 0.5 ? 1 : -1) * colJitter;
-        cellAssignments[i].row += (Math.random() > 0.5 ? 1 : -1) * rowJitter;
+        cellAssignments[i].fromRow = cellAssignments[i].toRow;
+        cellAssignments[i].fromCol = cellAssignments[i].toCol;
+        cellAssignments[i].toRow += (Math.random() > 0.5 ? 1 : -1) * colJitter;
+        cellAssignments[i].toCol += (Math.random() > 0.5 ? 1 : -1) * rowJitter;
       }
     }
 
+    const alpha = Math.min(
+      1,
+      Math.max(0, detector.timeSinceLastEventMs / rotateDurationMs),
+    );
+
     let normCubeX, normCubeY, x, y, z;
-    cellAssignments.forEach(({ row, col }, instanceIdx) => {
-      // Find a random cell
-      normCubeX = row / (nRows - 1);
-      normCubeY = col / (nCols - 1);
+    cellAssignments.forEach(
+      ({ fromRow, fromCol, toRow, toCol }, instanceIdx) => {
+        const row = fromRow + alpha * (toRow - fromRow);
+        const col = fromCol + alpha * (toCol - fromCol);
 
-      x = nRows * cellSize * (normCubeX - 0.5);
-      y = nCols * cellSize * (normCubeY - 0.5);
-      z = 0;
-      // Position
-      tmpMatrix.setPosition(x, y, z);
+        // Find a random cell
+        normCubeX = row / (nRows - 1);
+        normCubeY = col / (nCols - 1);
 
-      meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
-    });
+        x = nRows * cellSize * (normCubeX - 0.5);
+        y = nCols * cellSize * (normCubeY - 0.5);
+        z = 0;
+        // Position
+        tmpMatrix.setPosition(x, y, z);
+
+        meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
+      },
+    );
 
     // Update the instance
     meshRef.current.instanceMatrix.needsUpdate = true;

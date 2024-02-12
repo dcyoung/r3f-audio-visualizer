@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/eventDetector";
 import { usePalette } from "@/lib/appState";
+import { clip, easeInOut, lerp } from "@/lib/easing";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 import { ColorPalette } from "@/lib/palettes";
 import { useFrame } from "@react-three/fiber";
@@ -62,35 +63,53 @@ const BaseBoxes = ({
 
   useFrame(() => {
     if (detector.step(scalarTracker?.getNormalizedValue() ?? 0)) {
-      // random jitter
-      const rowJitter = Math.floor(Math.random() * 3) - 1;
-      const colJitter = Math.floor(Math.random() * 3) - 1;
+      // random jitter in one direction or the other
+      const [rowJitter, colJitter] =
+        Math.random() > 0.5 ? [true, false] : [false, true];
+
       for (let i = 0; i < nBoxes; i++) {
         cellAssignments[i].fromRow = cellAssignments[i].toRow;
         cellAssignments[i].fromCol = cellAssignments[i].toCol;
-        cellAssignments[i].toRow += (Math.random() > 0.5 ? 1 : -1) * colJitter;
-        cellAssignments[i].toCol += (Math.random() > 0.5 ? 1 : -1) * rowJitter;
+        if (rowJitter) {
+          cellAssignments[i].toRow += Math.random() > 0.5 ? 1 : -1;
+        }
+        if (colJitter) {
+          cellAssignments[i].toCol += Math.random() > 0.5 ? 1 : -1;
+        }
       }
     }
 
-    const alpha = Math.min(
-      1,
-      Math.max(0, detector.timeSinceLastEventMs / rotateDurationMs),
+    // smooth the roll
+    const alpha = easeInOut(
+      clip(detector.timeSinceLastEventMs / rotateDurationMs),
     );
+    // roll angle for each cube
+    const beta = lerp(Math.PI / 4, (3 * Math.PI) / 4, alpha);
+    // formula for COM of a rolling cube as a fxn of beta
+    const rollU = (-0.5 * cellSize * Math.cos(beta)) / Math.sqrt(2);
+    const rollV = (0.5 * cellSize * Math.sin(beta)) / Math.sqrt(2);
 
-    let normCubeX, normCubeY, x, y, z;
+    let normCubeX, normCubeY, x, y, z, deltaRow, deltaCol;
     cellAssignments.forEach(
       ({ fromRow, fromCol, toRow, toCol }, instanceIdx) => {
-        const row = fromRow + alpha * (toRow - fromRow);
-        const col = fromCol + alpha * (toCol - fromCol);
+        deltaRow = toRow - fromRow;
+        deltaCol = toCol - fromCol;
+        const row = fromRow + deltaRow * (rollU + 0.5);
+        const col = fromCol + deltaCol * (rollU + 0.5);
 
-        // Find a random cell
+        if (deltaRow !== 0) {
+          tmpMatrix.makeRotationY((beta - Math.PI / 4) * deltaRow);
+        }
+        if (deltaCol !== 0) {
+          tmpMatrix.makeRotationX(-(beta - Math.PI / 4) * deltaCol);
+        }
+
         normCubeX = row / (nRows - 1);
         normCubeY = col / (nCols - 1);
 
         x = nRows * cellSize * (normCubeX - 0.5);
         y = nCols * cellSize * (normCubeY - 0.5);
-        z = 0;
+        z = rollV - cellSize / 4;
         // Position
         tmpMatrix.setPosition(x, y, z);
 

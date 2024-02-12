@@ -5,9 +5,9 @@ import { Vector3 } from "three";
 import BaseBoxes from "./base";
 
 const BoxesVisual = ({ scalarTracker }: VisualProps) => {
-  const nBoxes = 100;
+  const nBoxes = 200;
   const gridSize = 100;
-  const cellSize = 0.25;
+  const cellSize = 1;
 
   return (
     <>

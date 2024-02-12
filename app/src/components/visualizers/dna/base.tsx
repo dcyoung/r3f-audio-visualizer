@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useMemo, useRef } from "react";
-import { useVisualContext } from "@/context/visual";
+import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
   TWO_PI,
@@ -91,7 +91,7 @@ const BaseDoubleHelix = forwardRef<
     },
     ref,
   ) => {
-    const { palette } = useVisualContext();
+    const palette = usePalette();
     const lut = ColorPalette.getPalette(palette).buildLut();
     const nBasePairs = Math.floor(helixLength / baseSpacing);
     const refBaseMesh = useRef<InstancedMesh>(null!);

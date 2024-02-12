@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useVisualContext } from "@/context/visual";
+import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
@@ -28,7 +28,7 @@ const BaseGrid = ({
 }) => {
   const meshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const { palette } = useVisualContext();
+  const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor

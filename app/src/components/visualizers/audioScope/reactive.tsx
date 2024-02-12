@@ -1,12 +1,14 @@
 import { useEffect } from "react";
-import { useVisualContext, useVisualContextSetters } from "@/context/visual";
+import { useVisualContextSetters } from "@/context/visual";
+import { useAppStateActions, usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 
 import BaseScopeVisual, { type TextureMapper } from "./base";
 
 const ScopeVisual = ({ textureMapper }: { textureMapper: TextureMapper }) => {
-  const { palette } = useVisualContext();
-  const { setColorBackground, setPalette } = useVisualContextSetters();
+  const palette = usePalette();
+  const { setPalette } = useAppStateActions();
+  const { setColorBackground } = useVisualContextSetters();
   const color = ColorPalette.getPalette(palette).lerpColor(0.5);
   const usePoints = true;
 

@@ -18,7 +18,6 @@ export const COLOR_PALETTE = {
   NATURAL: "Natural",
   NATURAL_2: "Natural_2",
   CIRCUS: "Circus",
-  CIRCUS_2: "Circus_2",
   SEASIDE: "Seaside",
   DRAGON: "Dragon",
 } as const;
@@ -40,7 +39,6 @@ export const AVAILABLE_COLOR_PALETTES = [
   COLOR_PALETTE.NATURAL,
   COLOR_PALETTE.NATURAL_2,
   COLOR_PALETTE.CIRCUS,
-  COLOR_PALETTE.CIRCUS_2,
   COLOR_PALETTE.SEASIDE,
   COLOR_PALETTE.DRAGON,
 ];
@@ -234,15 +232,6 @@ export class ColorPalette implements IColorPalette {
         ]);
       case COLOR_PALETTE.CIRCUS:
         return new ColorPalette(COLOR_PALETTE.CIRCUS, [
-          "#F62D62",
-          "#FFFFFF",
-          "#FDB600",
-          "#F42D2D",
-          "#544C98",
-          "#ECACBC",
-        ]);
-      case COLOR_PALETTE.CIRCUS_2:
-        return new ColorPalette(COLOR_PALETTE.CIRCUS_2, [
           "#F62D62",
           "#FFFFFF",
           "#FDB600",

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useVisualContext } from "@/context/visual";
+import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
   HALF_DIAGONAL_UNIT_SQUARE,
@@ -32,7 +32,7 @@ const BaseCube = ({
   const inputCoordinateType = volume
     ? COORDINATE_TYPE.CARTESIAN_3D
     : COORDINATE_TYPE.CARTESIAN_CUBE_FACES;
-  const { palette } = useVisualContext();
+  const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor

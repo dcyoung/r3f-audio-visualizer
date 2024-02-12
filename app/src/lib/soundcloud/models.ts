@@ -13,7 +13,7 @@ export const TrackSchema = z.object({
   id: z.number(),
   title: z.string(),
   artwork_url: z.string().nullable(),
-  playback_count: z.number(),
+  playback_count: z.number().nullable(),
   user: UserSchema.optional(),
 });
 export type SoundcloudTrack = z.infer<typeof TrackSchema>;

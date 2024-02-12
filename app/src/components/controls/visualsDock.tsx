@@ -4,7 +4,7 @@ import {
   type VisualType,
 } from "@/components/visualizers/common";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
-import { Box, CircleDashed, Dna, Globe, Grid3x3 } from "lucide-react";
+import { Box, Boxes, CircleDashed, Dna, Globe, Grid3x3 } from "lucide-react";
 
 import { Dock, DockItem, DockNav } from "./dock";
 
@@ -20,6 +20,8 @@ const VisualIcon = ({ visual }: { visual: VisualType }) => {
       return <CircleDashed />;
     case "dna":
       return <Dna />;
+    case "boxes":
+      return <Boxes />;
     default:
       return visual satisfies never;
   }

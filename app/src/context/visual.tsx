@@ -12,16 +12,19 @@ import {
   type VisualType,
 } from "@/components/visualizers/common";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { COLOR_PALETTE, type AVAILABLE_COLOR_PALETTES } from "@/lib/palettes";
 
 import { useModeContext } from "./mode";
-import { CombinedVisualsConfigContextProvider } from "./visualConfig/combined";
+import { CubeVisualConfigContextProvider } from "./visualConfig/cube";
+import { RingVisualConfigContextProvider } from "./visualConfig/diffusedRing";
+import { DnaVisualConfigContextProvider } from "./visualConfig/dna";
+import { GridVisualConfigContextProvider } from "./visualConfig/grid";
+import { SphereVisualConfigContextProvider } from "./visualConfig/sphere";
+// import { StencilVisualConfigContextProvider } from "./visualConfig/stencil";
+// import { SwarmVisualConfigContextProvider } from "./visualConfig/swarm";
 import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
-type Palette = (typeof AVAILABLE_COLOR_PALETTES)[number];
-export interface VisualConfig {
+interface VisualConfig {
   visual: VisualType;
-  palette: Palette;
   colorBackground: boolean;
   paletteTrackEnergy: boolean;
 }
@@ -29,9 +32,7 @@ export interface VisualConfig {
 export const VisualContext = createContext<{
   config: VisualConfig;
   setters: {
-    resetConfig: Dispatch<void>;
     setVisual: Dispatch<SetStateAction<VisualType>>;
-    setPalette: Dispatch<SetStateAction<Palette>>;
     setColorBackground: Dispatch<SetStateAction<boolean>>;
     setPaletteTrackEnergy: Dispatch<SetStateAction<boolean>>;
   };
@@ -43,14 +44,9 @@ export const VisualContextProvider = ({
 }: PropsWithChildren<{
   initial?: Partial<VisualConfig>;
 }>) => {
-  // const { setTheme } = useTheme();
   const { mode } = useModeContext();
-  const [key, setKey] = useState<number>(0); // used to reset the context
   const [visual, setVisual] = useState<VisualType>(
     initial?.visual ?? AVAILABLE_VISUALS[0],
-  );
-  const [palette, setPalette] = useState<Palette>(
-    initial?.palette ?? COLOR_PALETTE.THREE_COOL_TO_WARM,
   );
   const [colorBackground, setColorBackground] = useState<boolean>(
     initial?.colorBackground ?? true,
@@ -58,7 +54,6 @@ export const VisualContextProvider = ({
   const [paletteTrackEnergy, setPaletteTrackEnergy] = useState<boolean>(
     initial?.paletteTrackEnergy ?? false,
   );
-
   const { setWaveformFrequenciesHz, setMaxAmplitude } =
     useWaveGeneratorContextSetters();
 
@@ -78,6 +73,7 @@ export const VisualContextProvider = ({
     }
   }, [visual, mode, setWaveformFrequenciesHz, setMaxAmplitude]);
 
+  // Reset paletteTrackEnergy whenever the mode changes
   useEffect(() => {
     switch (mode) {
       case APPLICATION_MODE.WAVE_FORM:
@@ -87,33 +83,38 @@ export const VisualContextProvider = ({
         setPaletteTrackEnergy(false);
         break;
       case APPLICATION_MODE.AUDIO:
+        setPaletteTrackEnergy(true);
         break;
       default:
         return mode satisfies never;
     }
   }, [mode, setPaletteTrackEnergy]);
-
   return (
     <VisualContext.Provider
       value={{
         config: {
-          visual: visual,
-          palette: palette,
-          colorBackground: colorBackground,
-          paletteTrackEnergy: paletteTrackEnergy,
+          visual,
+          colorBackground,
+          paletteTrackEnergy,
         },
         setters: {
-          resetConfig: () => setKey((key) => key + 1),
-          setVisual: setVisual,
-          setPalette: setPalette,
-          setColorBackground: setColorBackground,
-          setPaletteTrackEnergy: setPaletteTrackEnergy,
+          setVisual,
+          setColorBackground,
+          setPaletteTrackEnergy,
         },
       }}
     >
-      <CombinedVisualsConfigContextProvider key={key}>
-        {children}
-      </CombinedVisualsConfigContextProvider>
+      <CubeVisualConfigContextProvider>
+        <GridVisualConfigContextProvider>
+          <RingVisualConfigContextProvider>
+            <DnaVisualConfigContextProvider>
+              <SphereVisualConfigContextProvider>
+                {children}
+              </SphereVisualConfigContextProvider>
+            </DnaVisualConfigContextProvider>
+          </RingVisualConfigContextProvider>
+        </GridVisualConfigContextProvider>
+      </CubeVisualConfigContextProvider>
     </VisualContext.Provider>
   );
 };

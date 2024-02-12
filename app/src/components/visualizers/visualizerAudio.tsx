@@ -13,6 +13,7 @@ const AudioVisual = ({ visual }: { visual: VisualType }) => {
 
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);
+
   const VisualComponent = useMemo(
     () =>
       lazy(

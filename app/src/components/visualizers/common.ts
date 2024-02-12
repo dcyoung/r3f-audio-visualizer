@@ -18,6 +18,7 @@ export const AVAILABLE_VISUALS = [
   "cube",
   "diffusedRing",
   "dna",
+  "boxes",
   // "stencil",
   // "swarm",
 ] as const;

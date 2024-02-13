@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/eventDetector";
+import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/scalarEventDetector";
 import { usePalette } from "@/lib/appState";
 import { clip, easeInOut, lerp } from "@/lib/easing";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";

@@ -1,11 +1,6 @@
 import { Clock } from "three";
 
-export interface IEventDetector {
-  timeSinceLastEventMs: number;
-  step(scalar: number): boolean;
-}
-
-export class ScalarMovingAvgEventDetector implements IEventDetector {
+export class ScalarMovingAvgEventDetector {
   private clock = new Clock(true);
   private bufferSize = 1000;
   private lastEventElapsedMs = 0;

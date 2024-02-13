@@ -1,5 +1,5 @@
 import { useVisualContext } from "@/context/visual";
-import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/eventDetector";
+import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/scalarEventDetector";
 import { useAppStateActions, useEnergyInfo } from "@/lib/appState";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";

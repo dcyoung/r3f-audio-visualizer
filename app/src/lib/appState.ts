@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+import { EventDetector } from "./eventDetector";
 import {
   AVAILABLE_COLOR_PALETTES,
   COLOR_PALETTE,
@@ -8,7 +9,7 @@ import {
 
 interface IAppState {
   user: {
-    lastCanvasInteraction: Date;
+    canvasInteractionEventTracker: EventDetector;
   };
   visual: {
     palette: ColorPaletteType;
@@ -30,7 +31,7 @@ interface IAppState {
 
 const useAppState = create<IAppState>((set, _) => ({
   user: {
-    lastCanvasInteraction: new Date(),
+    canvasInteractionEventTracker: new EventDetector(),
   },
   visual: {
     palette: COLOR_PALETTE.THREE_COOL_TO_WARM,
@@ -42,10 +43,13 @@ const useAppState = create<IAppState>((set, _) => ({
   energyInfo: { current: 0 },
   actions: {
     noteCanvasInteraction: () =>
-      set((_) => {
+      set((state) => {
+        state.user.canvasInteractionEventTracker.addEvent();
+        console.log("HERE");
         return {
           user: {
-            lastCanvasInteraction: new Date(),
+            canvasInteractionEventTracker:
+              state.user.canvasInteractionEventTracker,
           },
         };
       }),
@@ -76,8 +80,7 @@ const useAppState = create<IAppState>((set, _) => ({
   },
 }));
 
-export const useLastCanvasInteraction = () =>
-  useAppState((state) => state.user.lastCanvasInteraction);
+export const useUser = () => useAppState((state) => state.user);
 export const usePalette = () => useAppState((state) => state.visual.palette);
 export const useVisualSourceDataX = () =>
   useAppState((state) => state.visualSourceData.x);

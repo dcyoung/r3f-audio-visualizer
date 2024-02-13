@@ -3,9 +3,14 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
+import {
+  CAMERA_CONTROLS_MODE,
+  useCameraControlsContext,
+  useCameraControlsContextSetters,
+} from "@/context/cameraControls";
 import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
-import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
 import { useAppStateActions, usePalette } from "@/lib/appState";
 import {
   AVAILABLE_COLOR_PALETTES,
@@ -83,7 +88,9 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
     useVisualContextSetters();
   const palette = usePalette();
   const { setPalette } = useAppStateActions();
-
+  const { autoOrbitAfterSleepMs } = useCameraControlsContext();
+  const { setMode: setCameraMode, setAutoOrbitAfterSleepMs } =
+    useCameraControlsContextSetters();
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -117,12 +124,27 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
               />
             </div>
             <div className="flex items-center justify-between gap-2">
-              <Label>Follow Music</Label>
+              <Label>Colors Follow Music</Label>
               <Switch
                 disabled={mode !== APPLICATION_MODE.AUDIO}
                 defaultChecked={paletteTrackEnergy}
                 onCheckedChange={(e) => {
                   setPaletteTrackEnergy(e);
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <Label>Auto Orbit Camera</Label>
+              <Switch
+                disabled={!isCameraMode(mode)}
+                defaultChecked={autoOrbitAfterSleepMs > 0}
+                onCheckedChange={(e) => {
+                  setCameraMode(
+                    e
+                      ? CAMERA_CONTROLS_MODE.AUTO_ORBIT
+                      : CAMERA_CONTROLS_MODE.ORBIT_CONTROLS,
+                  );
+                  setAutoOrbitAfterSleepMs(e ? 3500 : 0);
                 }}
               />
             </div>

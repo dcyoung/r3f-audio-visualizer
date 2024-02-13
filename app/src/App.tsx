@@ -6,6 +6,8 @@ import { ControlsPanel } from "@/components/controls/main";
 import { useModeContext } from "@/context/mode";
 import { APPLICATION_MODE, type ApplicationMode } from "@/lib/applicationModes";
 
+import { useAppStateActions } from "./lib/appState";
+
 const getAnalyzerComponent = (mode: ApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO:
@@ -36,9 +38,15 @@ const getCanvasComponent = (mode: ApplicationMode) => {
 
 const App = () => {
   const { mode } = useModeContext();
+  const { noteCanvasInteraction } = useAppStateActions();
+
   return (
     <main className="relative h-[100dvh] w-[100dvw] bg-black">
-      <div className="absolute h-[100dvh] w-[100dvw]">
+      <div
+        className="absolute h-[100dvh] w-[100dvw]"
+        onMouseDown={noteCanvasInteraction}
+        onTouchStart={noteCanvasInteraction}
+      >
         <Suspense fallback={<span>loading...</span>}>
           {getCanvasComponent(mode)}
         </Suspense>

@@ -6,9 +6,11 @@ import WaveformVisual from "@/components/visualizers/visualizerWaveform";
 import {
   CAMERA_CONTROLS_MODE,
   useCameraControlsContext,
+  useCameraControlsContextSetters,
 } from "@/context/cameraControls";
 import { useVisualContext } from "@/context/visual";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { useUser } from "@/lib/appState";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
@@ -61,7 +63,25 @@ const AutoOrbitCameraControls = () => {
 };
 
 const CameraControls = () => {
-  const { mode } = useCameraControlsContext();
+  const { mode, autoOrbitAfterSleepMs } = useCameraControlsContext();
+  const { setMode } = useCameraControlsContextSetters();
+  const { canvasInteractionEventTracker } = useUser();
+
+  useFrame(() => {
+    if (
+      mode === CAMERA_CONTROLS_MODE.ORBIT_CONTROLS &&
+      autoOrbitAfterSleepMs > 0 &&
+      canvasInteractionEventTracker.msSinceLastEvent > autoOrbitAfterSleepMs
+    ) {
+      setMode(CAMERA_CONTROLS_MODE.AUTO_ORBIT);
+    } else if (
+      mode === CAMERA_CONTROLS_MODE.AUTO_ORBIT &&
+      canvasInteractionEventTracker.msSinceLastEvent < autoOrbitAfterSleepMs
+    ) {
+      setMode(CAMERA_CONTROLS_MODE.ORBIT_CONTROLS);
+    }
+  });
+
   switch (mode) {
     case CAMERA_CONTROLS_MODE.ORBIT_CONTROLS:
       return <OrbitControls makeDefault />;

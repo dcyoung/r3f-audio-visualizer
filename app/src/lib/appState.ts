@@ -7,6 +7,9 @@ import {
 } from "./palettes";
 
 interface IAppState {
+  user: {
+    lastCanvasInteraction: Date;
+  };
   visual: {
     palette: ColorPaletteType;
   };
@@ -18,6 +21,7 @@ interface IAppState {
     current: number;
   };
   actions: {
+    noteCanvasInteraction: () => void;
     setPalette: (newPalette: ColorPaletteType) => void;
     nextPalette: () => void;
     resizeVisualSourceData: (newSize: number) => void;
@@ -25,6 +29,9 @@ interface IAppState {
 }
 
 const useAppState = create<IAppState>((set, _) => ({
+  user: {
+    lastCanvasInteraction: new Date(),
+  },
   visual: {
     palette: COLOR_PALETTE.THREE_COOL_TO_WARM,
   },
@@ -34,6 +41,14 @@ const useAppState = create<IAppState>((set, _) => ({
   },
   energyInfo: { current: 0 },
   actions: {
+    noteCanvasInteraction: () =>
+      set((_) => {
+        return {
+          user: {
+            lastCanvasInteraction: new Date(),
+          },
+        };
+      }),
     setPalette: (newPalette: ColorPaletteType) =>
       set((_) => {
         return {
@@ -61,6 +76,8 @@ const useAppState = create<IAppState>((set, _) => ({
   },
 }));
 
+export const useLastCanvasInteraction = () =>
+  useAppState((state) => state.user.lastCanvasInteraction);
 export const usePalette = () => useAppState((state) => state.visual.palette);
 export const useVisualSourceDataX = () =>
   useAppState((state) => state.visualSourceData.x);

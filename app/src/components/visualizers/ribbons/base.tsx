@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
@@ -15,12 +15,14 @@ const BaseRibbons = ({
   ribbonHeight = 10,
   ribbonWidthSegments = 1,
   ribbonHeightSegments = 64,
+  zScale = 2,
 }: {
   coordinateMapper: ICoordinateMapper;
   ribbonWidth?: number;
   ribbonHeight?: number;
   ribbonWidthSegments?: number;
   ribbonHeightSegments?: number;
+  zScale?: number;
 }) => {
   const ribbonRefs = [
     useRef<Mesh>(null!),
@@ -38,26 +40,20 @@ const BaseRibbons = ({
       new Vector3(gridHalfWidth - ribbonWidth * i - ribbonWidth / 2, 0, 0),
   );
   const palette = usePalette();
-  const lut = ColorPalette.getPalette(palette).buildLut();
+  const colorPalette = ColorPalette.getPalette(palette);
+  // const lut = ColorPalette.getPalette(palette).buildLut();
 
   const material = useMemo(() => {
     return (
-      <meshPhysicalMaterial
-        color={lut.getColor(0.25).getHex()}
-        clearcoat={1.0}
-        clearcoatRoughness={0}
-        metalness={0.5}
+      <meshStandardMaterial
+        color={colorPalette.colorsHex[Math.floor(colorPalette.nColors / 2)]}
+        roughness={0.25}
+        metalness={0.25}
         side={DoubleSide}
+        flatShading={false}
       />
     );
-  }, [lut]);
-
-  // Recolor
-  useEffect(() => {
-    if (!lut) {
-      return;
-    }
-  });
+  }, [colorPalette]);
 
   useFrame(({ clock }) => {
     //in ms
@@ -78,13 +74,15 @@ const BaseRibbons = ({
           normX = (ribbonIdx + 0.5) / ribbonCount;
           normY = (h + 0.5) / ribbonHeightSegments;
           vIdx = h * (ribbonWidthSegments + 1) + w;
-          z = coordinateMapper.map(
-            COORDINATE_TYPE.CARTESIAN_2D,
-            normX,
-            normY,
-            0,
-            elapsedTimeSec,
-          );
+          z =
+            zScale *
+            coordinateMapper.map(
+              COORDINATE_TYPE.CARTESIAN_2D,
+              normX,
+              normY,
+              0,
+              elapsedTimeSec,
+            );
 
           positionsBuffer.setZ(vIdx, z * alpha);
         }
@@ -97,6 +95,7 @@ const BaseRibbons = ({
   return (
     <>
       <ambientLight />
+      <pointLight position={[2, 2, 5]} intensity={150} />
       <Plane
         args={[planeSize / 2, planeSize, 1, 1]}
         position={[gridHalfWidth + planeSize / 4, 0, 0]}

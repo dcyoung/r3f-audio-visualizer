@@ -45,7 +45,6 @@ const useAppState = create<IAppState>((set, _) => ({
     noteCanvasInteraction: () =>
       set((state) => {
         state.user.canvasInteractionEventTracker.addEvent();
-        console.log("HERE");
         return {
           user: {
             canvasInteractionEventTracker:

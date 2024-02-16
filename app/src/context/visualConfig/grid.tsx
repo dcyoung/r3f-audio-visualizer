@@ -44,16 +44,16 @@ export const GridVisualConfigContextProvider = ({
     <GridVisualConfigContext.Provider
       value={{
         config: {
-          nCols: nCols,
-          nRows: nRows,
-          unitSideLength: unitSideLength,
-          unitSpacingScalar: unitSpacingScalar,
+          nCols,
+          nRows,
+          unitSideLength,
+          unitSpacingScalar,
         },
         setters: {
-          setNCols: setNCols,
-          setNRows: setNRows,
-          setUnitSideLength: setUnitSideLength,
-          setUnitSpacingScalar: setUnitSpacingScalar,
+          setNCols,
+          setNRows,
+          setUnitSideLength,
+          setUnitSpacingScalar,
           reset: () => {
             setNCols(initial?.nCols ?? 100);
             setNRows(initial?.nRows ?? 100);

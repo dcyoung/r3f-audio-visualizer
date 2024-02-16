@@ -15,7 +15,7 @@ const MultiStrand = (props: BaseDoubleHelixProps) => {
   const strandCount = strandRefs.length;
   const bounds = 15;
 
-  const strandPositions = Array.from({ length: strandCount }).map((x, i) => {
+  const strandPositions = Array.from({ length: strandCount }).map((_, i) => {
     return new Vector3()
       .fromArray(
         Array.from({ length: 3 }).map(

@@ -19,6 +19,7 @@ export const AVAILABLE_VISUALS = [
   "diffusedRing",
   "dna",
   "boxes",
+  "ribbons",
   // "stencil",
   // "swarm",
 ] as const;

@@ -72,6 +72,7 @@ const VisualSettingsControls = () => {
       return SphereVisualSettingsControls();
     case "diffusedRing":
       return DiffusedRingVisualSettingsControls();
+    case "ribbons":
     case "dna":
     case "boxes":
       return null;

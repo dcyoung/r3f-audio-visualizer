@@ -18,6 +18,7 @@ import { CubeVisualConfigContextProvider } from "./visualConfig/cube";
 import { RingVisualConfigContextProvider } from "./visualConfig/diffusedRing";
 import { DnaVisualConfigContextProvider } from "./visualConfig/dna";
 import { GridVisualConfigContextProvider } from "./visualConfig/grid";
+import { RibbonsVisualConfigContextProvider } from "./visualConfig/ribbons";
 import { SphereVisualConfigContextProvider } from "./visualConfig/sphere";
 // import { StencilVisualConfigContextProvider } from "./visualConfig/stencil";
 // import { SwarmVisualConfigContextProvider } from "./visualConfig/swarm";
@@ -109,7 +110,9 @@ export const VisualContextProvider = ({
           <RingVisualConfigContextProvider>
             <DnaVisualConfigContextProvider>
               <SphereVisualConfigContextProvider>
-                {children}
+                <RibbonsVisualConfigContextProvider>
+                  {children}
+                </RibbonsVisualConfigContextProvider>
               </SphereVisualConfigContextProvider>
             </DnaVisualConfigContextProvider>
           </RingVisualConfigContextProvider>

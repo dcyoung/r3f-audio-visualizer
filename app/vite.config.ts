@@ -11,4 +11,5 @@ export default defineConfig({
     },
   },
   base: "/r3f-audio-visualizer/",
+  assetsInclude: ["**/*.glb"],
 });

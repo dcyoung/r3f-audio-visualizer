@@ -1,6 +1,7 @@
 import { type HTMLAttributes } from "react";
 import {
   AVAILABLE_VISUALS,
+  VISUAL,
   type VisualType,
 } from "@/components/visualizers/common";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
@@ -9,8 +10,10 @@ import {
   Boxes,
   CircleDashed,
   Dna,
+  Footprints,
   Globe,
   Grid3x3,
+  HelpCircle,
   Ribbon,
 } from "lucide-react";
 
@@ -18,22 +21,24 @@ import { Dock, DockItem, DockNav } from "./dock";
 
 const VisualIcon = ({ visual }: { visual: VisualType }) => {
   switch (visual) {
-    case "grid":
+    case VISUAL.GRID:
       return <Grid3x3 />;
-    case "cube":
+    case VISUAL.CUBE:
       return <Box />;
-    case "sphere":
+    case VISUAL.SPHERE:
       return <Globe />;
-    case "diffusedRing":
+    case VISUAL.DIFFUSED_RING:
       return <CircleDashed />;
-    case "dna":
+    case VISUAL.DNA:
       return <Dna />;
-    case "boxes":
+    case VISUAL.BOXES:
       return <Boxes />;
-    case "ribbons":
+    case VISUAL.RIBBONS:
       return <Ribbon />;
+    case VISUAL.WALK:
+      return <Footprints />;
     default:
-      return visual satisfies never;
+      return <HelpCircle />;
   }
 };
 

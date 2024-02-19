@@ -26,6 +26,7 @@ export const WaveformModeControls = () => {
       <div className="flex w-full items-center justify-between">
         <Label>Double</Label>
         <Switch
+          checked={waveformFrequenciesHz.length > 1}
           defaultChecked={waveformFrequenciesHz.length > 1}
           onCheckedChange={(e) => {
             setWaveformFrequenciesHz(e ? [2.0, 10.0] : [2.0]);

@@ -2,6 +2,8 @@ import { useVisualContext } from "@/context/visual";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Spherical, type Vector3 } from "three";
 
+import { VISUAL } from "../visualizers/common";
+
 const setFromSphericalZUp = (vec: Vector3, s: Spherical) => {
   const sinPhiRadius = Math.sin(s.phi) * s.radius;
   vec.x = sinPhiRadius * Math.sin(s.theta);
@@ -16,7 +18,7 @@ const useSphericalLimits = () => {
   // theta is the equator angle
   // phi is the polar angle
   switch (visual) {
-    case "ribbons":
+    case VISUAL.RIBBONS:
       return {
         rMin: 10,
         rMax: 15,
@@ -28,7 +30,7 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2.1,
         phiSpeed: 0.25,
       };
-    case "sphere":
+    case VISUAL.SPHERE:
       return {
         rMin: 10,
         rMax: 15,
@@ -40,7 +42,7 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
-    case "cube":
+    case VISUAL.CUBE:
       return {
         rMin: 12,
         rMax: 20,
@@ -52,7 +54,7 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
-    case "diffusedRing":
+    case VISUAL.DIFFUSED_RING:
       return {
         rMin: 10,
         rMax: 18,
@@ -64,9 +66,21 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2.25,
         phiSpeed: 0.25,
       };
-    case "boxes":
-    case "dna":
-    case "grid":
+    case VISUAL.WALK:
+      return {
+        rMin: 15,
+        rMax: 22,
+        rSpeed: 0.1,
+        thetaMin: 0,
+        thetaMax: 2 * Math.PI,
+        thetaSpeed: 0.025,
+        phiMin: Math.PI / 3.5,
+        phiMax: Math.PI / 2.25,
+        phiSpeed: 0.25,
+      };
+    case VISUAL.BOXES:
+    case VISUAL.DNA:
+    case VISUAL.GRID:
       return {
         rMin: 15,
         rMax: 22,

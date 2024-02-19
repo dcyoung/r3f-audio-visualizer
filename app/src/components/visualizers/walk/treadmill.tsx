@@ -38,7 +38,7 @@ export const Treadmill = ({
   stoneHeight?: number;
   stoneLength?: number;
 }) => {
-  const stoneRef = useRef<InstancedMesh>();
+  const stoneRef = useRef<InstancedMesh>(null);
   const [tmpMatrix, tmpVecPosition, tmpQuat, tmpVecScale] = useMemo(
     () => [new Matrix4(), new Vector3(), new Quaternion(), new Vector3()],
     [],

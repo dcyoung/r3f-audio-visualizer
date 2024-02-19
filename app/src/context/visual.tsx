@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   AVAILABLE_VISUALS,
+  VISUAL,
   type VisualType,
 } from "@/components/visualizers/common";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
@@ -62,7 +63,7 @@ export const VisualContextProvider = ({
   useEffect(() => {
     if (mode === APPLICATION_MODE.WAVE_FORM) {
       switch (visual) {
-        case "diffusedRing":
+        case VISUAL.DIFFUSED_RING:
           setWaveformFrequenciesHz([2.0, 10.0]);
           setMaxAmplitude(1.0);
           break;

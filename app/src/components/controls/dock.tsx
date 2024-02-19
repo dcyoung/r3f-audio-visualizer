@@ -51,7 +51,7 @@ export const Dock = ({
   return (
     <div
       className={cn(
-        "max-w-4/5 sm:max-w-3/5 pointer-events-none h-fit overflow-hidden bg-transparent",
+        "pointer-events-none h-fit overflow-hidden bg-transparent",
         className,
       )}
       {...props}

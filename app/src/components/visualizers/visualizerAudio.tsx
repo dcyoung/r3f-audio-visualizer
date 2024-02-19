@@ -1,9 +1,10 @@
-import { lazy, Suspense, useMemo } from "react";
 import { type VisualType } from "@/components/visualizers/common";
 import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import { useEnergyInfo, useVisualSourceDataX } from "@/lib/appState";
 import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
+
+import { Visual } from "./visual";
 
 const AudioVisual = ({ visual }: { visual: VisualType }) => {
   const freqData = useVisualSourceDataX();
@@ -14,22 +15,12 @@ const AudioVisual = ({ visual }: { visual: VisualType }) => {
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);
 
-  const VisualComponent = useMemo(
-    () =>
-      lazy(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        async () => await import(`./${visual}/reactive.tsx`),
-      ),
-    [visual],
-  );
-
   return (
-    <Suspense fallback={null}>
-      <VisualComponent
-        coordinateMapper={coordinateMapper}
-        scalarTracker={energyTracker}
-      />
-    </Suspense>
+    <Visual
+      visual={visual}
+      coordinateMapper={coordinateMapper}
+      scalarTracker={energyTracker}
+    />
   );
 };
 

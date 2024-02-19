@@ -51,7 +51,3 @@ export const clip = (t: number, min = 0, max = 1) => {
 export const lerp = (from: number, to: number, alpha: number) => {
   return from + alpha * (to - from);
 };
-
-console.log(
-  [0, 0.25, 0.5, 0.75, 1].map((t) => easeIn(t, EASING_FUNCTION.PARAMETRIC)),
-);

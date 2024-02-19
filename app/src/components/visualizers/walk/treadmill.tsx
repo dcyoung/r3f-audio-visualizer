@@ -17,24 +17,17 @@ import {
 import { type VisualProps } from "../common";
 
 const curvePoints = [
-  [0, 0],
-  [0.5, 0],
-  [0.6, 0],
-  [0.75, -0.1],
-  [0.9, 0],
-  [1, 0.5],
-  [0.75, 0.75],
-  [0, 1],
-  [-0.75, 0.75],
-  [-1, 0.5],
-  [-0.9, 0],
+  [-1, 1],
   [-0.75, -0.1],
   [-0.6, 0],
-  [-0.5, 0],
+  [0, 0],
+  [0.6, 0],
+  [0.75, -0.1],
+  [1, 1],
 ] as const;
 
 export const Treadmill = ({
-  nStones = 80,
+  nStones = 30,
   stoneWidth = 5,
   stoneHeight = 0.1,
   stoneLength = 1,
@@ -52,10 +45,10 @@ export const Treadmill = ({
   );
 
   const curve = useMemo(() => {
-    const scale = 20.0;
+    const scale = 10.0;
     return new CatmullRomCurve3(
       curvePoints.map((v) => new Vector3(0, v[0], v[1]).multiplyScalar(scale)),
-      true,
+      false,
       "catmullrom",
       0.1,
     );
@@ -81,16 +74,19 @@ export const Treadmill = ({
       return;
     }
     const t = clock.getElapsedTime();
-    // const rateOfChange = 0.5;
-    // const tScale = (Math.sin(rateOfChange * t) + 1) / 2;
-    // const periodSec = 16 * (1 + tScale / 1000);
-    const periodSec = 16;
-    const alphaRaw = (t % periodSec) / periodSec;
+    const speed = 0.025;
+
+    const q = 0.5;
+    // assume v(t) = (sin(q * t) + 1) / 2... integrate to find position
+    const normPosition = (speed * (t - Math.cos(q * t) / q)) % 1;
+
+    const alphaRaw = normPosition;
     const alpha = 1 - easeInOut(alphaRaw, EASING_FUNCTION.LINEAR);
 
     for (let instanceIdx = 0; instanceIdx < nStones; instanceIdx++) {
       const stoneAlpha = (alpha + instanceIdx / nStones) % 1;
-      const widthScalar = 2 * Math.abs(stoneAlpha - 0.5);
+      const widthScalar = 1 - 2 * Math.abs(stoneAlpha - 0.5);
+      // const widthScalar = 1;
 
       const dataAlpha = Math.abs(stoneAlpha - 0.5);
       const mappedWidthScalar =

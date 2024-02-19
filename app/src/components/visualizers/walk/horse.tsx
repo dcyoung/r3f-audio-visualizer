@@ -4,7 +4,7 @@ import { usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { type Group, type Mesh } from "three";
+import { type Group } from "three";
 import { type GLTF } from "three-stdlib";
 
 import MODEL_HORSE from "./horse.png";
@@ -24,8 +24,7 @@ interface GLTFAction extends THREE.AnimationClip {
 }
 
 const Horse = (_: VisualProps) => {
-  const group = useRef<Group>();
-  const meshRef = useRef<Mesh>();
+  const group = useRef<Group>(null);
   const { nodes, animations } = useGLTF(MODEL_HORSE) as GLTFResult;
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
@@ -54,9 +53,6 @@ const Horse = (_: VisualProps) => {
   });
 
   useFrame(({ clock }) => {
-    if (!meshRef.current) {
-      return;
-    }
     const t = clock.getElapsedTime();
 
     const rateOfChange = 0.5;
@@ -73,9 +69,8 @@ const Horse = (_: VisualProps) => {
       dispose={null}
     >
       <group name="AuxScene">
-        <pointLight position={[10, 10, 100]} intensity={100} />
+        <pointLight position={[10, 100, 200]} intensity={100} />
         <mesh
-          ref={meshRef}
           name="mesh_0"
           castShadow
           receiveShadow
@@ -90,6 +85,5 @@ const Horse = (_: VisualProps) => {
     </group>
   );
 };
-// useGLTF.preload(MODEL_HORSE);
 
 export default Horse;

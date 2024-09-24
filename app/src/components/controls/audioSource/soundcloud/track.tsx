@@ -18,7 +18,7 @@ export const TrackCard = ({
   return (
     <div
       className={cn(
-        "flex flex-row items-center justify-start gap-2 hover:scale-110",
+        "flex cursor-pointer flex-row items-center justify-start gap-2 hover:scale-105 hover:bg-slate-500/20",
         className,
       )}
       {...props}
@@ -32,10 +32,13 @@ export const TrackCard = ({
       ) : (
         <Image />
       )}
-      <div className="flex flex-col items-start justify-center gap-1">
+      <div className="flex flex-col items-start justify-center gap-0.5">
         <span className="truncate text-xs text-foreground">{track.title}</span>
         <span className="truncate text-xs text-foreground/50">
-          playcount: {track.playback_count}
+          playcount:{" "}
+          {track.playback_count?.toLocaleString("en-US", {
+            maximumFractionDigits: 0,
+          })}
         </span>
       </div>
     </div>
@@ -56,6 +59,13 @@ export const TrackList = ({
   // const [pageIdx, setPageIndex] = useState(0);
   // const maxPageIdx = Math.ceil(tracks.length / pageSize);
 
+  if (tracks.length === 0) {
+    return (
+      <span className="text-foreground">
+        This artist has no playable tracks.
+      </span>
+    );
+  }
   return (
     <ScrollArea
       className={cn(

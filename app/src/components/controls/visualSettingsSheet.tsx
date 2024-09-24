@@ -98,6 +98,7 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent
+        insertHidden={true}
         side="right"
         className="no-scrollbar w-full max-w-full overflow-scroll bg-background/70 sm:w-[540px] sm:max-w-[540px]"
       >

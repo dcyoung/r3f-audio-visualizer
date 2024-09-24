@@ -11,7 +11,7 @@ export const UserCard = ({
   return (
     <div
       className={cn(
-        "flex w-12 flex-col items-center justify-start gap-1 hover:border hover:border-white aria-selected:animate-pulse aria-selected:border aria-selected:border-white",
+        "flex w-12 shrink-0 flex-col items-center justify-start gap-1 hover:border hover:border-white aria-selected:animate-pulse aria-selected:border aria-selected:border-white",
         className,
       )}
       {...props}

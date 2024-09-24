@@ -33,7 +33,11 @@ const SouncloudUserSearch = ({ query }: { query: string }) => {
         onUserSelected={setUser}
         selectedUserId={user?.id}
       />
-      {user && <UserTrackList userId={user.id} onTrackSelected={setTrack} />}
+      {user && (
+        <Suspense fallback={<span>Loading...</span>}>
+          <UserTrackList userId={user.id} onTrackSelected={setTrack} />
+        </Suspense>
+      )}
     </div>
   );
 };

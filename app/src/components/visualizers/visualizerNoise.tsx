@@ -2,7 +2,7 @@ import { type VisualType } from "@/components/visualizers/common";
 import { useNoiseGeneratorContext } from "@/context/noiseGenerator";
 import { CoordinateMapper_Noise } from "@/lib/mappers/coordinateMappers/noise";
 
-import { Visual } from "./visual";
+import { VisualRegistry } from "./registry";
 
 const NoiseVisual = ({ visual }: { visual: VisualType }) => {
   const { amplitude, spatialScale, timeScale, nIterations } =
@@ -15,7 +15,11 @@ const NoiseVisual = ({ visual }: { visual: VisualType }) => {
     nIterations,
   );
 
-  return <Visual visual={visual} coordinateMapper={coordinateMapper} />;
+  const VisualComponent = VisualRegistry.get(visual)?.ReactiveComponent;
+  if (!VisualComponent) {
+    return null;
+  }
+  return <VisualComponent coordinateMapper={coordinateMapper} />;
 };
 
 export default NoiseVisual;

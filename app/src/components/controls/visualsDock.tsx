@@ -1,7 +1,7 @@
 import { type HTMLAttributes } from "react";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 
-import { VisualRegistry } from "../visualizers/registry";
+import { VISUAL_REGISTRY } from "../visualizers/registry";
 import { Dock, DockItem, DockNav } from "./dock";
 
 export const VisualsDock = ({ ...props }: HTMLAttributes<HTMLDivElement>) => {
@@ -11,7 +11,7 @@ export const VisualsDock = ({ ...props }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <Dock {...props}>
       <DockNav>
-        {VisualRegistry.visuals.map((visual) => (
+        {VISUAL_REGISTRY.visuals.map((visual) => (
           <DockItem
             key={`dock_item_${visual.id}`}
             aria-selected={visual.id === activeVisual}

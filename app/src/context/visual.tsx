@@ -7,11 +7,7 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-import {
-  AVAILABLE_VISUALS,
-  VISUAL,
-  type VisualType,
-} from "@/components/visualizers/common";
+import { type TVisualId } from "@/components/visualizers/registry";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
 
 import { useModeContext } from "./mode";
@@ -26,7 +22,7 @@ import { SphereVisualConfigContextProvider } from "./visualConfig/sphere";
 import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
 interface VisualConfig {
-  visual: VisualType;
+  visual: TVisualId;
   colorBackground: boolean;
   paletteTrackEnergy: boolean;
 }
@@ -34,7 +30,7 @@ interface VisualConfig {
 export const VisualContext = createContext<{
   config: VisualConfig;
   setters: {
-    setVisual: Dispatch<SetStateAction<VisualType>>;
+    setVisual: Dispatch<SetStateAction<TVisualId>>;
     setColorBackground: Dispatch<SetStateAction<boolean>>;
     setPaletteTrackEnergy: Dispatch<SetStateAction<boolean>>;
   };
@@ -47,9 +43,7 @@ export const VisualContextProvider = ({
   initial?: Partial<VisualConfig>;
 }>) => {
   const { mode } = useModeContext();
-  const [visual, setVisual] = useState<VisualType>(
-    initial?.visual ?? AVAILABLE_VISUALS[0],
-  );
+  const [visual, setVisual] = useState<TVisualId>(initial?.visual ?? "grid");
   const [colorBackground, setColorBackground] = useState<boolean>(
     initial?.colorBackground ?? true,
   );
@@ -63,7 +57,7 @@ export const VisualContextProvider = ({
   useEffect(() => {
     if (mode === APPLICATION_MODE.WAVE_FORM) {
       switch (visual) {
-        case VISUAL.DIFFUSED_RING:
+        case "diffusedRing":
           setWaveformFrequenciesHz([2.0, 10.0]);
           setMaxAmplitude(1.0);
           break;

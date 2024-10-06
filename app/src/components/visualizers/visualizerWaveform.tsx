@@ -1,10 +1,10 @@
-import { type VisualType } from "@/components/visualizers/common";
+import { type TVisualId } from "@/components/visualizers/registry";
 import { useWaveGeneratorContext } from "@/context/waveGenerator";
 import { CoordinateMapper_WaveformSuperposition } from "@/lib/mappers/coordinateMappers/waveform";
 
-import { VisualRegistry } from "./registry";
+import { VISUAL_REGISTRY } from "./registry";
 
-const WaveformVisual = ({ visual }: { visual: VisualType }) => {
+const WaveformVisual = ({ visual }: { visual: TVisualId }) => {
   const { maxAmplitude, waveformFrequenciesHz, amplitudeSplitRatio } =
     useWaveGeneratorContext();
 
@@ -14,10 +14,7 @@ const WaveformVisual = ({ visual }: { visual: VisualType }) => {
     amplitudeSplitRatio,
   );
 
-  const VisualComponent = VisualRegistry.get(visual)?.ReactiveComponent;
-  if (!VisualComponent) {
-    return null;
-  }
+  const VisualComponent = VISUAL_REGISTRY.get(visual).ReactiveComponent;
   return <VisualComponent coordinateMapper={coordinateMapper} />;
 };
 

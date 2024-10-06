@@ -12,18 +12,3 @@ export interface MotionVisualProps {
   scalarTracker?: IScalarTracker;
 }
 
-export const VISUAL = {
-  GRID: "grid",
-  SPHERE: "sphere",
-  CUBE: "cube",
-  DIFFUSED_RING: "diffusedRing",
-  DNA: "dna",
-  BOXES: "boxes",
-  RIBBONS: "ribbons",
-  WALK: "walk",
-  // STENCIL: "stencil",
-  // SWARM: "swarm",
-} as const;
-
-export const AVAILABLE_VISUALS = Object.values(VISUAL);
-export type VisualType = (typeof VISUAL)[keyof typeof VISUAL];

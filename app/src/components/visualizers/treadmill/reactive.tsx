@@ -3,7 +3,7 @@ import { type VisualProps } from "@/components/visualizers/common";
 import Horse from "./horse";
 import { Treadmill } from "./treadmill";
 
-const WalkVisual = ({ ...props }: VisualProps) => {
+const TreadmillVisual = ({ ...props }: VisualProps) => {
   return (
     <>
       <Treadmill {...props} />
@@ -12,4 +12,4 @@ const WalkVisual = ({ ...props }: VisualProps) => {
   );
 };
 
-export default WalkVisual;
+export default TreadmillVisual;

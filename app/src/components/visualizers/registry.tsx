@@ -11,166 +11,90 @@ import {
 
 import { type VisualProps } from "./common";
 
-const REGISTRY = {
+export type TVisualId = keyof typeof _REGISTRY;
+
+const LazyVisual = (visual: TVisualId, props: VisualProps) => {
+  const VisualComponent = useMemo(
+    () =>
+      lazy(async () => {
+        switch (visual) {
+          case "grid":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./grid/reactive`);
+          case "cube":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./cube/reactive`);
+          case "sphere":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./sphere/reactive`);
+          case "diffusedRing":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./diffusedRing/reactive`);
+          case "dna":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./dna/reactive`);
+          case "boxes":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./boxes/reactive`);
+          case "ribbons":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./ribbons/reactive`);
+          case "treadmill":
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await import(`./treadmill/reactive`);
+          default:
+            return visual satisfies never;
+        }
+      }),
+    [visual],
+  );
+  return (
+    <Suspense fallback={null}>
+      <VisualComponent {...props} />
+    </Suspense>
+  );
+};
+const _REGISTRY = {
   grid: {
     icon: Grid3x3,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./grid/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("grid", props),
   },
   cube: {
     icon: Boxes,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./cube/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("cube", props),
   },
   sphere: {
     icon: Globe,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./sphere/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("sphere", props),
   },
   diffusedRing: {
     icon: CircleDashed,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./diffusedRing/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) =>
+      LazyVisual("diffusedRing", props),
   },
   dna: {
     icon: Dna,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./dna/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("dna", props),
   },
   boxes: {
     icon: Boxes,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./boxes/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("boxes", props),
   },
   ribbons: {
     icon: Ribbon,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./ribbons/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("ribbons", props),
   },
-  walk: {
+  treadmill: {
     icon: Footprints,
-    ReactiveComponent: (props: VisualProps) => {
-      const VisualComponent = useMemo(
-        () =>
-          lazy(
-            async () =>
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-              await import(`./walk/reactive`),
-          ),
-        [],
-      );
-      return (
-        <Suspense fallback={null}>
-          <VisualComponent {...props} />
-        </Suspense>
-      );
-    },
+    ReactiveComponent: (props: VisualProps) => LazyVisual("treadmill", props),
   },
+  // stencil: {},
+  // swarm: {},
 } as const;
 
-type TVisualId = keyof typeof REGISTRY;
-
-export class VisualRegistry {
+export class VISUAL_REGISTRY {
   public static get visuals() {
-    return Object.entries(REGISTRY).map(([id, other]) => ({
+    return Object.entries(_REGISTRY).map(([id, other]) => ({
       id: id as TVisualId,
       ...other,
     }));
@@ -179,7 +103,7 @@ export class VisualRegistry {
   public static get(id: TVisualId) {
     return {
       id,
-      ...REGISTRY[id],
+      ..._REGISTRY[id],
     };
   }
 }

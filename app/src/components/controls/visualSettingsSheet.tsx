@@ -19,7 +19,6 @@ import {
 } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
 
-import { VISUAL } from "../visualizers/common";
 import { CubeVisualSettingsControls } from "./visual/cube";
 import { DiffusedRingVisualSettingsControls } from "./visual/diffusedRing";
 import { GridVisualSettingsControls } from "./visual/grid";
@@ -65,18 +64,18 @@ const PaletteIcon = ({
 const VisualSettingsControls = () => {
   const { visual } = useVisualContext();
   switch (visual) {
-    case VISUAL.CUBE:
+    case "cube":
       return CubeVisualSettingsControls();
-    case VISUAL.GRID:
+    case "grid":
       return GridVisualSettingsControls();
-    case VISUAL.SPHERE:
+    case "sphere":
       return SphereVisualSettingsControls();
-    case VISUAL.DIFFUSED_RING:
+    case "diffusedRing":
       return DiffusedRingVisualSettingsControls();
-    case VISUAL.RIBBONS:
-    case VISUAL.DNA:
-    case VISUAL.BOXES:
-    case VISUAL.WALK:
+    case "ribbons":
+    case "dna":
+    case "boxes":
+    case "treadmill":
       return null;
     default:
       return visual satisfies never;

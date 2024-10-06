@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import {
   useSphereVisualConfigContext,
   useSphereVisualConfigContextSetters,
-} from "@/context/visualConfig/sphere";
+} from "@/components/visualizers/sphere/config";
 
 import { ValueLabel } from "../mode/common";
 

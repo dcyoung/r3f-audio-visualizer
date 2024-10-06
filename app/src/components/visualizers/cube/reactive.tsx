@@ -1,9 +1,9 @@
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
-import { useCubeVisualConfigContext } from "@/context/visualConfig/cube";
 import { Vector3 } from "three";
 
 import BaseCube from "./base";
+import { useCubeVisualConfigContext } from "./config";
 
 const CubeVisual = ({ coordinateMapper }: VisualProps) => {
   const { nPerSide, unitSideLength, unitSpacingScalar, volume } =

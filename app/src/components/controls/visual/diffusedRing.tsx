@@ -4,9 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import {
-  useRingVisualConfigContext,
-  useRingVisualConfigContextSetters,
-} from "@/context/visualConfig/diffusedRing";
+  useDiffusedRingVisualConfigContext,
+  useDiffusedRingVisualConfigContextSetters,
+} from "@/components/visualizers/diffusedRing/config";
 
 import { ValueLabel } from "../mode/common";
 
@@ -23,9 +23,10 @@ const Presets = [
 ] as const;
 
 export const DiffusedRingVisualSettingsControls = () => {
-  const { radius, pointSize, mirrorEffects } = useRingVisualConfigContext();
+  const { radius, pointSize, mirrorEffects } =
+    useDiffusedRingVisualConfigContext();
   const { setRadius, setPointSize, setMirrorEffects } =
-    useRingVisualConfigContextSetters();
+    useDiffusedRingVisualConfigContextSetters();
   const [preset, setPreset] = useState<(typeof Presets)[number]>(
     Presets.find(
       (p) =>

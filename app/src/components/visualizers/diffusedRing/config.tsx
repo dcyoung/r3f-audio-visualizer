@@ -13,7 +13,7 @@ export interface RingVisualConfig {
   mirrorEffects: boolean;
 }
 
-export const RingVisualConfigContext = createContext<{
+export const DiffusedRingVisualConfigContext = createContext<{
   config: RingVisualConfig;
   setters: {
     setRadius: Dispatch<SetStateAction<number>>;
@@ -22,7 +22,7 @@ export const RingVisualConfigContext = createContext<{
   };
 } | null>(null);
 
-export const RingVisualConfigContextProvider = ({
+export const DiffusedRingVisualConfigContextProvider = ({
   initial = undefined,
   children,
 }: PropsWithChildren<{
@@ -35,7 +35,7 @@ export const RingVisualConfigContextProvider = ({
   );
 
   return (
-    <RingVisualConfigContext.Provider
+    <DiffusedRingVisualConfigContext.Provider
       value={{
         config: {
           radius: radius,
@@ -50,25 +50,25 @@ export const RingVisualConfigContextProvider = ({
       }}
     >
       {children}
-    </RingVisualConfigContext.Provider>
+    </DiffusedRingVisualConfigContext.Provider>
   );
 };
 
-export function useRingVisualConfigContext() {
-  const context = useContext(RingVisualConfigContext);
+export function useDiffusedRingVisualConfigContext() {
+  const context = useContext(DiffusedRingVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useRingVisualConfigContext must be used within a RingVisualConfigContextProvider",
+      "useDiffusedRingVisualConfigContext must be used within a DiffusedRingVisualConfigContextProvider",
     );
   }
   return context.config;
 }
 
-export function useRingVisualConfigContextSetters() {
-  const context = useContext(RingVisualConfigContext);
+export function useDiffusedRingVisualConfigContextSetters() {
+  const context = useContext(DiffusedRingVisualConfigContext);
   if (!context) {
     throw new Error(
-      "useRingVisualConfigContextSetters must be used within a RingVisualConfigContextProvider",
+      "useDiffusedRingVisualConfigContextSetters must be used within a DiffusedRingVisualConfigContextProvider",
     );
   }
   return context.setters;

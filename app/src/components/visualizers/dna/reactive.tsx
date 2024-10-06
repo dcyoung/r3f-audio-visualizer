@@ -1,5 +1,4 @@
 import { type VisualProps } from "@/components/visualizers/common";
-import { useDnaVisualConfigContext } from "@/context/visualConfig/dna";
 import {
   Bloom,
   DepthOfField,
@@ -9,6 +8,7 @@ import {
 } from "@react-three/postprocessing";
 
 import BaseDoubleHelix from "./base";
+import { useDnaVisualConfigContext } from "./config";
 import MultiStrand from "./multi";
 
 const DNAVisual = ({ coordinateMapper }: VisualProps) => {

@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import {
   useGridVisualConfigContext,
   useGridVisualConfigContextSetters,
-} from "@/context/visualConfig/grid";
+} from "@/components/visualizers/grid/config";
 
 import { ValueLabel } from "../mode/common";
 

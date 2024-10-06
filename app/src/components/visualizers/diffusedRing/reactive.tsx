@@ -1,13 +1,14 @@
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
-import { useRingVisualConfigContext } from "@/context/visualConfig/diffusedRing";
 import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
 import { Vector3 } from "three";
 
 import BaseDiffusedRing from "./base";
+import { useDiffusedRingVisualConfigContext } from "./config";
 
 const DiffusedRingVisual = ({ coordinateMapper }: VisualProps) => {
-  const { radius, pointSize, mirrorEffects } = useRingVisualConfigContext();
+  const { radius, pointSize, mirrorEffects } =
+    useDiffusedRingVisualConfigContext();
 
   return (
     <>

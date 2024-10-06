@@ -1,24 +1,21 @@
 import {
   createContext,
+  Fragment,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type Dispatch,
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-import { type TVisualId } from "@/components/visualizers/registry";
+import {
+  VISUAL_REGISTRY,
+  type TVisualId,
+} from "@/components/visualizers/registry";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
 
 import { useModeContext } from "./mode";
-import { CubeVisualConfigContextProvider } from "./visualConfig/cube";
-import { RingVisualConfigContextProvider } from "./visualConfig/diffusedRing";
-import { DnaVisualConfigContextProvider } from "./visualConfig/dna";
-import { GridVisualConfigContextProvider } from "./visualConfig/grid";
-import { RibbonsVisualConfigContextProvider } from "./visualConfig/ribbons";
-import { SphereVisualConfigContextProvider } from "./visualConfig/sphere";
-// import { StencilVisualConfigContextProvider } from "./visualConfig/stencil";
-// import { SwarmVisualConfigContextProvider } from "./visualConfig/swarm";
 import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
 interface VisualConfig {
@@ -85,6 +82,11 @@ export const VisualContextProvider = ({
         return mode satisfies never;
     }
   }, [mode, setPaletteTrackEnergy]);
+
+  const VisualConfigProvider = useMemo(
+    () => VISUAL_REGISTRY.get(visual).config?.provider ?? Fragment,
+    [visual],
+  );
   return (
     <VisualContext.Provider
       value={{
@@ -100,19 +102,7 @@ export const VisualContextProvider = ({
         },
       }}
     >
-      <CubeVisualConfigContextProvider>
-        <GridVisualConfigContextProvider>
-          <RingVisualConfigContextProvider>
-            <DnaVisualConfigContextProvider>
-              <SphereVisualConfigContextProvider>
-                <RibbonsVisualConfigContextProvider>
-                  {children}
-                </RibbonsVisualConfigContextProvider>
-              </SphereVisualConfigContextProvider>
-            </DnaVisualConfigContextProvider>
-          </RingVisualConfigContextProvider>
-        </GridVisualConfigContextProvider>
-      </CubeVisualConfigContextProvider>
+      <VisualConfigProvider>{children}</VisualConfigProvider>
     </VisualContext.Provider>
   );
 };

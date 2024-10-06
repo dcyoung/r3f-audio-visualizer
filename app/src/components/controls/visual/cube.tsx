@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   useCubeVisualConfigContext,
   useCubeVisualConfigContextSetters,
-} from "@/context/visualConfig/cube";
+} from "@/components/visualizers/cube/config";
 
 import { ValueLabel } from "../mode/common";
 

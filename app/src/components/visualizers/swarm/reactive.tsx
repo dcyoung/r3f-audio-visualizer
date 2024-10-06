@@ -1,9 +1,9 @@
 import { type MotionVisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
-import { useSwarmVisualConfigContext } from "@/context/visualConfig/swarm";
 import { Vector3 } from "three";
 
 import BaseSwarm from "./base";
+import { useSwarmVisualConfigContext } from "./config";
 
 const SwarmVisual = ({ motionMapper }: MotionVisualProps) => {
   const { maxDim, pointSize } = useSwarmVisualConfigContext();

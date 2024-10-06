@@ -1,10 +1,8 @@
-import { type TVisualId } from "@/components/visualizers/registry";
+import { type TVisual } from "@/components/visualizers/registry";
 import { useWaveGeneratorContext } from "@/context/waveGenerator";
 import { CoordinateMapper_WaveformSuperposition } from "@/lib/mappers/coordinateMappers/waveform";
 
-import { VISUAL_REGISTRY } from "./registry";
-
-const WaveformVisual = ({ visual }: { visual: TVisualId }) => {
+const WaveformVisual = ({ visual }: { visual: TVisual }) => {
   const { maxAmplitude, waveformFrequenciesHz, amplitudeSplitRatio } =
     useWaveGeneratorContext();
 
@@ -14,8 +12,7 @@ const WaveformVisual = ({ visual }: { visual: TVisualId }) => {
     amplitudeSplitRatio,
   );
 
-  const VisualComponent = VISUAL_REGISTRY.get(visual).ReactiveComponent;
-  return <VisualComponent coordinateMapper={coordinateMapper} />;
+  return <visual.ReactiveComponent coordinateMapper={coordinateMapper} />;
 };
 
 export default WaveformVisual;

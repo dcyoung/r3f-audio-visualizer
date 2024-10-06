@@ -3,9 +3,9 @@ import { useEnergyInfo, useVisualSourceDataX } from "@/lib/appState";
 import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
 import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
 
-import { VISUAL_REGISTRY, type TVisualId } from "./registry";
+import { type TVisual } from "./registry";
 
-const AudioVisual = ({ visual }: { visual: TVisualId }) => {
+const AudioVisual = ({ visual }: { visual: TVisual }) => {
   const freqData = useVisualSourceDataX();
   const energyInfo = useEnergyInfo();
   // TODO: Find a better place to put amplitude settings for this audio visual
@@ -14,9 +14,8 @@ const AudioVisual = ({ visual }: { visual: TVisualId }) => {
   const coordinateMapper = new CoordinateMapper_Data(amplitude, freqData);
   const energyTracker = new EnergyTracker(energyInfo);
 
-  const VisualComponent = VISUAL_REGISTRY.get(visual).ReactiveComponent;
   return (
-    <VisualComponent
+    <visual.ReactiveComponent
       coordinateMapper={coordinateMapper}
       scalarTracker={energyTracker}
     />

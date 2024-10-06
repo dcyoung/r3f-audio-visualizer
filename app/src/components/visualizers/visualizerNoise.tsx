@@ -1,9 +1,9 @@
 import { useNoiseGeneratorContext } from "@/context/noiseGenerator";
 import { CoordinateMapper_Noise } from "@/lib/mappers/coordinateMappers/noise";
 
-import { VISUAL_REGISTRY, type TVisualId } from "./registry";
+import { type TVisual } from "./registry";
 
-const NoiseVisual = ({ visual }: { visual: TVisualId }) => {
+const NoiseVisual = ({ visual }: { visual: TVisual }) => {
   const { amplitude, spatialScale, timeScale, nIterations } =
     useNoiseGeneratorContext();
 
@@ -14,8 +14,7 @@ const NoiseVisual = ({ visual }: { visual: TVisualId }) => {
     nIterations,
   );
 
-  const VisualComponent = VISUAL_REGISTRY.get(visual).ReactiveComponent;
-  return <VisualComponent coordinateMapper={coordinateMapper} />;
+  return <visual.ReactiveComponent coordinateMapper={coordinateMapper} />;
 };
 
 export default NoiseVisual;

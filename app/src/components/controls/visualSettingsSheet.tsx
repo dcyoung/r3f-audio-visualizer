@@ -1,4 +1,9 @@
-import { useState, type HTMLAttributes, type PropsWithChildren } from "react";
+import {
+  Fragment,
+  useState,
+  type HTMLAttributes,
+  type PropsWithChildren,
+} from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -18,11 +23,6 @@ import {
   type ColorPaletteType,
 } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
-
-import { CubeVisualSettingsControls } from "./visual/cube";
-import { DiffusedRingVisualSettingsControls } from "./visual/diffusedRing";
-import { GridVisualSettingsControls } from "./visual/grid";
-import { SphereVisualSettingsControls } from "./visual/sphere";
 
 const PaletteBand = ({
   palette,
@@ -61,31 +61,10 @@ const PaletteIcon = ({
   );
 };
 
-const VisualSettingsControls = () => {
-  const { visual } = useVisualContext();
-  switch (visual) {
-    case "cube":
-      return CubeVisualSettingsControls();
-    case "grid":
-      return GridVisualSettingsControls();
-    case "sphere":
-      return SphereVisualSettingsControls();
-    case "diffusedRing":
-      return DiffusedRingVisualSettingsControls();
-    case "ribbons":
-    case "dna":
-    case "boxes":
-    case "treadmill":
-      return null;
-    default:
-      return visual satisfies never;
-  }
-};
-
 export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
   const { mode } = useModeContext();
-  const { colorBackground, paletteTrackEnergy } = useVisualContext();
+  const { colorBackground, paletteTrackEnergy, visual } = useVisualContext();
   const { setColorBackground, setPaletteTrackEnergy } =
     useVisualContextSetters();
   const palette = usePalette();
@@ -93,6 +72,8 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const { autoOrbitAfterSleepMs } = useCameraControlsContext();
   const { setMode: setCameraMode, setAutoOrbitAfterSleepMs } =
     useCameraControlsContextSetters();
+
+  const VisualControlsComponent = visual.controls ?? Fragment;
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -154,7 +135,7 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
           </div>
           <Separator />
           <div className="space-y-4">
-            <VisualSettingsControls />
+            <VisualControlsComponent />
           </div>
         </div>
       </SheetContent>

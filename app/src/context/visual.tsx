@@ -1,9 +1,9 @@
 import {
   createContext,
   Fragment,
+  useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
   type Dispatch,
   type PropsWithChildren,
@@ -11,6 +11,7 @@ import {
 } from "react";
 import {
   VISUAL_REGISTRY,
+  type TVisual,
   type TVisualId,
 } from "@/components/visualizers/registry";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
@@ -19,7 +20,7 @@ import { useModeContext } from "./mode";
 import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
 interface VisualConfig {
-  visual: TVisualId;
+  visual: TVisual;
   colorBackground: boolean;
   paletteTrackEnergy: boolean;
 }
@@ -27,7 +28,7 @@ interface VisualConfig {
 export const VisualContext = createContext<{
   config: VisualConfig;
   setters: {
-    setVisual: Dispatch<SetStateAction<TVisualId>>;
+    setVisualId: (id: TVisualId) => void;
     setColorBackground: Dispatch<SetStateAction<boolean>>;
     setPaletteTrackEnergy: Dispatch<SetStateAction<boolean>>;
   };
@@ -40,7 +41,15 @@ export const VisualContextProvider = ({
   initial?: Partial<VisualConfig>;
 }>) => {
   const { mode } = useModeContext();
-  const [visual, setVisual] = useState<TVisualId>(initial?.visual ?? "grid");
+  const [visual, setVisual] = useState<TVisual>(
+    initial?.visual ?? VISUAL_REGISTRY.get("grid"),
+  );
+  const setVisualId = useCallback(
+    (id: TVisualId) => {
+      setVisual(VISUAL_REGISTRY.get(id));
+    },
+    [setVisual],
+  );
   const [colorBackground, setColorBackground] = useState<boolean>(
     initial?.colorBackground ?? true,
   );
@@ -53,7 +62,7 @@ export const VisualContextProvider = ({
   // Reset waveform values whenever the visual changes
   useEffect(() => {
     if (mode === APPLICATION_MODE.WAVE_FORM) {
-      switch (visual) {
+      switch (visual.id) {
         case "diffusedRing":
           setWaveformFrequenciesHz([2.0, 10.0]);
           setMaxAmplitude(1.0);
@@ -83,10 +92,7 @@ export const VisualContextProvider = ({
     }
   }, [mode, setPaletteTrackEnergy]);
 
-  const VisualConfigProvider = useMemo(
-    () => VISUAL_REGISTRY.get(visual).config?.provider ?? Fragment,
-    [visual],
-  );
+  const VisualConfigProvider = visual.configProvider ?? Fragment;
   return (
     <VisualContext.Provider
       value={{
@@ -96,7 +102,7 @@ export const VisualContextProvider = ({
           paletteTrackEnergy,
         },
         setters: {
-          setVisual,
+          setVisualId,
           setColorBackground,
           setPaletteTrackEnergy,
         },

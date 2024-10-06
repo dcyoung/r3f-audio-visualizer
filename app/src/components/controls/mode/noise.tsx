@@ -5,7 +5,7 @@ import {
 } from "@/context/noiseGenerator";
 import { RefreshCcw } from "lucide-react";
 
-import { ValueLabel } from "./common";
+import { ValueLabel } from "../common";
 
 export const NoiseGeneratorModeControls = () => {
   const { amplitude, spatialScale, timeScale, nIterations } =

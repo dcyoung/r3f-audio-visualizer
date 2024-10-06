@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
+import { ValueLabel } from "@/components/controls/common";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+
 import {
   useSphereVisualConfigContext,
   useSphereVisualConfigContextSetters,
-} from "@/components/visualizers/sphere/config";
-
-import { ValueLabel } from "../mode/common";
+} from "./config";
 
 const Presets = [
   {

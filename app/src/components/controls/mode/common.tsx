@@ -1,4 +1,4 @@
-import { useMemo, type HTMLAttributes, type HTMLProps } from "react";
+import { useMemo, type HTMLAttributes } from "react";
 import {
   AUDIO_SOURCE,
   getPlatformSupportedAudioSources,
@@ -6,7 +6,6 @@ import {
 } from "@/components/audio/sourceControls/common";
 import { FileUploadControls } from "@/components/controls/audioSource/fileUpload";
 import { SoundcloudControls } from "@/components/controls/audioSource/soundcloud/controls";
-import { Label } from "@/components/ui/label";
 import {
   useAudioSourceContext,
   useAudioSourceContextSetters,
@@ -19,28 +18,6 @@ import {
   ScreenShare,
   type LucideProps,
 } from "lucide-react";
-
-export const ValueLabel = ({
-  label,
-  value,
-  className,
-  ...props
-}: HTMLProps<HTMLDivElement> & {
-  label: string;
-  value: string | number;
-}) => {
-  return (
-    <div
-      className={cn("flex w-full items-center justify-between", className)}
-      {...props}
-    >
-      <Label>{label}</Label>
-      <span className="w-12 px-2 py-0.5 text-right text-sm text-muted-foreground">
-        {value}
-      </span>
-    </div>
-  );
-};
 
 const AudioSourceIcon = ({
   audioSource,

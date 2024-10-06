@@ -15,7 +15,7 @@ const useSphericalLimits = () => {
   // r     is the Radius
   // theta is the equator angle
   // phi is the polar angle
-  switch (visual) {
+  switch (visual.id) {
     case "ribbons":
       return {
         rMin: 10,
@@ -91,7 +91,7 @@ const useSphericalLimits = () => {
         phiSpeed: 0.25,
       };
     default:
-      return visual satisfies never;
+      return visual.id satisfies never;
   }
 };
 

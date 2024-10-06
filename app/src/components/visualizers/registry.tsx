@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo } from "react";
 import {
+  Box,
   Boxes,
   CircleDashed,
   Dna,
@@ -10,38 +11,19 @@ import {
 } from "lucide-react";
 
 import { type VisualProps } from "./common";
-import {
-  CubeVisualConfigContextProvider,
-  useCubeVisualConfigContext,
-  useCubeVisualConfigContextSetters,
-} from "./cube/config";
-import {
-  DiffusedRingVisualConfigContextProvider,
-  useDiffusedRingVisualConfigContext,
-} from "./diffusedRing/config";
-import {
-  DnaVisualConfigContextProvider,
-  useDnaVisualConfigContext,
-  useDnaVisualConfigContextSetters,
-} from "./dna/config";
-import {
-  GridVisualConfigContextProvider,
-  useGridVisualConfigContext,
-  useGridVisualConfigContextSetters,
-} from "./grid/config";
-import {
-  RibbonsVisualConfigContextProvider,
-  useRibbonsVisualConfigContext,
-  useRibbonsVisualConfigContextSetters,
-} from "./ribbons/config";
-import {
-  SphereVisualConfigContextProvider,
-  useSphereVisualConfigContext,
-  useSphereVisualConfigContextSetters,
-} from "./sphere/config";
+import { CubeVisualConfigContextProvider } from "./cube/config";
+import { CubeVisualSettingsControls } from "./cube/controls";
+import { DiffusedRingVisualConfigContextProvider } from "./diffusedRing/config";
+import { DiffusedRingVisualSettingsControls } from "./diffusedRing/controls";
+import { DnaVisualConfigContextProvider } from "./dna/config";
+import { GridVisualConfigContextProvider } from "./grid/config";
+import { GridVisualSettingsControls } from "./grid/controls";
+import { RibbonsVisualConfigContextProvider } from "./ribbons/config";
+import { SphereVisualConfigContextProvider } from "./sphere/config";
+import { SphereVisualSettingsControls } from "./sphere/sphere";
 
 export type TVisualId = keyof typeof _REGISTRY;
-
+export type TVisual = ReturnType<typeof VISUAL_REGISTRY.get>;
 const LazyVisual = (visual: TVisualId, props: VisualProps) => {
   const VisualComponent = useMemo(
     () =>
@@ -87,67 +69,51 @@ const _REGISTRY = {
   grid: {
     icon: Grid3x3,
     ReactiveComponent: (props: VisualProps) => LazyVisual("grid", props),
-    config: {
-      provider: GridVisualConfigContextProvider,
-      useConfig: useGridVisualConfigContext,
-      useConfigSetters: useGridVisualConfigContextSetters,
-    },
+    configProvider: GridVisualConfigContextProvider,
+    controls: GridVisualSettingsControls,
   },
   cube: {
-    icon: Boxes,
+    icon: Box,
     ReactiveComponent: (props: VisualProps) => LazyVisual("cube", props),
-    config: {
-      provider: CubeVisualConfigContextProvider,
-      useConfig: useCubeVisualConfigContext,
-      useConfigSetters: useCubeVisualConfigContextSetters,
-    },
+    configProvider: CubeVisualConfigContextProvider,
+    controls: CubeVisualSettingsControls,
   },
   sphere: {
     icon: Globe,
     ReactiveComponent: (props: VisualProps) => LazyVisual("sphere", props),
-    config: {
-      provider: SphereVisualConfigContextProvider,
-      useConfig: useSphereVisualConfigContext,
-      useConfigSetters: useSphereVisualConfigContextSetters,
-    },
+    configProvider: SphereVisualConfigContextProvider,
+    controls: SphereVisualSettingsControls,
   },
   diffusedRing: {
     icon: CircleDashed,
     ReactiveComponent: (props: VisualProps) =>
       LazyVisual("diffusedRing", props),
-    config: {
-      provider: DiffusedRingVisualConfigContextProvider,
-      useConfig: useDiffusedRingVisualConfigContext,
-      useConfigSetters: useDiffusedRingVisualConfigContext,
-    },
+    configProvider: DiffusedRingVisualConfigContextProvider,
+    controls: DiffusedRingVisualSettingsControls,
   },
   dna: {
     icon: Dna,
     ReactiveComponent: (props: VisualProps) => LazyVisual("dna", props),
-    config: {
-      provider: DnaVisualConfigContextProvider,
-      useConfig: useDnaVisualConfigContext,
-      useConfigSetters: useDnaVisualConfigContextSetters,
-    },
+    configProvider: DnaVisualConfigContextProvider,
+    controls: null,
   },
   boxes: {
     icon: Boxes,
     ReactiveComponent: (props: VisualProps) => LazyVisual("boxes", props),
-    config: null,
+    configProvider: null,
+    controls: null,
   },
   ribbons: {
     icon: Ribbon,
     ReactiveComponent: (props: VisualProps) => LazyVisual("ribbons", props),
-    config: {
-      provider: RibbonsVisualConfigContextProvider,
-      useConfig: useRibbonsVisualConfigContext,
-      useConfigSetters: useRibbonsVisualConfigContextSetters,
-    },
+    configProvider: RibbonsVisualConfigContextProvider,
+    controls: null,
   },
   treadmill: {
     icon: Footprints,
     ReactiveComponent: (props: VisualProps) => LazyVisual("treadmill", props),
-    config: null,
+    configProvider: null,
+    controls: null,
   },
   // stencil: {},
   // swarm: {},

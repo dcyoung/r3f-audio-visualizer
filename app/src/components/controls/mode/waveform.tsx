@@ -7,7 +7,7 @@ import {
 } from "@/context/waveGenerator";
 import { RefreshCcw } from "lucide-react";
 
-import { ValueLabel } from "./common";
+import { ValueLabel } from "../common";
 
 export const WaveformModeControls = () => {
   const { maxAmplitude, waveformFrequenciesHz } = useWaveGeneratorContext();

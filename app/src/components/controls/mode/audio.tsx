@@ -18,7 +18,8 @@ import {
   type OctaveBandMode,
 } from "@/lib/analyzers/fft";
 
-import { AudioSourceControls, AudioSourceSelect, ValueLabel } from "./common";
+import { ValueLabel } from "../common";
+import { AudioSourceControls, AudioSourceSelect } from "./common";
 
 const FFTAnalyzerControls = () => {
   const { amplitude, octaveBandMode, energyMeasure } = useFFTAnalyzerContext();

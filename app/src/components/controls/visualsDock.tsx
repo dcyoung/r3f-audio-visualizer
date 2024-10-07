@@ -11,7 +11,7 @@ export const VisualsDock = ({ ...props }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <Dock {...props}>
       <DockNav>
-        {VISUAL_REGISTRY.visuals.map((visual) => (
+        {Object.values(VISUAL_REGISTRY).map((visual) => (
           <DockItem
             key={`dock_item_${visual.id}`}
             aria-selected={visual === activeVisual}

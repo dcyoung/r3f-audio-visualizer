@@ -76,7 +76,7 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2.25,
         phiSpeed: 0.25,
       };
-    case "boxes":
+    case "movingBoxes":
     case "dna":
     case "grid":
       return {
@@ -91,7 +91,7 @@ const useSphericalLimits = () => {
         phiSpeed: 0.25,
       };
     default:
-      return visual.id satisfies never;
+      return visual satisfies never;
   }
 };
 

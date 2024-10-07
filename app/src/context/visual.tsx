@@ -1,6 +1,5 @@
 import {
   createContext,
-  Fragment,
   useCallback,
   useContext,
   useEffect,
@@ -42,11 +41,11 @@ export const VisualContextProvider = ({
 }>) => {
   const { mode } = useModeContext();
   const [visual, setVisual] = useState<TVisual>(
-    initial?.visual ?? VISUAL_REGISTRY.get("grid"),
+    initial?.visual ?? VISUAL_REGISTRY.grid,
   );
   const setVisualId = useCallback(
     (id: TVisualId) => {
-      setVisual(VISUAL_REGISTRY.get(id));
+      setVisual(VISUAL_REGISTRY[id]);
     },
     [setVisual],
   );
@@ -92,7 +91,6 @@ export const VisualContextProvider = ({
     }
   }, [mode, setPaletteTrackEnergy]);
 
-  const VisualConfigProvider = visual.configProvider ?? Fragment;
   return (
     <VisualContext.Provider
       value={{
@@ -108,7 +106,7 @@ export const VisualContextProvider = ({
         },
       }}
     >
-      <VisualConfigProvider>{children}</VisualConfigProvider>
+      {children}
     </VisualContext.Provider>
   );
 };

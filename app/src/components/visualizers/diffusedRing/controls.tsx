@@ -5,10 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
-import {
-  useDiffusedRingVisualConfigContext,
-  useDiffusedRingVisualConfigContextSetters,
-} from "./config";
+import { useActions, useVisualParams } from "./reactive";
 
 const Presets = [
   {
@@ -22,11 +19,10 @@ const Presets = [
   },
 ] as const;
 
-export const DiffusedRingVisualSettingsControls = () => {
-  const { radius, pointSize, mirrorEffects } =
-    useDiffusedRingVisualConfigContext();
-  const { setRadius, setPointSize, setMirrorEffects } =
-    useDiffusedRingVisualConfigContextSetters();
+export default () => {
+  const { radius, pointSize, mirrorEffects } = useVisualParams();
+  const { setVisualParams } = useActions();
+
   const [preset, setPreset] = useState<(typeof Presets)[number]>(
     Presets.find(
       (p) =>
@@ -41,10 +37,8 @@ export const DiffusedRingVisualSettingsControls = () => {
     if (preset.name === "custom") {
       return;
     }
-    setRadius(preset.radius);
-    setPointSize(preset.pointSize);
-    setMirrorEffects(preset.mirrorEffects);
-  }, [preset, setRadius, setPointSize, setMirrorEffects]);
+    setVisualParams(preset);
+  }, [preset, setVisualParams]);
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
@@ -71,7 +65,7 @@ export const DiffusedRingVisualSettingsControls = () => {
             min={0.25}
             max={3}
             step={0.25}
-            onValueChange={(e) => setRadius(e[0])}
+            onValueChange={(e) => setVisualParams({ radius: e[0] })}
           />
           <ValueLabel label="Point Size" value={pointSize.toFixed(2)} />
           <Slider
@@ -80,14 +74,14 @@ export const DiffusedRingVisualSettingsControls = () => {
             min={0.01}
             max={0.25}
             step={0.01}
-            onValueChange={(e) => setPointSize(e[0])}
+            onValueChange={(e) => setVisualParams({ pointSize: e[0] })}
           />
           <div className="flex w-full items-center justify-between">
             <Label>Mirror Effects</Label>
             <Switch
               defaultChecked={mirrorEffects}
               onCheckedChange={(e) => {
-                setMirrorEffects(e);
+                setVisualParams({ mirrorEffects: e });
               }}
             />
           </div>

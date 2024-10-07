@@ -5,16 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
-import {
-  useCubeVisualConfigContext,
-  useCubeVisualConfigContextSetters,
-} from "./config";
+import { useActions, useVisualParams } from "./reactive";
 
 const Presets = [
   {
     name: "default",
     nPerSide: 10,
-    unitSpacingScalar: 0.1,
+    cubeSpacingScalar: 0.1,
     volume: true,
   },
   {
@@ -22,17 +19,16 @@ const Presets = [
   },
 ] as const;
 
-export const CubeVisualSettingsControls = () => {
-  const { nPerSide, unitSpacingScalar, volume } = useCubeVisualConfigContext();
-  const { setNPerSide, setUnitSpacingScalar, setVolume } =
-    useCubeVisualConfigContextSetters();
+export default () => {
+  const { nPerSide, cubeSpacingScalar, volume } = useVisualParams();
+  const { setVisualParams } = useActions();
   const [preset, setPreset] = useState<(typeof Presets)[number]>(
     Presets.find(
       (p) =>
         p.name !== "custom" &&
         p.nPerSide === nPerSide &&
         p.volume === volume &&
-        p.unitSpacingScalar === unitSpacingScalar,
+        p.cubeSpacingScalar === cubeSpacingScalar,
     ) ?? Presets[0],
   );
 
@@ -40,10 +36,9 @@ export const CubeVisualSettingsControls = () => {
     if (preset.name === "custom") {
       return;
     }
-    setNPerSide(preset.nPerSide);
-    setUnitSpacingScalar(preset.unitSpacingScalar);
-    setVolume(preset.volume);
-  }, [preset, setNPerSide, setUnitSpacingScalar, setVolume]);
+    const { name, ...presetParams } = preset;
+    setVisualParams(presetParams);
+  }, [preset, setVisualParams]);
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
@@ -70,26 +65,26 @@ export const CubeVisualSettingsControls = () => {
             min={3}
             max={20}
             step={1}
-            onValueChange={(e) => setNPerSide(e[0])}
+            onValueChange={(e) => setVisualParams({ nPerSide: e[0] })}
           />
           <ValueLabel
             label="Cube Spacing"
-            value={unitSpacingScalar.toFixed(2)}
+            value={cubeSpacingScalar.toFixed(2)}
           />
           <Slider
-            defaultValue={[unitSpacingScalar]}
-            value={[unitSpacingScalar]}
+            defaultValue={[cubeSpacingScalar]}
+            value={[cubeSpacingScalar]}
             min={0}
             max={0.5}
             step={0.1}
-            onValueChange={(e) => setUnitSpacingScalar(e[0])}
+            onValueChange={(e) => setVisualParams({ cubeSpacingScalar: e[0] })}
           />
           <div className="flex w-full items-center justify-between">
             <Label>Volume</Label>
             <Switch
               defaultChecked={volume}
               onCheckedChange={(e) => {
-                setVolume(e);
+                setVisualParams({ volume: e });
               }}
             />
           </div>

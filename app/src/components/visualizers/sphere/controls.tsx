@@ -4,10 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-import {
-  useSphereVisualConfigContext,
-  useSphereVisualConfigContextSetters,
-} from "./config";
+import { useActions, useVisualParams } from "./reactive";
 
 const Presets = [
   {
@@ -20,9 +17,9 @@ const Presets = [
   },
 ] as const;
 
-export const SphereVisualSettingsControls = () => {
-  const { radius, nPoints } = useSphereVisualConfigContext();
-  const { setRadius, setNPoints } = useSphereVisualConfigContextSetters();
+export default () => {
+  const { radius, nPoints } = useVisualParams();
+  const { setVisualParams } = useActions();
   const [preset, setPreset] = useState<(typeof Presets)[number]>(
     Presets.find(
       (p) =>
@@ -34,9 +31,8 @@ export const SphereVisualSettingsControls = () => {
     if (preset.name === "custom") {
       return;
     }
-    setRadius(preset.radius);
-    setNPoints(preset.nPoints);
-  }, [preset, setRadius, setNPoints]);
+    setVisualParams(preset);
+  }, [preset, setVisualParams]);
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
@@ -63,7 +59,7 @@ export const SphereVisualSettingsControls = () => {
             min={100}
             max={2000}
             step={25}
-            onValueChange={(e) => setNPoints(e[0])}
+            onValueChange={(e) => setVisualParams({ nPoints: e[0] })}
           />
 
           <ValueLabel label="Radius" value={radius.toFixed(2)} />
@@ -73,7 +69,7 @@ export const SphereVisualSettingsControls = () => {
             min={0.25}
             max={3}
             step={0.25}
-            onValueChange={(e) => setRadius(e[0])}
+            onValueChange={(e) => setVisualParams({ radius: e[0] })}
           />
         </>
       )}

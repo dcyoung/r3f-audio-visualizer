@@ -1,29 +1,39 @@
+import { type ComponentPropsWithoutRef } from "react";
 import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
 import { Vector3 } from "three";
 
-import BaseCube from "./base";
-import { useCubeVisualConfigContext } from "./config";
+import { createVisualConfigStore } from "../storeHelpers";
+import BaseVisual from "./base";
+
+export type TConfig = Required<
+  Omit<ComponentPropsWithoutRef<typeof BaseVisual>, "coordinateMapper">
+>;
+
+export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
+  {
+    nPerSide: 10,
+    cubeSideLength: 0.5,
+    cubeSpacingScalar: 0.1,
+    volume: true,
+  },
+);
 
 const CubeVisual = ({ coordinateMapper }: VisualProps) => {
-  const { nPerSide, unitSideLength, unitSpacingScalar, volume } =
-    useCubeVisualConfigContext();
+  const params = useVisualParams();
 
   return (
     <>
-      <BaseCube
-        coordinateMapper={coordinateMapper}
-        nPerSide={nPerSide}
-        cubeSideLength={unitSideLength}
-        cubeSpacingScalar={unitSpacingScalar}
-        volume={volume}
-      />
+      <BaseVisual coordinateMapper={coordinateMapper} {...params} />
       <Ground
         position={
           new Vector3(
             0,
             0,
-            -0.75 * nPerSide * (1 + unitSpacingScalar) * unitSideLength,
+            -0.75 *
+              params.nPerSide *
+              (1 + params.cubeSpacingScalar) *
+              params.cubeSideLength,
           )
         }
       />

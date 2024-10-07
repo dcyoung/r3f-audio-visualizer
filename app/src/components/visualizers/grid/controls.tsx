@@ -4,50 +4,46 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-import {
-  useGridVisualConfigContext,
-  useGridVisualConfigContextSetters,
-} from "./config";
+import { useActions, useVisualParams } from "./reactive";
 
 const Presets = [
   {
     name: "default",
-    nRows: 100,
-    nCols: 100,
-    unitSpacingScalar: 5,
+    nGridCols: 100,
+    nGridRows: 100,
+    cubeSpacingScalar: 5,
   },
   {
     name: "bands",
-    nRows: 5,
-    nCols: 200,
-    unitSpacingScalar: 1,
+    nGridRows: 5,
+    nGridCols: 200,
+    cubeSpacingScalar: 1,
   },
   {
     name: "custom",
   },
 ] as const;
 
-export const GridVisualSettingsControls = () => {
-  const { nCols, nRows, unitSpacingScalar } = useGridVisualConfigContext();
-  const { setNCols, setNRows, setUnitSpacingScalar } =
-    useGridVisualConfigContextSetters();
+export default () => {
+  const { nGridCols, nGridRows, cubeSpacingScalar } = useVisualParams();
+  const { setVisualParams } = useActions();
+  // TODO: Genericize
   const [preset, setPreset] = useState<(typeof Presets)[number]>(
     Presets.find(
       (p) =>
         p.name !== "custom" &&
-        p.nRows === nRows &&
-        p.nCols === nCols &&
-        p.unitSpacingScalar === unitSpacingScalar,
+        p.nGridRows === nGridRows &&
+        p.nGridCols === nGridCols &&
+        p.cubeSpacingScalar === cubeSpacingScalar,
     ) ?? Presets[0],
   );
   useEffect(() => {
     if (preset.name === "custom") {
       return;
     }
-    setNRows(preset.nRows);
-    setNCols(preset.nCols);
-    setUnitSpacingScalar(preset.unitSpacingScalar);
-  }, [preset, setNCols, setNRows, setUnitSpacingScalar]);
+    const { name, ...presetParams } = preset;
+    setVisualParams(presetParams);
+  }, [preset, setVisualParams]);
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
@@ -67,35 +63,35 @@ export const GridVisualSettingsControls = () => {
       </div>
       {preset.name === "custom" && (
         <>
-          <ValueLabel label="N x Rows" value={nRows} />
+          <ValueLabel label="N x Rows" value={nGridRows} />
           <Slider
-            defaultValue={[nRows]}
-            value={[nRows]}
+            defaultValue={[nGridRows]}
+            value={[nGridRows]}
             min={5}
             max={200}
             step={5}
-            onValueChange={(e) => setNRows(e[0])}
+            onValueChange={(e) => setVisualParams({ nGridRows: e[0] })}
           />
-          <ValueLabel label="N x Cols" value={nCols} />
+          <ValueLabel label="N x Cols" value={nGridCols} />
           <Slider
-            defaultValue={[nCols]}
-            value={[nCols]}
+            defaultValue={[nGridCols]}
+            value={[nGridCols]}
             min={5}
             max={200}
             step={5}
-            onValueChange={(e) => setNCols(e[0])}
+            onValueChange={(e) => setVisualParams({ nGridCols: e[0] })}
           />
           <ValueLabel
             label="Grid Spacing"
-            value={unitSpacingScalar.toFixed(2)}
+            value={cubeSpacingScalar.toFixed(2)}
           />
           <Slider
-            defaultValue={[unitSpacingScalar]}
-            value={[unitSpacingScalar]}
+            defaultValue={[cubeSpacingScalar]}
+            value={[cubeSpacingScalar]}
             min={1}
             max={6}
             step={0.5}
-            onValueChange={(e) => setUnitSpacingScalar(e[0])}
+            onValueChange={(e) => setVisualParams({ cubeSpacingScalar: e[0] })}
           />
         </>
       )}

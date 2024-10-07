@@ -2,12 +2,10 @@ import { type VisualProps } from "@/components/visualizers/common";
 
 import BaseRibbons from "./base";
 
-const RibbonsVisual = ({ coordinateMapper }: VisualProps) => {
+export default ({ coordinateMapper }: VisualProps) => {
   return (
     <>
       <BaseRibbons coordinateMapper={coordinateMapper} />
     </>
   );
 };
-
-export default RibbonsVisual;

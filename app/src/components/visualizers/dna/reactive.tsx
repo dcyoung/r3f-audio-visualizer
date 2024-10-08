@@ -17,15 +17,17 @@ export type TConfig = { multi: boolean } & Required<
 
 export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
   {
-    multi: true,
-    helixLength: 50,
-    helixRadius: 1,
-    helixWindingSeparation: 10,
-    strandRadius: 0.1,
-    baseSpacing: 0.35,
-    strandOffsetRad: Math.PI / 2,
-    mirrorEffects: true,
-    fixedBaseGap: false,
+    default: {
+      multi: true,
+      helixLength: 50,
+      helixRadius: 1,
+      helixWindingSeparation: 10,
+      strandRadius: 0.1,
+      baseSpacing: 0.35,
+      strandOffsetRad: Math.PI / 2,
+      mirrorEffects: true,
+      fixedBaseGap: false,
+    },
   },
 );
 

@@ -1,56 +1,32 @@
-import { useEffect, useState } from "react";
 import { ValueLabel } from "@/components/controls/common";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-import { useActions, useVisualParams } from "./reactive";
-
-const Presets = [
-  {
-    name: "default",
-    radius: 2,
-    nPoints: 800,
-  },
-  {
-    name: "custom",
-  },
-] as const;
+import { useActions, usePresets, useVisualParams } from "./reactive";
 
 export default () => {
   const { radius, nPoints } = useVisualParams();
-  const { setVisualParams } = useActions();
-  const [preset, setPreset] = useState<(typeof Presets)[number]>(
-    Presets.find(
-      (p) =>
-        p.name !== "custom" && p.nPoints === nPoints && p.radius === radius,
-    ) ?? Presets[0],
-  );
-
-  useEffect(() => {
-    if (preset.name === "custom") {
-      return;
-    }
-    setVisualParams(preset);
-  }, [preset, setVisualParams]);
+  const { setVisualParams, setPreset } = useActions();
+  const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
       <Label>Sphere Presets</Label>
       <div className="flex w-full items-center justify-start gap-2">
-        {Presets.map((p) => (
+        {[...Object.keys(presetOptions), "custom"].map((p) => (
           <Button
-            key={`sphere_preset_${p.name}`}
+            key={`po_${p}`}
             variant="ghost"
-            aria-selected={p === preset}
+            aria-selected={activePreset === p}
             className="p-2 aria-selected:bg-primary/20"
-            onClick={() => setPreset(p)}
+            onClick={() => setPreset(p === "custom" ? undefined : p)}
           >
-            {p.name}
+            {p}
           </Button>
         ))}
       </div>
-      {preset.name === "custom" && (
+      {!activePreset && (
         <>
           <ValueLabel label="Point Count" value={nPoints} />
           <Slider

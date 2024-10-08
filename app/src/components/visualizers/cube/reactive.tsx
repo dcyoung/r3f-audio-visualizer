@@ -10,14 +10,15 @@ export type TConfig = Required<
   Omit<ComponentPropsWithoutRef<typeof BaseVisual>, "coordinateMapper">
 >;
 
-export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
-  {
-    nPerSide: 10,
-    cubeSideLength: 0.5,
-    cubeSpacingScalar: 0.1,
-    volume: true,
-  },
-);
+export const { useVisualParams, useActions, usePresets } =
+  createVisualConfigStore<TConfig>({
+    default: {
+      nPerSide: 10,
+      cubeSideLength: 0.5,
+      cubeSpacingScalar: 0.1,
+      volume: true,
+    },
+  });
 
 const CubeVisual = ({ coordinateMapper }: VisualProps) => {
   const params = useVisualParams();

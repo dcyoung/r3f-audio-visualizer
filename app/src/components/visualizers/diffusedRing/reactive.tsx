@@ -11,14 +11,15 @@ export type TConfig = Required<
   Omit<ComponentPropsWithoutRef<typeof BaseVisual>, "coordinateMapper">
 >;
 
-export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
-  {
-    radius: 2,
-    nPoints: 1000,
-    pointSize: 0.2,
-    mirrorEffects: false,
-  },
-);
+export const { useVisualParams, useActions, usePresets } =
+  createVisualConfigStore<TConfig>({
+    default: {
+      radius: 2,
+      nPoints: 1000,
+      pointSize: 0.2,
+      mirrorEffects: false,
+    },
+  });
 
 const DiffusedRingVisual = ({ coordinateMapper }: VisualProps) => {
   const params = useVisualParams();

@@ -1,67 +1,32 @@
-import { useEffect, useState } from "react";
 import { ValueLabel } from "@/components/controls/common";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-import { useActions, useVisualParams } from "./reactive";
-
-const Presets = [
-  {
-    name: "default",
-    nGridCols: 100,
-    nGridRows: 100,
-    cubeSpacingScalar: 5,
-  },
-  {
-    name: "bands",
-    nGridRows: 5,
-    nGridCols: 200,
-    cubeSpacingScalar: 1,
-  },
-  {
-    name: "custom",
-  },
-] as const;
+import { useActions, usePresets, useVisualParams } from "./reactive";
 
 export default () => {
   const { nGridCols, nGridRows, cubeSpacingScalar } = useVisualParams();
-  const { setVisualParams } = useActions();
-  // TODO: Genericize
-  const [preset, setPreset] = useState<(typeof Presets)[number]>(
-    Presets.find(
-      (p) =>
-        p.name !== "custom" &&
-        p.nGridRows === nGridRows &&
-        p.nGridCols === nGridCols &&
-        p.cubeSpacingScalar === cubeSpacingScalar,
-    ) ?? Presets[0],
-  );
-  useEffect(() => {
-    if (preset.name === "custom") {
-      return;
-    }
-    const { name: _, ...presetParams } = preset;
-    setVisualParams(presetParams);
-  }, [preset, setVisualParams]);
+  const { setVisualParams, setPreset } = useActions();
+  const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
       <Label>Grid Presets</Label>
       <div className="flex w-full items-center justify-start gap-2">
-        {Presets.map((p) => (
+        {[...Object.keys(presetOptions), "custom"].map((p) => (
           <Button
-            key={`grid_preset_${p.name}`}
+            key={`po_${p}`}
             variant="ghost"
-            aria-selected={p === preset}
+            aria-selected={activePreset === p}
             className="p-2 aria-selected:bg-primary/20"
-            onClick={() => setPreset(p)}
+            onClick={() => setPreset(p === "custom" ? undefined : p)}
           >
-            {p.name}
+            {p}
           </Button>
         ))}
       </div>
-      {preset.name === "custom" && (
+      {!activePreset && (
         <>
           <ValueLabel label="N x Rows" value={nGridRows} />
           <Slider

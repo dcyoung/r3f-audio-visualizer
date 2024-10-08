@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo } from "react";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { Globe } from "lucide-react";
+import { Shell } from "lucide-react";
 
 import { type TVisualProps } from "../models";
 
@@ -20,30 +20,10 @@ const ReactiveComponent = (props: TVisualProps) => {
   );
 };
 
-const ControlsComponent = () => {
-  const ControlsComponent = useMemo(
-    () =>
-      lazy(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        async () => await import(`./controls`),
-      ),
-    [],
-  );
-  return (
-    <Suspense fallback={null}>
-      <ControlsComponent />
-    </Suspense>
-  );
-};
-
 export default {
-  id: "sphere",
-  icon: Globe,
+  id: "scope",
+  icon: Shell,
   ReactiveComponent,
-  ControlsComponent,
-  supportedApplicationModes: [
-    APPLICATION_MODE.WAVE_FORM,
-    APPLICATION_MODE.NOISE,
-    APPLICATION_MODE.AUDIO,
-  ],
+  ControlsComponent: null,
+  supportedApplicationModes: [APPLICATION_MODE.AUDIO_SCOPE],
 } as const;

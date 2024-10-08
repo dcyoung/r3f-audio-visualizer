@@ -9,6 +9,8 @@ type TRegistry = {
   [APPLICATION_MODE.AUDIO]: CoordinateMapper_Data;
   [APPLICATION_MODE.WAVE_FORM]: CoordinateMapper_WaveformSuperposition;
   [APPLICATION_MODE.NOISE]: CoordinateMapper_Noise;
+  [APPLICATION_MODE.AUDIO_SCOPE]: ICoordinateMapper;
+  [APPLICATION_MODE.PARTICLE_NOISE]: ICoordinateMapper;
 };
 export class CoordinateMapper_Modal implements ICoordinateMapper {
   private _registry: TRegistry;
@@ -29,6 +31,8 @@ export class CoordinateMapper_Modal implements ICoordinateMapper {
         1.0,
         new Float32Array(121).fill(0),
       ),
+      [APPLICATION_MODE.AUDIO_SCOPE]: { amplitude: 0, map: () => 0 },
+      [APPLICATION_MODE.PARTICLE_NOISE]: { amplitude: 0, map: () => 0 },
     };
     this._activeMode = initialMode;
   }

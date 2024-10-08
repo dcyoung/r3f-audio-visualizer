@@ -1,4 +1,7 @@
-import { type VisualProps } from "@/components/visualizers/models";
+import {
+  type TOmitVisualProps,
+  type TVisualProps,
+} from "@/components/visualizers/models";
 import {
   Bloom,
   DepthOfField,
@@ -14,9 +17,9 @@ import {
   type BaseDoubleHelixProps,
 } from "./base";
 
-export type TConfig = { multi: boolean } & Required<
-  Omit<BaseDoubleHelixProps, "coordinateMapper">
->;
+export type TConfig = Required<TOmitVisualProps<BaseDoubleHelixProps>> & {
+  multi: boolean;
+};
 
 export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
   {
@@ -34,7 +37,7 @@ export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
   },
 );
 
-const DNAVisual = ({ coordinateMapper }: VisualProps) => {
+const DNAVisual = ({ coordinateMapper }: TVisualProps) => {
   const { multi, ...params } = useVisualParams();
   // const {
   //   multi,
@@ -75,7 +78,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps) => {
   );
 };
 
-export default (props: VisualProps) => {
+export default (props: TVisualProps) => {
   return (
     <>
       <DNAVisual {...props} />

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
+import { AudioScopeModeControls } from "./mode/audioScope";
 // import { AudioScopeModeControls } from "./mode/audioScope";
 import { NoiseGeneratorModeControls } from "./mode/noise";
 import { WaveformModeControls } from "./mode/waveform";
@@ -111,7 +112,7 @@ export const ModeSheet = ({ children }: PropsWithChildren) => {
         {mode === APPLICATION_MODE.WAVE_FORM && <WaveformModeControls />}
         {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
         {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
-        {/* {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />} */}
+        {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
       </SheetContent>
     </Sheet>
   );

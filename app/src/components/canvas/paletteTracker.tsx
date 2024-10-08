@@ -28,5 +28,7 @@ const PaletteUpdater = ({
 
 export const PaletteTracker = () => {
   const energyTracker = useEnergyTracker();
-  return <PaletteUpdater scalarTracker={energyTracker} />;
+  return energyTracker ? (
+    <PaletteUpdater scalarTracker={energyTracker} />
+  ) : null;
 };

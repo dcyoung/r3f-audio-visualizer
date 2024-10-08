@@ -3,7 +3,7 @@ import { type IMotionMapper } from "@/lib/mappers/motionMappers/common";
 import { useFrame } from "@react-three/fiber";
 import { Vector3, type Points } from "three";
 
-const BaseGrid = ({
+export default ({
   motionMapper,
   maxPoints = 1000,
   pointSize = 0.2,
@@ -70,5 +70,3 @@ const BaseGrid = ({
     </points>
   );
 };
-
-export default BaseGrid;

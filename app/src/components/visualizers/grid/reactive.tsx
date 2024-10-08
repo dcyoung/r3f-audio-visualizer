@@ -1,13 +1,16 @@
 import { type ComponentPropsWithoutRef } from "react";
 import Ground from "@/components/visualizers/ground";
-import { type VisualProps } from "@/components/visualizers/models";
+import {
+  type TOmitVisualProps,
+  type TVisualProps,
+} from "@/components/visualizers/models";
 import { Vector3 } from "three";
 
 import { createVisualConfigStore } from "../storeHelpers";
 import BaseVisual from "./base";
 
 export type TConfig = Required<
-  Omit<ComponentPropsWithoutRef<typeof BaseVisual>, "coordinateMapper">
+  TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
 >;
 
 export const { useVisualParams, useActions, usePresets } =
@@ -26,7 +29,7 @@ export const { useVisualParams, useActions, usePresets } =
     },
   });
 
-const GridVisual = ({ coordinateMapper }: VisualProps) => {
+const GridVisual = ({ coordinateMapper }: TVisualProps) => {
   const params = useVisualParams();
   return (
     <>

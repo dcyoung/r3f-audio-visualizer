@@ -32,7 +32,7 @@ const getCanvasComponent = (mode: TApplicationMode) => {
     case APPLICATION_MODE.NOISE:
     case APPLICATION_MODE.AUDIO:
     case APPLICATION_MODE.PARTICLE_NOISE:
-      return <Visual3DCanvas mode={mode} />;
+      return <Visual3DCanvas />;
     default:
       return mode satisfies never;
   }

@@ -1,9 +1,10 @@
 import { lazy, Suspense, useMemo } from "react";
+import { APPLICATION_MODE } from "@/lib/applicationModes";
 import { Box } from "lucide-react";
 
-import { type VisualProps } from "../models";
+import { type TVisualProps } from "../models";
 
-const ReactiveComponent = (props: VisualProps) => {
+const ReactiveComponent = (props: TVisualProps) => {
   const VisualComponent = useMemo(
     () =>
       lazy(
@@ -40,4 +41,9 @@ export default {
   icon: Box,
   ReactiveComponent,
   ControlsComponent,
+  supportedApplicationModes: [
+    APPLICATION_MODE.WAVE_FORM,
+    APPLICATION_MODE.NOISE,
+    APPLICATION_MODE.AUDIO,
+  ],
 } as const;

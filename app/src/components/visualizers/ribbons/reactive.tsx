@@ -1,8 +1,8 @@
-import { type VisualProps } from "@/components/visualizers/models";
+import { type TVisualProps } from "@/components/visualizers/models";
 
 import BaseRibbons from "./base";
 
-export default ({ coordinateMapper }: VisualProps) => {
+export default ({ coordinateMapper }: TVisualProps) => {
   return (
     <>
       <BaseRibbons coordinateMapper={coordinateMapper} />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { type VisualProps } from "@/components/visualizers/models";
+import { type TVisualProps } from "@/components/visualizers/models";
 import { usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 import { useAnimations, useGLTF } from "@react-three/drei";
@@ -23,7 +23,7 @@ interface GLTFAction extends THREE.AnimationClip {
   name: ActionName;
 }
 
-const Horse = (_: VisualProps) => {
+const Horse = (_: TVisualProps) => {
   const group = useRef<Group>(null);
   const { nodes, animations } = useGLTF(MODEL_HORSE) as GLTFResult;
   const palette = usePalette();

@@ -90,6 +90,20 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
+    case "swarm":
+      return {
+        rMin: 10,
+        rMax: 15,
+        rSpeed: 0.1,
+        thetaMin: 0,
+        thetaMax: 2 * Math.PI,
+        thetaSpeed: 0.025,
+        phiMin: Math.PI / 3,
+        phiMax: Math.PI / 2,
+        phiSpeed: 0.25,
+      };
+    case "scope":
+      return null;
     default:
       return visual satisfies never;
   }
@@ -100,20 +114,24 @@ export const AutoOrbitCameraControls = () => {
   // r     is the Radius
   // theta is the equator angle
   // phi is the polar angle
-  const {
-    rMin,
-    rMax,
-    rSpeed,
-    thetaMin,
-    thetaMax,
-    thetaSpeed,
-    phiMin,
-    phiMax,
-    phiSpeed,
-  } = useSphericalLimits();
+  const limits = useSphericalLimits();
   const target = new Spherical();
 
   useFrame(({ clock }) => {
+    if (!limits) {
+      return;
+    }
+    const {
+      rMin,
+      rMax,
+      rSpeed,
+      thetaMin,
+      thetaMax,
+      thetaSpeed,
+      phiMin,
+      phiMax,
+      phiSpeed,
+    } = limits;
     const t = clock.elapsedTime;
 
     const rAlpha = 0.5 * (1 + Math.sin(t * rSpeed));

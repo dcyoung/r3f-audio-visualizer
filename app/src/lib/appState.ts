@@ -1,22 +1,18 @@
-import { TextureMapper } from "@/components/visualizers/audioScope/base";
 import { create } from "zustand";
 
-import { APPLICATION_MODE } from "./applicationModes";
+import { APPLICATION_MODE, type TApplicationMode } from "./applicationModes";
 import { EventDetector } from "./eventDetector";
 import { CoordinateMapper_Data } from "./mappers/coordinateMappers/data";
 import { CoordinateMapper_Modal } from "./mappers/coordinateMappers/modal";
-import { type IScalarTracker } from "./mappers/valueTracker/common";
+import { type IMotionMapper } from "./mappers/motionMappers/common";
+import { MotionMapper_Noise } from "./mappers/motionMappers/curlNoise";
+import { TextureMapper } from "./mappers/textureMappers/textureMapper";
 import { EnergyTracker } from "./mappers/valueTracker/energyTracker";
 import {
   AVAILABLE_COLOR_PALETTES,
   COLOR_PALETTE,
   type ColorPaletteType,
 } from "./palettes";
-
-type TApplicationMode =
-  | typeof APPLICATION_MODE.WAVE_FORM
-  | typeof APPLICATION_MODE.NOISE
-  | typeof APPLICATION_MODE.AUDIO;
 
 interface IAppState {
   user: {
@@ -28,8 +24,9 @@ interface IAppState {
   mode: TApplicationMode;
   mappers: {
     textureMapper: TextureMapper;
+    motionMapper: IMotionMapper;
     coordinateMapper: CoordinateMapper_Modal;
-    energyTracker: IScalarTracker | null;
+    energyTracker: EnergyTracker | null;
   };
   actions: {
     setMode: (newMode: TApplicationMode) => void;
@@ -55,6 +52,7 @@ const useAppState = create<IAppState>((set) => ({
     ),
     coordinateMapper: new CoordinateMapper_Modal(),
     energyTracker: new EnergyTracker(0),
+    motionMapper: new MotionMapper_Noise(2.0, 0.5),
   },
   actions: {
     noteCanvasInteraction: () =>
@@ -110,21 +108,18 @@ const useAppState = create<IAppState>((set) => ({
           },
         };
       }),
-    // setCoordinateMapper: (newMapper: ICoordinateMapper) =>
-    //   set((state) => {
-    //     state.drivers.coordinateMapper.set(newMapper);
-    //     return {};
-    //   }),
   },
 }));
 
 export const useMode = () => useAppState((state) => state.mode);
 export const useUser = () => useAppState((state) => state.user);
 export const usePalette = () => useAppState((state) => state.visual.palette);
+export const useMotionMapper = () =>
+  useAppState((state) => state.mappers.motionMapper);
 export const useTextureMapper = () =>
   useAppState((state) => state.mappers.textureMapper);
 export const useCoordinateMapper = () =>
   useAppState((state) => state.mappers.coordinateMapper);
 export const useEnergyTracker = () =>
-  useAppState((state) => state.mappers.energyTracker);
+  useAppState((state) => state.mappers.energyTracker ?? undefined);
 export const useAppStateActions = () => useAppState((state) => state.actions);

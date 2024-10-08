@@ -29,9 +29,9 @@ export const getPlatformSupportedApplicationModes = () => {
     APPLICATION_MODE.NOISE,
     APPLICATION_MODE.AUDIO,
     /* Disabled until bugs can be resolved */
-    // APPLICATION_MODE.AUDIO_SCOPE,
+    APPLICATION_MODE.AUDIO_SCOPE,
     /* Disabled until IMotionMappers & ICoordinateMappers are more compatible */
-    // APPLICATION_MODE.PARTICLE_NOISE,
+    APPLICATION_MODE.PARTICLE_NOISE,
   ];
 };
 

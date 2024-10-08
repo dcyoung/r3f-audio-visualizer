@@ -14,7 +14,7 @@ import {
   type InstancedMesh,
 } from "three";
 
-import { type VisualProps } from "../models";
+import { type TVisualProps } from "../models";
 
 const curvePoints = [
   [-1, 1],
@@ -32,7 +32,7 @@ export const Treadmill = ({
   stoneHeight = 0.1,
   stoneLength = 1,
   coordinateMapper,
-}: VisualProps & {
+}: TVisualProps & {
   nStones?: number;
   stoneWidth?: number;
   stoneHeight?: number;

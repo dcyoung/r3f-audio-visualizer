@@ -1,10 +1,10 @@
 import Ground from "@/components/visualizers/ground";
-import { type VisualProps } from "@/components/visualizers/models";
+import { type TVisualProps } from "@/components/visualizers/models";
 import { Vector3 } from "three";
 
 import BaseVisual from "./base";
 
-export default ({ scalarTracker }: VisualProps) => {
+export default ({ scalarTracker }: TVisualProps) => {
   const nBoxes = 200;
   const gridSize = 100;
   const cellSize = 1;
@@ -14,7 +14,7 @@ export default ({ scalarTracker }: VisualProps) => {
       <BaseVisual
         scalarTracker={
           scalarTracker ?? {
-            getNormalizedValue: () => Math.sin(0.0025 * Date.now()) + 1,
+            get: () => Math.sin(0.0025 * Date.now()) + 1,
           }
         }
         nBoxes={nBoxes}

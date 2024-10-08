@@ -32,7 +32,7 @@ export const FFTAnalyzerControls = ({
       return;
     }
 
-    energyTracker.set(analyzer.getEnergy(energyMeasure));
+    energyTracker?.set(analyzer.getEnergy(energyMeasure));
 
     bars.forEach(({ value }, index) => {
       freqData[index] = value;

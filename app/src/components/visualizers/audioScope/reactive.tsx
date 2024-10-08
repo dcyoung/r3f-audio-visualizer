@@ -3,9 +3,10 @@ import { useVisualContextSetters } from "@/context/visual";
 import { useAppStateActions, usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 
-import BaseScopeVisual, { type TextureMapper } from "./base";
+import { type TVisualProps } from "../models";
+import BaseScopeVisual from "./base";
 
-const ScopeVisual = ({ textureMapper }: { textureMapper: TextureMapper }) => {
+const ScopeVisual = ({ textureMapper }: TVisualProps) => {
   const palette = usePalette();
   const { setPalette } = useAppStateActions();
   const { setColorBackground } = useVisualContextSetters();

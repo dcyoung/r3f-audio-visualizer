@@ -1,9 +1,4 @@
-import {
-  Fragment,
-  useState,
-  type HTMLAttributes,
-  type PropsWithChildren,
-} from "react";
+import { useState, type HTMLAttributes, type PropsWithChildren } from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -73,7 +68,6 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const { setMode: setCameraMode, setAutoOrbitAfterSleepMs } =
     useCameraControlsContextSetters();
 
-  const VisualControlsComponent = visual.controls ?? Fragment;
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -135,7 +129,7 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
           </div>
           <Separator />
           <div className="space-y-4">
-            <VisualControlsComponent />
+            {visual.ControlsComponent && <visual.ControlsComponent />}
           </div>
         </div>
       </SheetContent>

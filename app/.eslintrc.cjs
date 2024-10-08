@@ -43,6 +43,7 @@ const config = {
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/heading-has-content": "off",
     "react/no-unknown-property": "off",
+    "react/display-name": "off",
   },
   globals: {
     React: "writable",

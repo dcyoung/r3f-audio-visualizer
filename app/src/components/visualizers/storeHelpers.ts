@@ -18,7 +18,7 @@ export function createVisualConfigStore<T>(defaults: T) {
           };
         }),
       reset: () =>
-        set((state) => {
+        set(() => {
           return {
             visualParams: { ...defaults },
           };

@@ -36,7 +36,7 @@ export default () => {
     if (preset.name === "custom") {
       return;
     }
-    const { name, ...presetParams } = preset;
+    const { name: _, ...presetParams } = preset;
     setVisualParams(presetParams);
   }, [preset, setVisualParams]);
 

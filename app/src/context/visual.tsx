@@ -14,8 +14,8 @@ import {
   type TVisualId,
 } from "@/components/visualizers/registry";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { useMode } from "@/lib/appState";
 
-import { useModeContext } from "./mode";
 import { useWaveGeneratorContextSetters } from "./waveGenerator";
 
 interface VisualConfig {
@@ -39,7 +39,7 @@ export const VisualContextProvider = ({
 }: PropsWithChildren<{
   initial?: Partial<VisualConfig>;
 }>) => {
-  const { mode } = useModeContext();
+  const mode = useMode();
   const [visual, setVisual] = useState<TVisual>(
     initial?.visual ?? VISUAL_REGISTRY.grid,
   );
@@ -79,8 +79,8 @@ export const VisualContextProvider = ({
     switch (mode) {
       case APPLICATION_MODE.WAVE_FORM:
       case APPLICATION_MODE.NOISE:
-      case APPLICATION_MODE.AUDIO_SCOPE:
-      case APPLICATION_MODE.PARTICLE_NOISE:
+        // case APPLICATION_MODE.AUDIO_SCOPE:
+        // case APPLICATION_MODE.PARTICLE_NOISE:
         setPaletteTrackEnergy(false);
         break;
       case APPLICATION_MODE.AUDIO:

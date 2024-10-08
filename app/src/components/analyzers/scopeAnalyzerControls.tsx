@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
 import type ScopeAnalyzer from "@/lib/analyzers/scope";
-import {
-  useAppStateActions,
-  useVisualSourceDataX,
-  useVisualSourceDataY,
-} from "@/lib/appState";
+import { useAppStateActions, useTextureMapper } from "@/lib/appState";
 
 export const AudioScopeAnalyzerControls = ({
   analyzer,
 }: {
   analyzer: ScopeAnalyzer;
 }) => {
-  const timeData = useVisualSourceDataX();
-  const quadData = useVisualSourceDataY();
+  const textureMapper = useTextureMapper();
+
+  const timeData = textureMapper.samplesX;
+  const quadData = textureMapper.samplesY;
   const { resizeVisualSourceData } = useAppStateActions();
   const animationRequestRef = useRef<number>(null!);
 

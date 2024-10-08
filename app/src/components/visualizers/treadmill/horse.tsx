@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { type VisualProps } from "@/components/visualizers/common";
+import { type VisualProps } from "@/components/visualizers/models";
 import { usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 import { useAnimations, useGLTF } from "@react-three/drei";

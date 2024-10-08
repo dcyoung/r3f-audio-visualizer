@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import type FFTAnalyzer from "@/lib/analyzers/fft";
+import { APPLICATION_MODE } from "@/lib/applicationModes";
 import {
   useAppStateActions,
-  useEnergyInfo,
-  useVisualSourceDataX,
+  useCoordinateMapper,
+  useEnergyTracker,
 } from "@/lib/appState";
 
 export const FFTAnalyzerControls = ({
@@ -13,8 +14,9 @@ export const FFTAnalyzerControls = ({
   analyzer: FFTAnalyzer;
 }) => {
   const { octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
-  const freqData = useVisualSourceDataX();
-  const energyInfo = useEnergyInfo();
+  const coordinateMapper = useCoordinateMapper();
+  const freqData = coordinateMapper.get(APPLICATION_MODE.AUDIO).data;
+  const energyTracker = useEnergyTracker();
   const { resizeVisualSourceData } = useAppStateActions();
   const animationRequestRef = useRef<number>(null!);
 
@@ -30,12 +32,18 @@ export const FFTAnalyzerControls = ({
       return;
     }
 
-    energyInfo.current = analyzer.getEnergy(energyMeasure);
+    energyTracker.set(analyzer.getEnergy(energyMeasure));
 
     bars.forEach(({ value }, index) => {
       freqData[index] = value;
     });
-  }, [freqData, analyzer, resizeVisualSourceData, energyInfo, energyMeasure]);
+  }, [
+    freqData,
+    analyzer,
+    resizeVisualSourceData,
+    energyTracker,
+    energyMeasure,
+  ]);
 
   /**
    * Re-Synchronize the animation loop if the target data destination changes.

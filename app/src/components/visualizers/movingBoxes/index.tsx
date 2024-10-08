@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from "react";
 import { Boxes } from "lucide-react";
 
-import { type VisualProps } from "../common";
+import { type VisualProps } from "../models";
 
 const ReactiveComponent = (props: VisualProps) => {
   const VisualComponent = useMemo(

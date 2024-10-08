@@ -1,13 +1,12 @@
 import VisualsDock from "@/components/controls/visualsDock";
 import { Switch } from "@/components/ui/switch";
 import { useModeContext, useModeContextSetters } from "@/context/mode";
-import { APPLICATION_MODE } from "@/lib/applicationModes";
 import { cn } from "@/lib/utils";
 
 import SettingsDock from "./settingsDock";
 
 export const ControlsPanel = () => {
-  const { mode, showUI } = useModeContext();
+  const { showUI } = useModeContext();
   const { setShowUI } = useModeContextSetters();
   return (
     <>
@@ -23,9 +22,7 @@ export const ControlsPanel = () => {
       </div>
       {showUI && (
         <div className="pointer-events-none absolute bottom-0 flex w-full items-end justify-center gap-4 p-4">
-          {mode !== APPLICATION_MODE.AUDIO_SCOPE && (
-            <VisualsDock className="sm:max-w-[60%]" />
-          )}
+          <VisualsDock className="sm:max-w-[60%]" />
           <div
             className={cn({
               "absolute bottom-24 right-0 sm:static sm:bottom-0": true,

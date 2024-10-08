@@ -62,7 +62,7 @@ const BaseBoxes = ({
   }, [lut, nBoxes]);
 
   useFrame(() => {
-    if (detector.step(scalarTracker?.getNormalizedValue() ?? 0)) {
+    if (detector.step(scalarTracker?.get() ?? 0)) {
       // random jitter in one direction or the other
       const [rowJitter, colJitter] =
         Math.random() > 0.5 ? [true, false] : [false, true];

@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef } from "react";
-import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
+import { type VisualProps } from "@/components/visualizers/models";
 import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
 import { Vector3 } from "three";
 
@@ -32,7 +32,7 @@ const DiffusedRingVisual = ({ coordinateMapper }: VisualProps) => {
   );
 };
 
-const ComposeDiffusedRingVisual = (props: VisualProps) => {
+export default (props: VisualProps) => {
   return (
     <>
       <DiffusedRingVisual {...props} />
@@ -43,5 +43,3 @@ const ComposeDiffusedRingVisual = (props: VisualProps) => {
     </>
   );
 };
-
-export default ComposeDiffusedRingVisual;

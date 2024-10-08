@@ -14,7 +14,7 @@ import {
   type InstancedMesh,
 } from "three";
 
-import { type VisualProps } from "../common";
+import { type VisualProps } from "../models";
 
 const curvePoints = [
   [-1, 1],

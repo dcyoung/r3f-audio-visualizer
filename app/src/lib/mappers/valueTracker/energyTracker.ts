@@ -1,12 +1,17 @@
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 
 export class EnergyTracker implements IScalarTracker {
-  private readonly _energyInfo: { current: number };
+  private _energyInfo: number;
 
-  constructor(energyInfo: { current: number }) {
+  constructor(energyInfo: number) {
     this._energyInfo = energyInfo;
   }
-  public getNormalizedValue(): number {
-    return this._energyInfo.current;
+
+  public set(value: number): void {
+    this._energyInfo = value;
+  }
+
+  public get(): number {
+    return this._energyInfo;
   }
 }

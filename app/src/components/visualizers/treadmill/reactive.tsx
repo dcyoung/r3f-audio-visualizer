@@ -1,4 +1,4 @@
-import { type VisualProps } from "@/components/visualizers/common";
+import { type VisualProps } from "@/components/visualizers/models";
 
 import Horse from "./horse";
 import { Treadmill } from "./treadmill";

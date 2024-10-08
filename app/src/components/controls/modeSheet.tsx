@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useModeContext, useModeContextSetters } from "@/context/mode";
 import {
   APPLICATION_MODE,
   getPlatformSupportedApplicationModes,
   isAudioMode,
-  type ApplicationMode,
+  type TApplicationMode,
 } from "@/lib/applicationModes";
+import { useAppStateActions, useMode } from "@/lib/appState";
 import {
   AudioWaveform,
   Drum,
@@ -25,28 +25,28 @@ import {
 } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
-import { AudioScopeModeControls } from "./mode/audioScope";
+// import { AudioScopeModeControls } from "./mode/audioScope";
 import { NoiseGeneratorModeControls } from "./mode/noise";
 import { WaveformModeControls } from "./mode/waveform";
 
-const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
+const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
   switch (mode) {
-    case "WAVE_FORM":
+    case APPLICATION_MODE.WAVE_FORM:
       return <AudioWaveform />;
-    case "NOISE":
+    case APPLICATION_MODE.NOISE:
       return <Waves />;
-    case "AUDIO":
+    case APPLICATION_MODE.AUDIO:
       return <Music />;
-    case "AUDIO_SCOPE":
+    case APPLICATION_MODE.AUDIO_SCOPE:
       return <Shell />;
-    case "PARTICLE_NOISE":
+    case APPLICATION_MODE.PARTICLE_NOISE:
       return <Drum />;
     default:
       return <HelpCircle />;
     // return mode satisfies never;
   }
 };
-const ModeSelectEntry = ({ mode }: { mode: ApplicationMode }) => {
+const ModeSelectEntry = ({ mode }: { mode: TApplicationMode }) => {
   return (
     <div className="flex w-full items-center justify-start gap-2">
       <div className="w-4">{isAudioMode(mode) && "🎧"}</div>
@@ -57,8 +57,8 @@ const ModeSelectEntry = ({ mode }: { mode: ApplicationMode }) => {
 };
 
 const ModeSelector = () => {
-  const { mode } = useModeContext();
-  const { setMode } = useModeContextSetters();
+  const mode = useMode();
+  const { setMode } = useAppStateActions();
 
   const availableModes = useMemo(() => {
     return getPlatformSupportedApplicationModes();
@@ -67,7 +67,7 @@ const ModeSelector = () => {
   return (
     <Select
       onValueChange={(v) => {
-        setMode(v as ApplicationMode);
+        setMode(v as (typeof availableModes)[number]);
       }}
     >
       <SelectTrigger>
@@ -94,8 +94,7 @@ const ModeSelector = () => {
 
 export const ModeSheet = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
-  const { mode } = useModeContext();
-
+  const mode = useMode();
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -112,7 +111,7 @@ export const ModeSheet = ({ children }: PropsWithChildren) => {
         {mode === APPLICATION_MODE.WAVE_FORM && <WaveformModeControls />}
         {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
         {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
-        {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
+        {/* {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />} */}
       </SheetContent>
     </Sheet>
   );

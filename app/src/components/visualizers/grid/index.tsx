@@ -1,8 +1,7 @@
 import { lazy, Suspense, useMemo } from "react";
 import { Grid3x3 } from "lucide-react";
 
-import { type VisualProps } from "../common";
-import ControlsComponent from "./controls";
+import { type VisualProps } from "../models";
 
 const ReactiveComponent = (props: VisualProps) => {
   const VisualComponent = useMemo(
@@ -16,6 +15,22 @@ const ReactiveComponent = (props: VisualProps) => {
   return (
     <Suspense fallback={null}>
       <VisualComponent {...props} />
+    </Suspense>
+  );
+};
+
+const ControlsComponent = () => {
+  const ControlsComponent = useMemo(
+    () =>
+      lazy(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        async () => await import(`./controls`),
+      ),
+    [],
+  );
+  return (
+    <Suspense fallback={null}>
+      <ControlsComponent />
     </Suspense>
   );
 };

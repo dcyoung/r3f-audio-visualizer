@@ -1,8 +1,6 @@
 import { BackgroundFog, CanvasBackground } from "@/components/canvas/common";
-import AudioVisual from "@/components/visualizers/visualizerAudio";
-import NoiseVisual from "@/components/visualizers/visualizerNoise";
+import ModalVisual from "@/components/visualizers/visualizerModal";
 import ParticleNoiseVisual from "@/components/visualizers/visualizerParticleNoise";
-import WaveformVisual from "@/components/visualizers/visualizerWaveform";
 import {
   CAMERA_CONTROLS_MODE,
   useCameraControlsContext,
@@ -25,13 +23,11 @@ const VisualizerComponent = ({
   const { visual } = useVisualContext();
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
-      return <WaveformVisual visual={visual} />;
     case APPLICATION_MODE.NOISE:
-      return <NoiseVisual visual={visual} />;
+    case APPLICATION_MODE.AUDIO:
+      return <ModalVisual visual={visual} />;
     case APPLICATION_MODE.PARTICLE_NOISE:
       return <ParticleNoiseVisual />;
-    case APPLICATION_MODE.AUDIO:
-      return <AudioVisual visual={visual} />;
     default:
       return mode satisfies never;
   }

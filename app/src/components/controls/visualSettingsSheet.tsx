@@ -8,10 +8,9 @@ import {
   useCameraControlsContext,
   useCameraControlsContextSetters,
 } from "@/context/cameraControls";
-import { useModeContext } from "@/context/mode";
 import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
-import { useAppStateActions, usePalette } from "@/lib/appState";
+import { useAppStateActions, useMode, usePalette } from "@/lib/appState";
 import {
   AVAILABLE_COLOR_PALETTES,
   ColorPalette,
@@ -58,7 +57,7 @@ const PaletteIcon = ({
 
 export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
-  const { mode } = useModeContext();
+  const mode = useMode();
   const { colorBackground, paletteTrackEnergy, visual } = useVisualContext();
   const { setColorBackground, setPaletteTrackEnergy } =
     useVisualContextSetters();

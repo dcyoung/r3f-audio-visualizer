@@ -2,5 +2,6 @@
  * Tracks scalar values
  */
 export interface IScalarTracker {
-  getNormalizedValue(): number;
+  set(value: number): void;
+  get(): number;
 }

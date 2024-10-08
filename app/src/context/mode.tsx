@@ -6,34 +6,28 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-import { APPLICATION_MODE, type ApplicationMode } from "@/lib/applicationModes";
 
 export interface ModeConfig {
-  mode: ApplicationMode;
   showUI: boolean;
 }
 
 export const ModeContext = createContext<{
   config: ModeConfig;
   setters: {
-    setMode: Dispatch<SetStateAction<ApplicationMode>>;
     setShowUI: Dispatch<SetStateAction<boolean>>;
   };
 } | null>(null);
 
 export const ModeContextProvider = ({ children }: PropsWithChildren) => {
-  const [mode, setMode] = useState<ApplicationMode>(APPLICATION_MODE.WAVE_FORM);
   const [showUI, setShowUI] = useState<boolean>(true);
 
   return (
     <ModeContext.Provider
       value={{
         config: {
-          mode,
           showUI,
         },
         setters: {
-          setMode,
           setShowUI,
         },
       }}

@@ -1,5 +1,5 @@
-import { type MotionVisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
+import { type MotionVisualProps } from "@/components/visualizers/models";
 import { Vector3 } from "three";
 
 import BaseSwarm from "./base";

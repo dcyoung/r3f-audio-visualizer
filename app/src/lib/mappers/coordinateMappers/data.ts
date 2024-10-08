@@ -10,7 +10,7 @@ import {
  * Supports interpolation and anti-aliasing.
  */
 export class CoordinateMapper_Data extends CoordinateMapperBase {
-  public data: Float32Array;
+  public readonly data: Float32Array;
 
   /**
    *

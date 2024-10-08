@@ -13,8 +13,8 @@ import fragmentShader from "./shaders/fragment";
 import vertexShader from "./shaders/vertex";
 
 export class TextureMapper {
-  public samplesX: Float32Array;
-  public samplesY: Float32Array;
+  public readonly samplesX: Float32Array;
+  public readonly samplesY: Float32Array;
   public maxAmplitude = 4.0;
   private readonly M: number = 4;
 

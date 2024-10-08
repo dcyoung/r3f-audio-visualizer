@@ -1,4 +1,4 @@
-import { type VisualProps } from "@/components/visualizers/common";
+import { type VisualProps } from "@/components/visualizers/models";
 import {
   Bloom,
   DepthOfField,
@@ -8,8 +8,11 @@ import {
 } from "@react-three/postprocessing";
 
 import { createVisualConfigStore } from "../storeHelpers";
-import BaseDoubleHelix, { type BaseDoubleHelixProps } from "./base";
-import MultiStrand from "./multi";
+import {
+  BaseDoubleHelix,
+  MultiStrand,
+  type BaseDoubleHelixProps,
+} from "./base";
 
 export type TConfig = { multi: boolean } & Required<
   Omit<BaseDoubleHelixProps, "coordinateMapper">
@@ -72,7 +75,7 @@ const DNAVisual = ({ coordinateMapper }: VisualProps) => {
   );
 };
 
-const ComposedDNAVisual = (props: VisualProps) => {
+export default (props: VisualProps) => {
   return (
     <>
       <DNAVisual {...props} />
@@ -90,5 +93,3 @@ const ComposedDNAVisual = (props: VisualProps) => {
     </>
   );
 };
-
-export default ComposedDNAVisual;

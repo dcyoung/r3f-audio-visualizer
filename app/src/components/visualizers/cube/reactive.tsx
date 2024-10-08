@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef } from "react";
-import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
+import { type VisualProps } from "@/components/visualizers/models";
 import { Vector3 } from "three";
 
 import { createVisualConfigStore } from "../storeHelpers";

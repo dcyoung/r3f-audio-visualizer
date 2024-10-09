@@ -8,18 +8,19 @@ import {
 } from "@/components/audio/sourceControls/common";
 import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
 import ScreenShareControls from "@/components/audio/sourceControls/screenshare";
-import { useAudioSourceContext } from "@/context/audioSource";
 import { useMediaStreamLink } from "@/lib/analyzers/common";
 import FFTAnalyzer from "@/lib/analyzers/fft";
 import ScopeAnalyzer from "@/lib/analyzers/scope";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import { useAudio } from "@/lib/appState";
 
 import { AudioScopeAnalyzerControls } from "./scopeAnalyzerControls";
 
-const useAudio = (
+const useAudioInternal = (
   mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE,
 ) => {
   return useMemo(() => {
+    console.log("NEW AUDIO");
     const audioCtx = buildAudioContext();
     const audio = buildAudio();
     return {
@@ -46,7 +47,7 @@ const InternalAudioAnalyzer = ({
   mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
   audioSource: typeof AUDIO_SOURCE.SOUNDCLOUD | typeof AUDIO_SOURCE.FILE_UPLOAD;
 }) => {
-  const { audio, analyzer } = useAudio(mode);
+  const { audio, analyzer } = useAudioInternal(mode);
 
   return (
     <>
@@ -69,7 +70,7 @@ const InternalMediaStreamAnalyzer = ({
   mode: "AUDIO" | "AUDIO_SCOPE";
   audioSource: "MICROPHONE" | "SCREEN_SHARE";
 }) => {
-  const { audio, analyzer } = useAudio(mode);
+  const { audio, analyzer } = useAudioInternal(mode);
   const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
 
   return (
@@ -105,19 +106,17 @@ const AudioAnalyzer = ({
 }: {
   mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
 }) => {
-  const { audioSource } = useAudioSourceContext();
+  const { source } = useAudio();
 
-  switch (audioSource) {
+  switch (source) {
     case AUDIO_SOURCE.SOUNDCLOUD:
     case AUDIO_SOURCE.FILE_UPLOAD:
-      return <InternalAudioAnalyzer mode={mode} audioSource={audioSource} />;
+      return <InternalAudioAnalyzer mode={mode} audioSource={source} />;
     case AUDIO_SOURCE.MICROPHONE:
     case AUDIO_SOURCE.SCREEN_SHARE:
-      return (
-        <InternalMediaStreamAnalyzer mode={mode} audioSource={audioSource} />
-      );
+      return <InternalMediaStreamAnalyzer mode={mode} audioSource={source} />;
     default:
-      return audioSource satisfies never;
+      return source satisfies never;
   }
 };
 

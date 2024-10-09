@@ -1,13 +1,12 @@
 import { useMemo, type HTMLAttributes } from "react";
 import { VISUAL_REGISTRY } from "@/components/visualizers/registry";
-import { useVisualContext, useVisualContextSetters } from "@/context/visual";
-import { useMode } from "@/lib/appState";
+import { useAppStateActions, useMode, useVisual } from "@/lib/appState";
 
 import { Dock, DockItem, DockNav } from "./dock";
 
 export const VisualsDock = ({ ...props }: HTMLAttributes<HTMLDivElement>) => {
-  const { visual: activeVisual } = useVisualContext();
-  const { setVisualId } = useVisualContextSetters();
+  const activeVisual = useVisual();
+  const { setVisual } = useAppStateActions();
   const mode = useMode();
 
   const supportedVisuals = useMemo(() => {
@@ -23,7 +22,7 @@ export const VisualsDock = ({ ...props }: HTMLAttributes<HTMLDivElement>) => {
           <DockItem
             key={`dock_item_${visual.id}`}
             aria-selected={visual === activeVisual}
-            onClick={() => setVisualId(visual.id)}
+            onClick={() => setVisual(visual.id)}
           >
             {<visual.icon />}
           </DockItem>

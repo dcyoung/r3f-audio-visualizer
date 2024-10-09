@@ -1,5 +1,15 @@
+import {
+  getPlatformSupportedAudioSources,
+  type AudioSource,
+} from "@/components/audio/sourceControls/common";
+import {
+  VISUAL_REGISTRY,
+  type TVisual,
+  type TVisualId,
+} from "@/components/visualizers/registry";
 import { create } from "zustand";
 
+import { type EnergyMeasure, type OctaveBandMode } from "./analyzers/fft";
 import { APPLICATION_MODE, type TApplicationMode } from "./applicationModes";
 import { EventDetector } from "./eventDetector";
 import { CoordinateMapper_Data } from "./mappers/coordinateMappers/data";
@@ -15,28 +25,56 @@ import {
   type ColorPaletteType,
 } from "./palettes";
 
+interface IAppearanceState {
+  showUI: boolean;
+  palette: ColorPaletteType;
+  paletteTrackEnergy: boolean;
+  colorBackground: boolean;
+}
+interface ICameraState {
+  mode: "AUTO_ORBIT" | "ORBIT_CONTROLS";
+  autoOrbitAfterSleepMs: number; // disabled if <= 0
+}
+interface IMappersState {
+  textureMapper: TextureMapper;
+  motionMapper: IMotionMapper;
+  coordinateMapperWaveform: CoordinateMapper_WaveformSuperposition;
+  coordinateMapperNoise: CoordinateMapper_Noise;
+  coordinateMapperData: CoordinateMapper_Data;
+  energyTracker: EnergyTracker | null;
+}
+interface IAudioState {
+  source: AudioSource;
+  sourceCounter: number;
+}
+interface IAnalyzersState {
+  fft: {
+    octaveBandMode: OctaveBandMode;
+    energyMeasure: EnergyMeasure;
+  };
+}
+
 interface IAppState {
   user: {
     canvasInteractionEventTracker: EventDetector;
   };
-  visual: {
-    palette: ColorPaletteType;
-  };
+  visual: TVisual;
+  appearance: IAppearanceState;
+  camera: ICameraState;
   mode: TApplicationMode;
-  mappers: {
-    textureMapper: TextureMapper;
-    motionMapper: IMotionMapper;
-    coordinateMapperWaveform: CoordinateMapper_WaveformSuperposition;
-    coordinateMapperNoise: CoordinateMapper_Noise;
-    coordinateMapperData: CoordinateMapper_Data;
-    energyTracker: EnergyTracker | null;
-  };
+  mappers: IMappersState;
+  audio: IAudioState;
+  analyzers: IAnalyzersState;
   actions: {
     setMode: (newMode: TApplicationMode) => void;
+    setAudio: (newAudio: Partial<IAudioState>) => void;
+    setVisual: (newVisualId: TVisualId) => void;
+    setCamera: (newCamera: Partial<ICameraState>) => void;
     noteCanvasInteraction: () => void;
-    setPalette: (newPalette: ColorPaletteType) => void;
+    setAppearance: (newAppearance: Partial<IAppearanceState>) => void;
     nextPalette: () => void;
-    setMappers: (newMappers: Partial<IAppState["mappers"]>) => void;
+    setMappers: (newMappers: Partial<IMappersState>) => void;
+    setAnalyzerFFT: (newAnalyzer: Partial<IAnalyzersState["fft"]>) => void;
   };
 }
 
@@ -44,8 +82,22 @@ const useAppState = create<IAppState>((set) => ({
   user: {
     canvasInteractionEventTracker: new EventDetector(),
   },
-  visual: {
+  visual: VISUAL_REGISTRY.grid,
+  appearance: {
     palette: COLOR_PALETTE.THREE_COOL_TO_WARM,
+    colorBackground: true,
+    paletteTrackEnergy: false,
+    showUI: true,
+  },
+  camera: {
+    mode: "ORBIT_CONTROLS",
+    autoOrbitAfterSleepMs: 10000,
+  },
+  analyzers: {
+    fft: {
+      octaveBandMode: 2,
+      energyMeasure: "bass",
+    },
   },
   mode: APPLICATION_MODE.WAVE_FORM,
   mappers: {
@@ -56,7 +108,33 @@ const useAppState = create<IAppState>((set) => ({
     energyTracker: new EnergyTracker(0),
     motionMapper: new MotionMapper_Noise(2.0, 0.5),
   },
+  audio: {
+    source: getPlatformSupportedAudioSources()[0],
+    sourceCounter: 0,
+  },
   actions: {
+    setVisual: (newVisualId: TVisualId) =>
+      set((state) => {
+        const newVisual = VISUAL_REGISTRY[newVisualId];
+        return [...newVisual.supportedApplicationModes].includes(state.mode)
+          ? {
+              visual: newVisual,
+              // mappers values whenever the visual changes
+              mappers: {
+                ...state.mappers,
+                textureMapper: new TextureMapper(),
+                coordinateMapperWaveform:
+                  new CoordinateMapper_WaveformSuperposition(
+                    newVisualId === "diffusedRing"
+                      ? CoordinateMapper_WaveformSuperposition.PRESETS.DOUBLE
+                      : undefined,
+                  ),
+                coordinateMapperData: new CoordinateMapper_Data(),
+                coordinateMapperNoise: new CoordinateMapper_Noise(),
+              },
+            }
+          : {};
+      }),
     noteCanvasInteraction: () =>
       set((state) => {
         state.user.canvasInteractionEventTracker.addEvent();
@@ -67,39 +145,98 @@ const useAppState = create<IAppState>((set) => ({
           },
         };
       }),
-    setPalette: (newPalette: ColorPaletteType) =>
-      set((_) => {
+    setAppearance: (newAppearance: Partial<IAppearanceState>) =>
+      set((state) => {
         return {
-          visual: { palette: newPalette },
+          appearance: {
+            ...state.appearance,
+            ...newAppearance,
+          },
         };
       }),
     nextPalette: () =>
       set((state) => {
         const currIdx =
-          AVAILABLE_COLOR_PALETTES.indexOf(state.visual.palette) ?? 0;
+          AVAILABLE_COLOR_PALETTES.indexOf(state.appearance.palette) ?? 0;
         const nextIdx = (currIdx + 1) % AVAILABLE_COLOR_PALETTES.length;
         return {
-          visual: { palette: AVAILABLE_COLOR_PALETTES[nextIdx] },
+          appearance: {
+            ...state.appearance,
+            palette: AVAILABLE_COLOR_PALETTES[nextIdx],
+          },
         };
       }),
     setMode: (newMode: TApplicationMode) =>
-      set(() => {
+      set((state) => {
         return {
           mode: newMode,
+          audio: {
+            ...state.audio,
+            sourceCounter: state.audio.sourceCounter + 1,
+          },
+          ...(![...state.visual.supportedApplicationModes].includes(newMode)
+            ? {
+                visual: Object.values(VISUAL_REGISTRY).find((v) =>
+                  [...v.supportedApplicationModes].includes(newMode),
+                ),
+              }
+            : {}),
+          appearance: {
+            ...state.appearance,
+            // Reset paletteTrackEnergy whenever the mode changes
+            paletteTrackEnergy: newMode === APPLICATION_MODE.AUDIO,
+            // Set default appearance settings for audio scope mode
+            ...(newMode === APPLICATION_MODE.AUDIO_SCOPE
+              ? {
+                  palette: "rainbow",
+                  colorBackground: false,
+                }
+              : {}),
+          },
         };
       }),
-    setMappers: (newMappers: Partial<IAppState["mappers"]>) =>
+    setMappers: (newMappers: Partial<IMappersState>) =>
       set((state) => ({
         mappers: {
           ...state.mappers,
           ...newMappers,
         },
       })),
+    setAudio: (newAudio: Partial<IAudioState>) =>
+      set((state) => ({
+        audio: {
+          ...state.audio,
+          ...newAudio,
+        },
+      })),
+    setCamera: (newCamera: Partial<ICameraState>) =>
+      set((state) => ({
+        camera: {
+          ...state.camera,
+          ...newCamera,
+        },
+      })),
+    setAnalyzerFFT: (newAnalyzer: Partial<IAnalyzersState["fft"]>) =>
+      set((state) => ({
+        analyzers: {
+          ...state.analyzers,
+          fft: {
+            ...state.analyzers.fft,
+            ...newAnalyzer,
+          },
+        },
+      })),
   },
 }));
 
+export const useAnalyzerFFT = () => useAppState((state) => state.analyzers.fft);
+export const useCameraState = () => useAppState((state) => state.camera);
+export const useVisual = () => useAppState((state) => state.visual);
+export const useAppearance = () => useAppState((state) => state.appearance);
+export const usePalette = () =>
+  useAppState((state) => state.appearance.palette);
 export const useMode = () => useAppState((state) => state.mode);
 export const useUser = () => useAppState((state) => state.user);
-export const usePalette = () => useAppState((state) => state.visual.palette);
 export const useMappers = () => useAppState((state) => state.mappers);
+export const useAudio = () => useAppState((state) => state.audio);
 export const useAppStateActions = () => useAppState((state) => state.actions);

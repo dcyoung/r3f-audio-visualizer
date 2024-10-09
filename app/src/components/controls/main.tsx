@@ -1,13 +1,13 @@
 import VisualsDock from "@/components/controls/visualsDock";
 import { Switch } from "@/components/ui/switch";
-import { useModeContext, useModeContextSetters } from "@/context/mode";
+import { useAppearance, useAppStateActions } from "@/lib/appState";
 import { cn } from "@/lib/utils";
 
 import SettingsDock from "./settingsDock";
 
 export const ControlsPanel = () => {
-  const { showUI } = useModeContext();
-  const { setShowUI } = useModeContextSetters();
+  const { showUI } = useAppearance();
+  const { setAppearance } = useAppStateActions();
   return (
     <>
       <div className="pointer-events-none absolute top-0 flex w-full flex-row items-center justify-end gap-2 p-4">
@@ -16,7 +16,7 @@ export const ControlsPanel = () => {
           className="pointer-events-auto cursor-pointer"
           id="controls-visible"
           onCheckedChange={(e) => {
-            setShowUI(e);
+            setAppearance({ showUI: e });
           }}
         />
       </div>

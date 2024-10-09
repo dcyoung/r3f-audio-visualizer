@@ -8,23 +8,19 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  useFFTAnalyzerContext,
-  useFFTAnalyzerContextSetters,
-} from "@/context/fftAnalyzer";
-import {
   EnergyMeasureOptions,
   OctaveBandModeMap,
   type EnergyMeasure,
   type OctaveBandMode,
 } from "@/lib/analyzers/fft";
-import { useAppStateActions, useMappers } from "@/lib/appState";
+import { useAnalyzerFFT, useAppStateActions, useMappers } from "@/lib/appState";
 
 import { ValueLabel } from "../common";
 import { AudioSourceControls, AudioSourceSelect } from "./common";
 
 const FFTAnalyzerControls = () => {
-  const { octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
-  const { setOctaveBand, setEnergyMeasure } = useFFTAnalyzerContextSetters();
+  const { octaveBandMode, energyMeasure } = useAnalyzerFFT();
+  const { setAnalyzerFFT } = useAppStateActions();
   const { coordinateMapperData: mapper } = useMappers();
   const { setMappers } = useAppStateActions();
   return (
@@ -51,9 +47,11 @@ const FFTAnalyzerControls = () => {
         <span>Octave Band Mode</span>
 
         <Select
-          onValueChange={(v) => {
-            setOctaveBand(Number(v) as OctaveBandMode);
-          }}
+          onValueChange={(v) =>
+            setAnalyzerFFT({
+              octaveBandMode: Number(v) as OctaveBandMode,
+            })
+          }
         >
           <SelectTrigger className="max-w-1/2 w-[240px]">
             <SelectValue
@@ -80,7 +78,9 @@ const FFTAnalyzerControls = () => {
 
         <Select
           onValueChange={(v) => {
-            setEnergyMeasure(v as EnergyMeasure);
+            setAnalyzerFFT({
+              energyMeasure: v as EnergyMeasure,
+            });
           }}
         >
           <SelectTrigger className="max-w-1/2 w-[240px]">

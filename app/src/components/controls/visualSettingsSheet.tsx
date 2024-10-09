@@ -3,14 +3,15 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import {
-  CAMERA_CONTROLS_MODE,
-  useCameraControlsContext,
-  useCameraControlsContextSetters,
-} from "@/context/cameraControls";
-import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
-import { useAppStateActions, useMode, usePalette } from "@/lib/appState";
+import {
+  useAppearance,
+  useAppStateActions,
+  useCameraState,
+  useMode,
+  usePalette,
+  useVisual,
+} from "@/lib/appState";
 import {
   AVAILABLE_COLOR_PALETTES,
   ColorPalette,
@@ -55,17 +56,19 @@ const PaletteIcon = ({
   );
 };
 
+const VisualControlsComponent = () => {
+  const visual = useVisual();
+  return visual.ControlsComponent ? <visual.ControlsComponent /> : null;
+};
+
 export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
   const mode = useMode();
-  const { colorBackground, paletteTrackEnergy, visual } = useVisualContext();
-  const { setColorBackground, setPaletteTrackEnergy } =
-    useVisualContextSetters();
+  const { colorBackground, paletteTrackEnergy } = useAppearance();
   const palette = usePalette();
-  const { setPalette } = useAppStateActions();
-  const { autoOrbitAfterSleepMs } = useCameraControlsContext();
-  const { setMode: setCameraMode, setAutoOrbitAfterSleepMs } =
-    useCameraControlsContextSetters();
+  const { setAppearance } = useAppStateActions();
+  const { autoOrbitAfterSleepMs } = useCameraState();
+  const { setCamera } = useAppStateActions();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -85,7 +88,7 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
                   <PaletteIcon
                     key={p}
                     palette={p}
-                    onClick={() => setPalette(p)}
+                    onClick={() => setAppearance({ palette: p })}
                     aria-selected={p === palette}
                   />
                 ))}
@@ -95,9 +98,7 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
               <Label>Color Background</Label>
               <Switch
                 defaultChecked={colorBackground}
-                onCheckedChange={(e) => {
-                  setColorBackground(e);
-                }}
+                onCheckedChange={(e) => setAppearance({ colorBackground: e })}
               />
             </div>
             <div className="flex items-center justify-between gap-2">
@@ -105,9 +106,9 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
               <Switch
                 disabled={mode !== APPLICATION_MODE.AUDIO}
                 defaultChecked={paletteTrackEnergy}
-                onCheckedChange={(e) => {
-                  setPaletteTrackEnergy(e);
-                }}
+                onCheckedChange={(e) =>
+                  setAppearance({ paletteTrackEnergy: e })
+                }
               />
             </div>
             <div className="flex items-center justify-between gap-2">
@@ -116,19 +117,24 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
                 disabled={!isCameraMode(mode)}
                 defaultChecked={autoOrbitAfterSleepMs > 0}
                 onCheckedChange={(e) => {
-                  setCameraMode(
+                  setCamera(
                     e
-                      ? CAMERA_CONTROLS_MODE.AUTO_ORBIT
-                      : CAMERA_CONTROLS_MODE.ORBIT_CONTROLS,
+                      ? {
+                          mode: "AUTO_ORBIT",
+                          autoOrbitAfterSleepMs: 3500,
+                        }
+                      : {
+                          mode: "ORBIT_CONTROLS",
+                          autoOrbitAfterSleepMs: 0,
+                        },
                   );
-                  setAutoOrbitAfterSleepMs(e ? 3500 : 0);
                 }}
               />
             </div>
           </div>
           <Separator />
           <div className="space-y-4">
-            {visual.ControlsComponent && <visual.ControlsComponent />}
+            <VisualControlsComponent />
           </div>
         </div>
       </SheetContent>

@@ -6,10 +6,7 @@ import {
 } from "@/components/audio/sourceControls/common";
 import { FileUploadControls } from "@/components/controls/audioSource/fileUpload";
 import { SoundcloudControls } from "@/components/controls/audioSource/soundcloud/controls";
-import {
-  useAudioSourceContext,
-  useAudioSourceContextSetters,
-} from "@/context/audioSource";
+import { useAppStateActions, useAudio } from "@/lib/appState";
 import { cn } from "@/lib/utils";
 import {
   FileUp,
@@ -57,8 +54,8 @@ export const AudioSourceSelect = ({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
-  const { audioSource } = useAudioSourceContext();
-  const { setAudioSource } = useAudioSourceContextSetters();
+  const { source: activeSource } = useAudio();
+  const { setAudio } = useAppStateActions();
   const available = useMemo(() => {
     return getPlatformSupportedAudioSources();
   }, []);
@@ -74,8 +71,8 @@ export const AudioSourceSelect = ({
       {available.map((source) => (
         <GridIconWrapper
           key={`grid_icon_${source}`}
-          onClick={() => setAudioSource(source)}
-          aria-selected={audioSource === source}
+          onClick={() => setAudio({ source })}
+          aria-selected={activeSource === source}
         >
           <AudioSourceIcon audioSource={source} />
         </GridIconWrapper>
@@ -85,8 +82,8 @@ export const AudioSourceSelect = ({
 };
 
 export const AudioSourceControls = () => {
-  const { audioSource } = useAudioSourceContext();
-  switch (audioSource) {
+  const { source } = useAudio();
+  switch (source) {
     case AUDIO_SOURCE.SOUNDCLOUD:
       return <SoundcloudControls />;
     case AUDIO_SOURCE.FILE_UPLOAD:
@@ -96,6 +93,6 @@ export const AudioSourceControls = () => {
       // TODO: Add controls
       return null;
     default:
-      return audioSource satisfies never;
+      return source satisfies never;
   }
 };

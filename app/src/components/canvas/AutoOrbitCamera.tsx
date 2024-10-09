@@ -1,4 +1,4 @@
-import { useVisualContext } from "@/context/visual";
+import { useVisual } from "@/lib/appState";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Spherical, type Vector3 } from "three";
 
@@ -11,7 +11,7 @@ const setFromSphericalZUp = (vec: Vector3, s: Spherical) => {
 };
 
 const useSphericalLimits = () => {
-  const { visual } = useVisualContext();
+  const visual = useVisual();
   // r     is the Radius
   // theta is the equator angle
   // phi is the polar angle

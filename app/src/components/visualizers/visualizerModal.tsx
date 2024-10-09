@@ -1,8 +1,6 @@
 import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { useMappers, useMode } from "@/lib/appState";
+import { useMappers, useMode, useVisual } from "@/lib/appState";
 import { type ICoordinateMapper } from "@/lib/mappers/coordinateMappers/common";
-
-import { type TVisual } from "./registry";
 
 const DummyMapper: ICoordinateMapper = { map: () => 0, amplitude: 0 };
 const useScalarTracker = () => {
@@ -37,7 +35,8 @@ const useCoordinateMapper = () => {
       return mode satisfies never;
   }
 };
-const ModalVisual = ({ visual }: { visual: TVisual }) => {
+const ModalVisual = () => {
+  const visual = useVisual();
   const coordinateMapper = useCoordinateMapper();
   const scalarTracker = useScalarTracker();
   const { textureMapper, motionMapper } = useMappers();

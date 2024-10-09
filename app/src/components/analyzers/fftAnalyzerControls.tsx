@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import type FFTAnalyzer from "@/lib/analyzers/fft";
-import { useAppStateActions, useMappers } from "@/lib/appState";
+import { useAnalyzerFFT, useAppStateActions, useMappers } from "@/lib/appState";
 import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
 
 export const FFTAnalyzerControls = ({
@@ -9,7 +8,7 @@ export const FFTAnalyzerControls = ({
 }: {
   analyzer: FFTAnalyzer;
 }) => {
-  const { octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
+  const { octaveBandMode, energyMeasure } = useAnalyzerFFT();
   const { coordinateMapperData, energyTracker } = useMappers();
   const { setMappers } = useAppStateActions();
   const animationRequestRef = useRef<number>(null!);

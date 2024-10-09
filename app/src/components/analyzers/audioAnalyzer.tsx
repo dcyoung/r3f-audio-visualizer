@@ -16,26 +16,37 @@ import { APPLICATION_MODE } from "@/lib/applicationModes";
 
 import { AudioScopeAnalyzerControls } from "./scopeAnalyzerControls";
 
+const useAudio = (
+  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE,
+) => {
+  return useMemo(() => {
+    const audioCtx = buildAudioContext();
+    const audio = buildAudio();
+    return {
+      audio,
+      analyzer: (() => {
+        console.log("Creating analyzer...");
+        switch (mode) {
+          case APPLICATION_MODE.AUDIO:
+            return new FFTAnalyzer(audio, audioCtx, 0.0);
+          case APPLICATION_MODE.AUDIO_SCOPE:
+            return new ScopeAnalyzer(audio, audioCtx);
+          default:
+            return mode satisfies never;
+        }
+      })(),
+    };
+  }, [mode]);
+};
+
 const InternalAudioAnalyzer = ({
   mode,
   audioSource,
 }: {
-  mode: "AUDIO" | "AUDIO_SCOPE";
-  audioSource: "SOUNDCLOUD" | "FILE_UPLOAD";
+  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
+  audioSource: typeof AUDIO_SOURCE.SOUNDCLOUD | typeof AUDIO_SOURCE.FILE_UPLOAD;
 }) => {
-  const audioCtx = useMemo(() => buildAudioContext(), []);
-  const audio = useMemo(() => buildAudio(), []);
-  const analyzer = useMemo(() => {
-    console.log("Creating analyzer...");
-    switch (mode) {
-      case APPLICATION_MODE.AUDIO:
-        return new FFTAnalyzer(audio, audioCtx, 1.0);
-      case APPLICATION_MODE.AUDIO_SCOPE:
-        return new ScopeAnalyzer(audio, audioCtx);
-      default:
-        return mode satisfies never;
-    }
-  }, [mode, audio, audioCtx]);
+  const { audio, analyzer } = useAudio(mode);
 
   return (
     <>
@@ -58,20 +69,7 @@ const InternalMediaStreamAnalyzer = ({
   mode: "AUDIO" | "AUDIO_SCOPE";
   audioSource: "MICROPHONE" | "SCREEN_SHARE";
 }) => {
-  const audioCtx = useMemo(() => buildAudioContext(), []);
-  const audio = useMemo(() => buildAudio(), []);
-  const analyzer = useMemo(() => {
-    console.log("Creating analyzer...");
-    switch (mode) {
-      case APPLICATION_MODE.AUDIO:
-        return new FFTAnalyzer(audio, audioCtx, 0.0);
-      case APPLICATION_MODE.AUDIO_SCOPE:
-        return new ScopeAnalyzer(audio, audioCtx);
-      default:
-        return mode satisfies never;
-    }
-  }, [audio, audioCtx, mode]);
-
+  const { audio, analyzer } = useAudio(mode);
   const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
 
   return (
@@ -102,7 +100,11 @@ const InternalMediaStreamAnalyzer = ({
   );
 };
 
-const AudioAnalyzer = ({ mode }: { mode: "AUDIO" | "AUDIO_SCOPE" }) => {
+const AudioAnalyzer = ({
+  mode,
+}: {
+  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
+}) => {
   const { audioSource } = useAudioSourceContext();
 
   switch (audioSource) {

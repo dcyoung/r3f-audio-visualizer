@@ -3,7 +3,8 @@ import { create } from "zustand";
 import { APPLICATION_MODE, type TApplicationMode } from "./applicationModes";
 import { EventDetector } from "./eventDetector";
 import { CoordinateMapper_Data } from "./mappers/coordinateMappers/data";
-import { CoordinateMapper_Modal } from "./mappers/coordinateMappers/modal";
+import { CoordinateMapper_Noise } from "./mappers/coordinateMappers/noise";
+import { CoordinateMapper_WaveformSuperposition } from "./mappers/coordinateMappers/waveform";
 import { type IMotionMapper } from "./mappers/motionMappers/common";
 import { MotionMapper_Noise } from "./mappers/motionMappers/curlNoise";
 import { TextureMapper } from "./mappers/textureMappers/textureMapper";
@@ -25,7 +26,9 @@ interface IAppState {
   mappers: {
     textureMapper: TextureMapper;
     motionMapper: IMotionMapper;
-    coordinateMapper: CoordinateMapper_Modal;
+    coordinateMapperWaveform: CoordinateMapper_WaveformSuperposition;
+    coordinateMapperNoise: CoordinateMapper_Noise;
+    coordinateMapperData: CoordinateMapper_Data;
     energyTracker: EnergyTracker | null;
   };
   actions: {
@@ -33,7 +36,7 @@ interface IAppState {
     noteCanvasInteraction: () => void;
     setPalette: (newPalette: ColorPaletteType) => void;
     nextPalette: () => void;
-    resizeVisualSourceData: (newSize: number) => void;
+    setMappers: (newMappers: Partial<IAppState["mappers"]>) => void;
   };
 }
 
@@ -46,11 +49,10 @@ const useAppState = create<IAppState>((set) => ({
   },
   mode: APPLICATION_MODE.WAVE_FORM,
   mappers: {
-    textureMapper: new TextureMapper(
-      new Float32Array(512).fill(0), //timeSamples,
-      new Float32Array(512).fill(0), //quadSamples
-    ),
-    coordinateMapper: new CoordinateMapper_Modal(),
+    textureMapper: new TextureMapper(),
+    coordinateMapperWaveform: new CoordinateMapper_WaveformSuperposition(),
+    coordinateMapperNoise: new CoordinateMapper_Noise(),
+    coordinateMapperData: new CoordinateMapper_Data(),
     energyTracker: new EnergyTracker(0),
     motionMapper: new MotionMapper_Noise(2.0, 0.5),
   },
@@ -80,46 +82,24 @@ const useAppState = create<IAppState>((set) => ({
           visual: { palette: AVAILABLE_COLOR_PALETTES[nextIdx] },
         };
       }),
-    resizeVisualSourceData: (newSize: number) =>
-      set((state) => {
-        state.mappers.coordinateMapper.update(
-          APPLICATION_MODE.AUDIO,
-          new CoordinateMapper_Data(1.0, new Float32Array(newSize).fill(0)),
-        );
-        return {
-          mappers: {
-            ...state.mappers,
-            textureMapper: new TextureMapper(
-              new Float32Array(newSize).fill(0), // time samples
-              new Float32Array(newSize).fill(0), // quad samples
-            ),
-          },
-        };
-      }),
     setMode: (newMode: TApplicationMode) =>
-      set((state) => {
-        state.mappers.coordinateMapper.setMode(newMode);
+      set(() => {
         return {
           mode: newMode,
-          mappers: {
-            ...state.mappers,
-            energyTracker:
-              newMode === APPLICATION_MODE.AUDIO ? new EnergyTracker(0) : null,
-          },
         };
       }),
+    setMappers: (newMappers: Partial<IAppState["mappers"]>) =>
+      set((state) => ({
+        mappers: {
+          ...state.mappers,
+          ...newMappers,
+        },
+      })),
   },
 }));
 
 export const useMode = () => useAppState((state) => state.mode);
 export const useUser = () => useAppState((state) => state.user);
 export const usePalette = () => useAppState((state) => state.visual.palette);
-export const useMotionMapper = () =>
-  useAppState((state) => state.mappers.motionMapper);
-export const useTextureMapper = () =>
-  useAppState((state) => state.mappers.textureMapper);
-export const useCoordinateMapper = () =>
-  useAppState((state) => state.mappers.coordinateMapper);
-export const useEnergyTracker = () =>
-  useAppState((state) => state.mappers.energyTracker ?? undefined);
+export const useMappers = () => useAppState((state) => state.mappers);
 export const useAppStateActions = () => useAppState((state) => state.actions);

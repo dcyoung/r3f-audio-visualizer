@@ -12,6 +12,7 @@ import {
  * Maps input coordinates to output values based on a time varying waveform.
  */
 export class CoordinateMapper_Waveform extends CoordinateMapperBase {
+  public readonly frequencyHz: number;
   protected periodSec: number;
   protected b: number;
 
@@ -22,6 +23,7 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
    */
   constructor(amplitude = 1.0, frequencyHz: number) {
     super(amplitude);
+    this.frequencyHz = frequencyHz;
     this.periodSec = 1 / frequencyHz;
     this.b = TWO_PI / this.periodSec;
   }
@@ -70,14 +72,46 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
   }
 }
 
+export type TSuperPositionParams = {
+  waveformFrequenciesHz: number[];
+  maxAmplitude: number;
+  amplitudeSplitRatio: number;
+};
 /**
  * Maps input coordinates to output values based on the superposition of multiple time varying waveforms.
  */
 export class CoordinateMapper_WaveformSuperposition
   implements ICoordinateMapper
 {
+  public static get PRESETS() {
+    return {
+      DEFAULT: {
+        waveformFrequenciesHz: [2.0],
+        maxAmplitude: 1.0,
+        amplitudeSplitRatio: 0.75,
+      },
+      DOUBLE: {
+        waveformFrequenciesHz: [2.0, 10.0],
+        maxAmplitude: 1.0,
+        amplitudeSplitRatio: 0.75,
+      },
+    };
+  }
+
+  public clone(params: Partial<TSuperPositionParams>) {
+    return new CoordinateMapper_WaveformSuperposition({
+      ...this._params,
+      ...params,
+    });
+  }
   private mappers: CoordinateMapper_Waveform[];
-  public readonly amplitude: number;
+  private _params: TSuperPositionParams;
+  public get params(): TSuperPositionParams {
+    return this._params;
+  }
+  public get amplitude() {
+    return this.params.maxAmplitude;
+  }
 
   /**
    * @param waveformFrequenciesHz - the frequency (in hz) for each of the time varying waveforms
@@ -85,24 +119,32 @@ export class CoordinateMapper_WaveformSuperposition
    * @param amplitudeSplitRatio - the recursive split ratio controlling how amplitude is divided among the various waveforms
    */
   constructor(
-    waveformFrequenciesHz: number[],
-    maxAmplitude = 1.0,
-    amplitudeSplitRatio = 0.75,
+    params: TSuperPositionParams = CoordinateMapper_WaveformSuperposition
+      .PRESETS.DEFAULT,
   ) {
-    this.amplitude = maxAmplitude;
-    this.mappers = [];
-    for (let i = 0; i < waveformFrequenciesHz.length; i++) {
-      // Split the total amplitude among the various waves
-      const amplitude =
-        i >= waveformFrequenciesHz.length - 1
-          ? maxAmplitude
-          : amplitudeSplitRatio * maxAmplitude;
-      maxAmplitude -= amplitude;
+    this._params = params;
+    this.mappers = CoordinateMapper_WaveformSuperposition.genMappersForParams(
+      this.params,
+    );
+  }
 
-      this.mappers.push(
-        new CoordinateMapper_Waveform(amplitude, waveformFrequenciesHz[i]),
-      );
-    }
+  private static genMappersForParams(params: TSuperPositionParams) {
+    let maxAmplitude = params.maxAmplitude;
+    return Array.from({ length: params.waveformFrequenciesHz.length }).map(
+      (_, i) => {
+        // Split the total amplitude among the various waves
+        // const amplitude = i > 0 ? params.amplitudeSplitRatio * maxAmplitude : maxAmplitude;
+        const amplitude =
+          i >= params.waveformFrequenciesHz.length - 1
+            ? maxAmplitude
+            : params.amplitudeSplitRatio * maxAmplitude;
+        maxAmplitude -= amplitude;
+        return new CoordinateMapper_Waveform(
+          amplitude,
+          params.waveformFrequenciesHz[i],
+        );
+      },
+    );
   }
 
   public map(

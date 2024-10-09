@@ -1,17 +1,46 @@
 import { DataTexture, RGBAFormat } from "three";
 
+export type TTextureMapperParams = {
+  size: number;
+};
 export class TextureMapper {
-  public readonly samplesX: Float32Array;
-  public readonly samplesY: Float32Array;
+  public static get PRESETS() {
+    return {
+      DEFAULT: {
+        size: 512,
+      },
+    };
+  }
+  public clone(params: Partial<TTextureMapperParams>) {
+    return new TextureMapper({
+      ...this._params,
+      ...params,
+    });
+  }
+  private _params: TTextureMapperParams;
+  public get params(): TTextureMapperParams {
+    return {
+      ...this.params,
+    };
+  }
+  public samplesX: Float32Array;
+  public samplesY: Float32Array;
   public maxAmplitude = 4.0;
   private readonly M: number = 4;
 
-  constructor(samplesX: Float32Array, samplesY: Float32Array) {
-    if (samplesX.length != samplesY.length) {
-      throw new Error("sample size mismatch");
-    }
-    this.samplesX = samplesX;
-    this.samplesY = samplesY;
+  constructor(params: TTextureMapperParams = TextureMapper.PRESETS.DEFAULT) {
+    this._params = params;
+    this.samplesX = new Float32Array(params.size).fill(0);
+    this.samplesY = new Float32Array(params.size).fill(0);
+  }
+
+  public updateParams(params: Partial<TTextureMapperParams>): void {
+    this._params = {
+      ...this._params,
+      ...params,
+    };
+    this.samplesX = new Float32Array(this._params.size).fill(0);
+    this.samplesY = new Float32Array(this._params.size).fill(0);
   }
 
   public updateTextureData(data: Uint8Array): void {

@@ -5,21 +5,47 @@ import {
   HALF_DIAGONAL_UNIT_SQUARE,
 } from "@/lib/mappers/coordinateMappers/common";
 
+export type TCoordinateMapper_DataParams = {
+  amplitude: number;
+  size: number;
+};
 /**
  * Maps input coordinates to output values based on pre-existing 1D data.
  * Supports interpolation and anti-aliasing.
  */
 export class CoordinateMapper_Data extends CoordinateMapperBase {
-  public readonly data: Float32Array;
+  public static get PRESETS() {
+    return {
+      DEFAULT: {
+        amplitude: 1.0,
+        size: 121,
+      },
+    };
+  }
+  public clone(params: Partial<TCoordinateMapper_DataParams>) {
+    return new CoordinateMapper_Data({
+      ...this._params,
+      ...params,
+    });
+  }
+  private _params: TCoordinateMapper_DataParams;
+  public get params(): TCoordinateMapper_DataParams {
+    return this._params;
+  }
+  public data: Float32Array;
 
   /**
    *
    * @param amplitude - the maximum amplitude of the scaled output.
-   * @param data - the pre-existing 1D data from which to interpolate values.
+   * @param data - the size of 1D data from which to interpolate values.
    */
-  constructor(amplitude = 1.0, data: Float32Array) {
-    super(amplitude);
-    this.data = data;
+  constructor(
+    params: TCoordinateMapper_DataParams = CoordinateMapper_Data.PRESETS
+      .DEFAULT,
+  ) {
+    super(params.amplitude);
+    this._params = params;
+    this.data = new Float32Array(params.size).fill(0);
   }
 
   private interpolateValueForNormalizedCoord(normalizedCoord: number): number {

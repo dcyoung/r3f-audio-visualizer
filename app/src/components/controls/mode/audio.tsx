@@ -17,24 +17,35 @@ import {
   type EnergyMeasure,
   type OctaveBandMode,
 } from "@/lib/analyzers/fft";
+import { useAppStateActions, useMappers } from "@/lib/appState";
 
 import { ValueLabel } from "../common";
 import { AudioSourceControls, AudioSourceSelect } from "./common";
 
 const FFTAnalyzerControls = () => {
-  const { amplitude, octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
-  const { setAmplitude, setOctaveBand, setEnergyMeasure } =
-    useFFTAnalyzerContextSetters();
+  const { octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
+  const { setOctaveBand, setEnergyMeasure } = useFFTAnalyzerContextSetters();
+  const { coordinateMapperData: mapper } = useMappers();
+  const { setMappers } = useAppStateActions();
   return (
     <div className="w-full space-y-4">
-      <ValueLabel label="Amplitude" value={amplitude.toFixed(2)} />
+      <ValueLabel
+        label="Amplitude"
+        value={mapper.params.amplitude.toFixed(2)}
+      />
       <Slider
-        defaultValue={[amplitude]}
-        value={[amplitude]}
+        defaultValue={[mapper.params.amplitude]}
+        value={[mapper.params.amplitude]}
         min={0.0}
         max={5.0}
         step={0.01}
-        onValueChange={(e) => setAmplitude(e[0])}
+        onValueChange={(e) =>
+          setMappers({
+            coordinateMapperData: mapper.clone({
+              amplitude: e[0],
+            }),
+          })
+        }
       />
       <div className="flex w-full items-center justify-between">
         <span>Octave Band Mode</span>

@@ -9,8 +9,6 @@ import {
 import { type EnergyMeasure, type OctaveBandMode } from "@/lib/analyzers/fft";
 
 interface FFTAnalyzerConfig {
-  // TODO: Find a better place to put amplitude for audio visuals
-  amplitude: number;
   octaveBandMode: OctaveBandMode;
   energyMeasure: EnergyMeasure;
 }
@@ -18,7 +16,6 @@ interface FFTAnalyzerConfig {
 export const FFTAnalyzerContext = createContext<{
   config: FFTAnalyzerConfig;
   setters: {
-    setAmplitude: Dispatch<SetStateAction<number>>;
     setOctaveBand: Dispatch<SetStateAction<OctaveBandMode>>;
     setEnergyMeasure: Dispatch<SetStateAction<EnergyMeasure>>;
   };
@@ -30,7 +27,6 @@ export const FFTAnalyzerContextProvider = ({
 }: PropsWithChildren<{
   initial?: Partial<FFTAnalyzerConfig>;
 }>) => {
-  const [amplitude, setAmplitude] = useState<number>(initial?.amplitude ?? 1.0);
   const [octaveBandMode, setOctaveBandMode] = useState<OctaveBandMode>(
     initial?.octaveBandMode ?? 2,
   );
@@ -41,12 +37,10 @@ export const FFTAnalyzerContextProvider = ({
     <FFTAnalyzerContext.Provider
       value={{
         config: {
-          amplitude: amplitude,
           octaveBandMode: octaveBandMode,
           energyMeasure: energyMeasure,
         },
         setters: {
-          setAmplitude: setAmplitude,
           setOctaveBand: setOctaveBandMode,
           setEnergyMeasure: setEnergyMeasure,
         },

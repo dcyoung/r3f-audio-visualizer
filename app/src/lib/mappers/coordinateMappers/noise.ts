@@ -11,34 +11,52 @@ import {
   type NoiseFunction4D,
 } from "simplex-noise";
 
+export type TCoordinateMapper_NoiseParams = {
+  amplitude: number;
+  spatialScale: number;
+  timeScale: number;
+  nIterations: number;
+  persistence: number;
+};
 /**
  * Maps input coordinates to output values based on the noise functions.
  */
 export class CoordinateMapper_Noise extends CoordinateMapperBase {
+  public static get PRESETS() {
+    return {
+      DEFAULT: {
+        amplitude: 1.0,
+        spatialScale: 2.0,
+        timeScale: 0.5,
+        nIterations: 10,
+        persistence: 0.5,
+      },
+    };
+  }
+  public clone(params: Partial<TCoordinateMapper_NoiseParams>) {
+    return new CoordinateMapper_Noise({
+      ...this._params,
+      ...params,
+    });
+  }
+  private _params: TCoordinateMapper_NoiseParams;
+  public get params(): TCoordinateMapper_NoiseParams {
+    return this._params;
+  }
   private readonly noise2D: NoiseFunction2D;
   private readonly noise3D: NoiseFunction3D;
   private readonly noise4D: NoiseFunction4D;
-  private readonly spatialScale: number;
-  private readonly timeScale: number;
-  private readonly nIterations: number;
-  private readonly persistence: number;
 
   /**
    *
    * @param amplitude - the maximum amplitude of the scaled output.
    */
   constructor(
-    amplitude = 1.0,
-    spatialScale = 1.0,
-    timeScale = 1.0,
-    nIterations = 1,
-    persistence = 0.5,
+    params: TCoordinateMapper_NoiseParams = CoordinateMapper_Noise.PRESETS
+      .DEFAULT,
   ) {
-    super(amplitude);
-    this.spatialScale = spatialScale;
-    this.timeScale = timeScale;
-    this.nIterations = nIterations;
-    this.persistence = persistence;
+    super(params.amplitude);
+    this._params = params;
     this.noise2D = createNoise2D();
     this.noise3D = createNoise3D();
     this.noise4D = createNoise4D();
@@ -48,28 +66,28 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
-      spatialScale = this.spatialScale;
-    const timeScale = this.timeScale;
+      spatialScale = this._params.spatialScale;
+    const timeScale = this._params.timeScale;
 
-    for (let i = 0; i < this.nIterations; i++) {
+    for (let i = 0; i < this._params.nIterations; i++) {
       noise +=
         amp * this.noise2D(xNorm * spatialScale, elapsedTimeSec * timeScale);
       maxAmp += amp;
-      amp *= this.persistence;
+      amp *= this._params.persistence;
       spatialScale *= 2;
     }
 
-    return this.nIterations > 1 ? noise / maxAmp : noise;
+    return this._params.nIterations > 1 ? noise / maxAmp : noise;
   }
 
   public map_2D(xNorm: number, yNorm: number, elapsedTimeSec = 0.0): number {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
-      spatialScale = this.spatialScale;
-    const timeScale = this.timeScale;
+      spatialScale = this._params.spatialScale;
+    const timeScale = this._params.timeScale;
 
-    for (let i = 0; i < this.nIterations; i++) {
+    for (let i = 0; i < this._params.nIterations; i++) {
       noise +=
         amp *
         this.noise3D(
@@ -78,11 +96,11 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
           elapsedTimeSec * timeScale,
         );
       maxAmp += amp;
-      amp *= this.persistence;
+      amp *= this._params.persistence;
       spatialScale *= 2;
     }
 
-    return this.nIterations > 1 ? noise / maxAmp : noise;
+    return this._params.nIterations > 1 ? noise / maxAmp : noise;
   }
 
   public map_3D(
@@ -94,10 +112,10 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
     let noise = 0,
       maxAmp = 0,
       amp = this.amplitude,
-      spatialScale = this.spatialScale;
-    const timeScale = this.timeScale;
+      spatialScale = this._params.spatialScale;
+    const timeScale = this._params.timeScale;
 
-    for (let i = 0; i < this.nIterations; i++) {
+    for (let i = 0; i < this._params.nIterations; i++) {
       noise +=
         amp *
         this.noise4D(
@@ -107,11 +125,11 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
           elapsedTimeSec * timeScale,
         );
       maxAmp += amp;
-      amp *= this.persistence;
+      amp *= this._params.persistence;
       spatialScale *= 2;
     }
 
-    return this.nIterations > 1 ? noise / maxAmp : noise;
+    return this._params.nIterations > 1 ? noise / maxAmp : noise;
   }
 
   public map_3DFaces(

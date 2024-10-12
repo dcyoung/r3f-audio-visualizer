@@ -1,4 +1,4 @@
-import { useMemo, useState, type PropsWithChildren } from "react";
+import { useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SheetContent } from "@/components/ui/sheet";
 import {
   APPLICATION_MODE,
   getPlatformSupportedApplicationModes,
@@ -15,14 +15,7 @@ import {
   type TApplicationMode,
 } from "@/lib/applicationModes";
 import { useAppStateActions, useMode } from "@/lib/appState";
-import {
-  AudioWaveform,
-  Drum,
-  HelpCircle,
-  Music,
-  Shell,
-  Waves,
-} from "lucide-react";
+import { AudioWaveform, Drum, Music, Shell, Waves } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
@@ -43,8 +36,7 @@ const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
     case APPLICATION_MODE.PARTICLE_NOISE:
       return <Drum />;
     default:
-      return <HelpCircle />;
-    // return mode satisfies never;
+      return mode satisfies never;
   }
 };
 const ModeSelectEntry = ({ mode }: { mode: TApplicationMode }) => {
@@ -93,27 +85,23 @@ const ModeSelector = () => {
   );
 };
 
-export const ModeSheet = ({ children }: PropsWithChildren) => {
-  const [open, setOpen] = useState(false);
+export const ModeSheetContent = () => {
   const mode = useMode();
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent
-        insertHidden={true}
-        side="right"
-        className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[540px] sm:max-w-[540px]"
-      >
-        <div className="flex items-center justify-start gap-4">
-          <span className="text-xl font-bold">MODE</span>
-          <ModeSelector />
-        </div>
-        <Separator />
-        {mode === APPLICATION_MODE.WAVE_FORM && <WaveformModeControls />}
-        {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
-        {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
-        {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
-      </SheetContent>
-    </Sheet>
+    <SheetContent
+      insertHidden={true}
+      side="right"
+      className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[540px] sm:max-w-[540px]"
+    >
+      <div className="flex items-center justify-start gap-4">
+        <span className="text-xl font-bold">MODE</span>
+        <ModeSelector />
+      </div>
+      <Separator />
+      {mode === APPLICATION_MODE.WAVE_FORM && <WaveformModeControls />}
+      {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
+      {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
+      {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
+    </SheetContent>
   );
 };

@@ -1,6 +1,6 @@
 import {
   getPlatformSupportedAudioSources,
-  type AudioSource,
+  type TAudioSource,
 } from "@/components/audio/sourceControls/common";
 import {
   VISUAL_REGISTRY,
@@ -44,8 +44,7 @@ interface IMappersState {
   energyTracker: EnergyTracker | null;
 }
 interface IAudioState {
-  source: AudioSource;
-  sourceCounter: number;
+  source: TAudioSource;
 }
 interface IAnalyzersState {
   fft: {
@@ -110,7 +109,6 @@ const useAppState = create<IAppState>((set) => ({
   },
   audio: {
     source: getPlatformSupportedAudioSources()[0],
-    sourceCounter: 0,
   },
   actions: {
     setVisual: (newVisualId: TVisualId) =>
@@ -170,10 +168,10 @@ const useAppState = create<IAppState>((set) => ({
       set((state) => {
         return {
           mode: newMode,
-          audio: {
-            ...state.audio,
-            sourceCounter: state.audio.sourceCounter + 1,
-          },
+          // audio: {
+          //   ...state.audio,
+          //   sourceCounter: state.audio.sourceCounter + 1,
+          // },
           ...(![...state.visual.supportedApplicationModes].includes(newMode)
             ? {
                 visual: Object.values(VISUAL_REGISTRY).find((v) =>

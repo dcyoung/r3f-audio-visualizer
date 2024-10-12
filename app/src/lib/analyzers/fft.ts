@@ -3,7 +3,7 @@
  * See https://github.com/hvianna/audioMotion-analyzer
  */
 
-import { type AnalyzerInputControl } from "./common";
+import { type TAnalyzerInputControl } from "./common";
 
 export interface FreqBinInfo {
   binLo: number;
@@ -60,7 +60,7 @@ export type EnergyMeasure = (typeof EnergyMeasureOptions)[number];
 const ROOT24 = 2 ** (1 / 24), // 24th root of 2
   C0 = 440 * ROOT24 ** -114; // ~16.35 Hz
 
-export default class FFTAnalyzer implements AnalyzerInputControl {
+export default class FFTAnalyzer implements TAnalyzerInputControl {
   private _analyzer: AnalyserNode;
   private _input: GainNode;
   private _output: GainNode;

@@ -1,9 +1,6 @@
-import VisualsDock from "@/components/controls/visualsDock";
+import VisualsDock from "@/components/controls/dock";
 import { Switch } from "@/components/ui/switch";
 import { useAppearance, useAppStateActions } from "@/lib/appState";
-import { cn } from "@/lib/utils";
-
-import SettingsDock from "./settingsDock";
 
 export const ControlsPanel = () => {
   const { showUI } = useAppearance();
@@ -20,18 +17,7 @@ export const ControlsPanel = () => {
           }}
         />
       </div>
-      {showUI && (
-        <div className="pointer-events-none absolute bottom-0 flex w-full items-end justify-center gap-4 p-4">
-          <VisualsDock className="sm:max-w-[60%]" />
-          <div
-            className={cn({
-              "absolute bottom-24 right-0 sm:static sm:bottom-0": true,
-            })}
-          >
-            <SettingsDock />
-          </div>
-        </div>
-      )}
+      {showUI && <VisualsDock />}
     </>
   );
 };

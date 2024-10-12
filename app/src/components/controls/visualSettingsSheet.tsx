@@ -1,7 +1,7 @@
-import { useState, type HTMLAttributes, type PropsWithChildren } from "react";
+import { type HTMLAttributes } from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SheetContent } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
 import {
@@ -61,8 +61,7 @@ const VisualControlsComponent = () => {
   return visual.ControlsComponent ? <visual.ControlsComponent /> : null;
 };
 
-export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
-  const [open, setOpen] = useState(false);
+export const VisualSettingsSheetContent = () => {
   const mode = useMode();
   const { colorBackground, paletteTrackEnergy } = useAppearance();
   const palette = usePalette();
@@ -71,73 +70,68 @@ export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
   const { setCamera } = useAppStateActions();
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent
-        insertHidden={true}
-        side="right"
-        className="no-scrollbar w-full max-w-full overflow-scroll bg-background/70 sm:w-[540px] sm:max-w-[540px]"
-      >
+    <SheetContent
+      insertHidden={true}
+      side="right"
+      className="no-scrollbar w-full max-w-full overflow-scroll bg-background/70 sm:w-[540px] sm:max-w-[540px]"
+    >
+      <div className="space-y-4">
         <div className="space-y-4">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="">Palette</div>
-              <PaletteBand palette={palette} />
-              <div className="grid w-full grid-cols-4 justify-items-stretch gap-2 sm:grid-cols-6">
-                {AVAILABLE_COLOR_PALETTES.map((p) => (
-                  <PaletteIcon
-                    key={p}
-                    palette={p}
-                    onClick={() => setAppearance({ palette: p })}
-                    aria-selected={p === palette}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <Label>Color Background</Label>
-              <Switch
-                defaultChecked={colorBackground}
-                onCheckedChange={(e) => setAppearance({ colorBackground: e })}
-              />
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <Label>Colors Follow Music</Label>
-              <Switch
-                disabled={mode !== APPLICATION_MODE.AUDIO}
-                defaultChecked={paletteTrackEnergy}
-                onCheckedChange={(e) =>
-                  setAppearance({ paletteTrackEnergy: e })
-                }
-              />
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <Label>Auto Orbit Camera</Label>
-              <Switch
-                disabled={!isCameraMode(mode)}
-                defaultChecked={autoOrbitAfterSleepMs > 0}
-                onCheckedChange={(e) => {
-                  setCamera(
-                    e
-                      ? {
-                          mode: "AUTO_ORBIT",
-                          autoOrbitAfterSleepMs: 3500,
-                        }
-                      : {
-                          mode: "ORBIT_CONTROLS",
-                          autoOrbitAfterSleepMs: 0,
-                        },
-                  );
-                }}
-              />
+          <div className="space-y-2">
+            <div className="">Palette</div>
+            <PaletteBand palette={palette} />
+            <div className="grid w-full grid-cols-4 justify-items-stretch gap-2 sm:grid-cols-6">
+              {AVAILABLE_COLOR_PALETTES.map((p) => (
+                <PaletteIcon
+                  key={p}
+                  palette={p}
+                  onClick={() => setAppearance({ palette: p })}
+                  aria-selected={p === palette}
+                />
+              ))}
             </div>
           </div>
-          <Separator />
-          <div className="space-y-4">
-            <VisualControlsComponent />
+          <div className="flex items-center justify-between gap-2">
+            <Label>Color Background</Label>
+            <Switch
+              defaultChecked={colorBackground}
+              onCheckedChange={(e) => setAppearance({ colorBackground: e })}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <Label>Colors Follow Music</Label>
+            <Switch
+              disabled={mode !== APPLICATION_MODE.AUDIO}
+              defaultChecked={paletteTrackEnergy}
+              onCheckedChange={(e) => setAppearance({ paletteTrackEnergy: e })}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <Label>Auto Orbit Camera</Label>
+            <Switch
+              disabled={!isCameraMode(mode)}
+              defaultChecked={autoOrbitAfterSleepMs > 0}
+              onCheckedChange={(e) => {
+                setCamera(
+                  e
+                    ? {
+                        mode: "AUTO_ORBIT",
+                        autoOrbitAfterSleepMs: 3500,
+                      }
+                    : {
+                        mode: "ORBIT_CONTROLS",
+                        autoOrbitAfterSleepMs: 0,
+                      },
+                );
+              }}
+            />
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+        <Separator />
+        <div className="space-y-4">
+          <VisualControlsComponent />
+        </div>
+      </div>
+    </SheetContent>
   );
 };

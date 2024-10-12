@@ -2,7 +2,7 @@ import { useMemo, type HTMLAttributes } from "react";
 import {
   AUDIO_SOURCE,
   getPlatformSupportedAudioSources,
-  type AudioSource,
+  type TAudioSource,
 } from "@/components/audio/sourceControls/common";
 import { FileUploadControls } from "@/components/controls/audioSource/fileUpload";
 import { SoundcloudControls } from "@/components/controls/audioSource/soundcloud/controls";
@@ -19,7 +19,7 @@ import {
 const AudioSourceIcon = ({
   audioSource,
   ...props
-}: { audioSource: AudioSource } & LucideProps) => {
+}: { audioSource: TAudioSource } & LucideProps) => {
   switch (audioSource) {
     case AUDIO_SOURCE.SOUNDCLOUD:
       return <Music {...props} />;

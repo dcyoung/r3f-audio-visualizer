@@ -10,7 +10,7 @@ export const AUDIO_SOURCE = {
 } as const;
 
 type ObjectValues<T> = T[keyof T];
-export type AudioSource = ObjectValues<typeof AUDIO_SOURCE>;
+export type TAudioSource = ObjectValues<typeof AUDIO_SOURCE>;
 
 export const iOS = (): boolean => {
   // apple "iP..." device detection. Ex: iPad, iPod, iPhone etc.
@@ -24,7 +24,7 @@ export const iOS = (): boolean => {
   );
 };
 
-export const getPlatformSupportedAudioSources = (): AudioSource[] => {
+export const getPlatformSupportedAudioSources = (): TAudioSource[] => {
   return [
     AUDIO_SOURCE.SOUNDCLOUD,
     AUDIO_SOURCE.MICROPHONE,

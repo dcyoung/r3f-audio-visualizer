@@ -5,10 +5,14 @@ import {
   AUDIO_SOURCE,
   buildAudio,
   buildAudioContext,
+  type TAudioSource,
 } from "@/components/audio/sourceControls/common";
 import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
 import ScreenShareControls from "@/components/audio/sourceControls/screenshare";
-import { useMediaStreamLink } from "@/lib/analyzers/common";
+import {
+  useMediaStreamLink,
+  type TAnalyzerInputControl,
+} from "@/lib/analyzers/common";
 import FFTAnalyzer from "@/lib/analyzers/fft";
 import ScopeAnalyzer from "@/lib/analyzers/scope";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
@@ -16,77 +20,98 @@ import { useAudio } from "@/lib/appState";
 
 import { AudioScopeAnalyzerControls } from "./scopeAnalyzerControls";
 
-const useAudioInternal = (
-  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE,
-) => {
-  return useMemo(() => {
-    console.log("NEW AUDIO");
-    const audioCtx = buildAudioContext();
-    const audio = buildAudio();
-    return {
-      audio,
-      analyzer: (() => {
-        console.log("Creating analyzer...");
-        switch (mode) {
-          case APPLICATION_MODE.AUDIO:
-            return new FFTAnalyzer(audio, audioCtx, 0.0);
-          case APPLICATION_MODE.AUDIO_SCOPE:
-            return new ScopeAnalyzer(audio, audioCtx);
-          default:
-            return mode satisfies never;
-        }
-      })(),
-    };
-  }, [mode]);
+const buildScopeAnalyzer = () => {
+  const audioCtx = buildAudioContext();
+  const audio = buildAudio();
+  return {
+    audio,
+    analyzer: new ScopeAnalyzer(audio, audioCtx),
+  };
 };
 
-const InternalAudioAnalyzer = ({
+const buildFFTAnalyzer = (volume: number) => {
+  const audioCtx = buildAudioContext();
+  const audio = buildAudio();
+  return {
+    audio,
+    analyzer: new FFTAnalyzer(audio, audioCtx, volume),
+  };
+};
+
+const ControlledMicAnalyzer = ({
+  audio,
+  analyzer,
+}: {
+  audio: HTMLAudioElement;
+  analyzer: TAnalyzerInputControl;
+}) => {
+  const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
+  return (
+    <MicrophoneAudioControls
+      audio={audio}
+      onDisabled={onDisabled}
+      onStreamCreated={onStreamCreated}
+    />
+  );
+};
+
+const ControlledScreenShareAnalyzer = ({
+  audio,
+  analyzer,
+}: {
+  audio: HTMLAudioElement;
+  analyzer: TAnalyzerInputControl;
+}) => {
+  const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
+  return (
+    <ScreenShareControls
+      audio={audio}
+      onDisabled={onDisabled}
+      onStreamCreated={onStreamCreated}
+    />
+  );
+};
+
+const isMediaStream = (source: TAudioSource) => {
+  switch (source) {
+    case AUDIO_SOURCE.MICROPHONE:
+    case AUDIO_SOURCE.SCREEN_SHARE:
+      return true;
+    case AUDIO_SOURCE.SOUNDCLOUD:
+    case AUDIO_SOURCE.FILE_UPLOAD:
+      return false;
+    default:
+      return source satisfies never;
+  }
+};
+
+const ControlledAnalyzer = ({
   mode,
   audioSource,
 }: {
   mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
-  audioSource: typeof AUDIO_SOURCE.SOUNDCLOUD | typeof AUDIO_SOURCE.FILE_UPLOAD;
+  audioSource: TAudioSource;
 }) => {
-  const { audio, analyzer } = useAudioInternal(mode);
-
-  return (
-    <>
-      <ControlledAudioSource audio={audio} audioSource={audioSource} />
-      {analyzer instanceof FFTAnalyzer ? (
-        <FFTAnalyzerControls analyzer={analyzer} />
-      ) : analyzer instanceof ScopeAnalyzer ? (
-        <AudioScopeAnalyzerControls analyzer={analyzer} />
-      ) : (
-        (analyzer satisfies never)
-      )}
-    </>
-  );
-};
-
-const InternalMediaStreamAnalyzer = ({
-  mode,
-  audioSource,
-}: {
-  mode: "AUDIO" | "AUDIO_SCOPE";
-  audioSource: "MICROPHONE" | "SCREEN_SHARE";
-}) => {
-  const { audio, analyzer } = useAudioInternal(mode);
-  const { onDisabled, onStreamCreated } = useMediaStreamLink(audio, analyzer);
+  const { audio, analyzer } = useMemo(() => {
+    switch (mode) {
+      case APPLICATION_MODE.AUDIO:
+        return buildFFTAnalyzer(isMediaStream(audioSource) ? 0.0 : 1.0);
+      case APPLICATION_MODE.AUDIO_SCOPE:
+        return buildScopeAnalyzer();
+      default:
+        return mode satisfies never;
+    }
+  }, [mode, audioSource]);
 
   return (
     <>
       {audioSource === AUDIO_SOURCE.MICROPHONE ? (
-        <MicrophoneAudioControls
-          audio={audio}
-          onDisabled={onDisabled}
-          onStreamCreated={onStreamCreated}
-        />
+        <ControlledMicAnalyzer audio={audio} analyzer={analyzer} />
       ) : audioSource === AUDIO_SOURCE.SCREEN_SHARE ? (
-        <ScreenShareControls
-          audio={audio}
-          onDisabled={onDisabled}
-          onStreamCreated={onStreamCreated}
-        />
+        <ControlledScreenShareAnalyzer audio={audio} analyzer={analyzer} />
+      ) : audioSource === AUDIO_SOURCE.SOUNDCLOUD ||
+        audioSource === AUDIO_SOURCE.FILE_UPLOAD ? (
+        <ControlledAudioSource audio={audio} audioSource={audioSource} />
       ) : (
         (audioSource satisfies never)
       )}
@@ -108,16 +133,7 @@ const AudioAnalyzer = ({
 }) => {
   const { source } = useAudio();
 
-  switch (source) {
-    case AUDIO_SOURCE.SOUNDCLOUD:
-    case AUDIO_SOURCE.FILE_UPLOAD:
-      return <InternalAudioAnalyzer mode={mode} audioSource={source} />;
-    case AUDIO_SOURCE.MICROPHONE:
-    case AUDIO_SOURCE.SCREEN_SHARE:
-      return <InternalMediaStreamAnalyzer mode={mode} audioSource={source} />;
-    default:
-      return source satisfies never;
-  }
+  return <ControlledAnalyzer mode={mode} audioSource={source} />;
 };
 
 export default AudioAnalyzer;

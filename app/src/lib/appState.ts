@@ -18,6 +18,10 @@ import { CoordinateMapper_WaveformSuperposition } from "./mappers/coordinateMapp
 import { type IMotionMapper } from "./mappers/motionMappers/common";
 import { MotionMapper_Noise } from "./mappers/motionMappers/curlNoise";
 import { TextureMapper } from "./mappers/textureMappers/textureMapper";
+import {
+  NoOpScalarTracker,
+  type IScalarTracker,
+} from "./mappers/valueTracker/common";
 import { EnergyTracker } from "./mappers/valueTracker/energyTracker";
 import {
   AVAILABLE_COLOR_PALETTES,
@@ -41,7 +45,7 @@ interface IMappersState {
   coordinateMapperWaveform: CoordinateMapper_WaveformSuperposition;
   coordinateMapperNoise: CoordinateMapper_Noise;
   coordinateMapperData: CoordinateMapper_Data;
-  energyTracker: EnergyTracker | null;
+  energyTracker: IScalarTracker | null;
 }
 interface IAudioState {
   source: TAudioSource;
@@ -168,10 +172,6 @@ const useAppState = create<IAppState>((set) => ({
       set((state) => {
         return {
           mode: newMode,
-          // audio: {
-          //   ...state.audio,
-          //   sourceCounter: state.audio.sourceCounter + 1,
-          // },
           ...(![...state.visual.supportedApplicationModes].includes(newMode)
             ? {
                 visual: Object.values(VISUAL_REGISTRY).find((v) =>
@@ -179,6 +179,13 @@ const useAppState = create<IAppState>((set) => ({
                 ),
               }
             : {}),
+          mappers: {
+            ...state.mappers,
+            energyTracker:
+              newMode === APPLICATION_MODE.AUDIO
+                ? new EnergyTracker(0)
+                : NoOpScalarTracker,
+          },
           appearance: {
             ...state.appearance,
             // Reset paletteTrackEnergy whenever the mode changes
@@ -187,7 +194,6 @@ const useAppState = create<IAppState>((set) => ({
             ...(newMode === APPLICATION_MODE.AUDIO_SCOPE
               ? {
                   palette: "rainbow",
-                  colorBackground: false,
                 }
               : {}),
           },

@@ -63,6 +63,7 @@ const VisualControlsComponent = () => {
 export const VisualSettingsSheetContent = () => {
   const mode = useMode();
   const { colorBackground, paletteTrackEnergy } = useAppearance();
+  console.log(colorBackground, paletteTrackEnergy);
   const palette = usePalette();
   const { setAppearance } = useAppStateActions();
   const { autoOrbitAfterSleepMs } = useCameraState();

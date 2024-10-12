@@ -7,7 +7,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { SheetContent } from "@/components/ui/sheet";
 import {
   APPLICATION_MODE,
   getPlatformSupportedApplicationModes,
@@ -88,11 +87,7 @@ const ModeSelector = () => {
 export const ModeSheetContent = () => {
   const mode = useMode();
   return (
-    <SheetContent
-      insertHidden={true}
-      side="right"
-      className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[540px] sm:max-w-[540px]"
-    >
+    <>
       <div className="flex items-center justify-start gap-4">
         <span className="text-xl font-bold">MODE</span>
         <ModeSelector />
@@ -102,6 +97,6 @@ export const ModeSheetContent = () => {
       {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
       {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
       {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
-    </SheetContent>
+    </>
   );
 };

@@ -1,13 +1,13 @@
-import { type VisualProps } from "@/components/visualizers/common";
 import Ground from "@/components/visualizers/ground";
-import { useStencilVisualConfigContext } from "@/context/visualConfig/stencil";
+import { type TVisualProps } from "@/components/visualizers/models";
 import { Vector3 } from "three";
 
 import BaseStencil from "./base";
+import { useStencilVisualConfigContext } from "./config";
 import { getPoly2D as getPoly2D_DIAG } from "./polys/diagonal";
 import { getPoly2D as getPoly2D_OWL } from "./polys/owl";
 
-const StencilVisual = ({ coordinateMapper }: VisualProps) => {
+const StencilVisual = ({ coordinateMapper }: TVisualProps) => {
   const { pointSize, power, bounds, transitionSpeed } =
     useStencilVisualConfigContext();
   // const { pointSize, power, bounds, transitionSpeed } = useControls({

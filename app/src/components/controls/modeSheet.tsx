@@ -1,4 +1,4 @@
-import { useMemo, useState, type PropsWithChildren } from "react";
+import { useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -7,46 +7,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useModeContext, useModeContextSetters } from "@/context/mode";
 import {
   APPLICATION_MODE,
   getPlatformSupportedApplicationModes,
   isAudioMode,
-  type ApplicationMode,
+  type TApplicationMode,
 } from "@/lib/applicationModes";
-import {
-  AudioWaveform,
-  Drum,
-  HelpCircle,
-  Music,
-  Shell,
-  Waves,
-} from "lucide-react";
+import { useAppStateActions, useMode } from "@/lib/appState";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
+import { AudioWaveform, Music, Shell, Waves, Wind } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
-import { NoiseGeneratorModeControls } from "./mode/noise";
-import { WaveformModeControls } from "./mode/waveform";
 
-const ModeIcon = ({ mode }: { mode: ApplicationMode }) => {
+const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
   switch (mode) {
-    case "WAVE_FORM":
+    case APPLICATION_MODE.WAVE_FORM:
       return <AudioWaveform />;
-    case "NOISE":
+    case APPLICATION_MODE.NOISE:
       return <Waves />;
-    case "AUDIO":
+    case APPLICATION_MODE.AUDIO:
       return <Music />;
-    case "AUDIO_SCOPE":
+    case APPLICATION_MODE.AUDIO_SCOPE:
       return <Shell />;
-    case "PARTICLE_NOISE":
-      return <Drum />;
+    case APPLICATION_MODE.PARTICLE_NOISE:
+      return <Wind />;
     default:
-      return <HelpCircle />;
-    // return mode satisfies never;
+      return mode satisfies never;
   }
 };
-const ModeSelectEntry = ({ mode }: { mode: ApplicationMode }) => {
+const ModeSelectEntry = ({ mode }: { mode: TApplicationMode }) => {
   return (
     <div className="flex w-full items-center justify-start gap-2">
       <div className="w-4">{isAudioMode(mode) && "🎧"}</div>
@@ -57,8 +47,8 @@ const ModeSelectEntry = ({ mode }: { mode: ApplicationMode }) => {
 };
 
 const ModeSelector = () => {
-  const { mode } = useModeContext();
-  const { setMode } = useModeContextSetters();
+  const mode = useMode();
+  const { setMode } = useAppStateActions();
 
   const availableModes = useMemo(() => {
     return getPlatformSupportedApplicationModes();
@@ -67,7 +57,7 @@ const ModeSelector = () => {
   return (
     <Select
       onValueChange={(v) => {
-        setMode(v as ApplicationMode);
+        setMode(v as (typeof availableModes)[number]);
       }}
     >
       <SelectTrigger>
@@ -92,28 +82,23 @@ const ModeSelector = () => {
   );
 };
 
-export const ModeSheet = ({ children }: PropsWithChildren) => {
-  const [open, setOpen] = useState(false);
-  const { mode } = useModeContext();
-
+export const ModeSheetContent = () => {
+  const mode = useMode();
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent
-        insertHidden={true}
-        side="right"
-        className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[540px] sm:max-w-[540px]"
-      >
-        <div className="flex items-center justify-start gap-4">
-          <span className="text-xl font-bold">MODE</span>
-          <ModeSelector />
-        </div>
-        <Separator />
-        {mode === APPLICATION_MODE.WAVE_FORM && <WaveformModeControls />}
-        {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
-        {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
-        {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
-      </SheetContent>
-    </Sheet>
+    <>
+      <div className="flex items-center justify-start gap-4">
+        <span className="text-xl font-bold">MODE</span>
+        <ModeSelector />
+      </div>
+      <Separator />
+      {mode === APPLICATION_MODE.WAVE_FORM && (
+        <COORDINATE_MAPPER_REGISTRY.waveform.ControlsComponent />
+      )}
+      {mode === APPLICATION_MODE.NOISE && (
+        <COORDINATE_MAPPER_REGISTRY.noise.ControlsComponent />
+      )}
+      {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
+      {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
+    </>
   );
 };

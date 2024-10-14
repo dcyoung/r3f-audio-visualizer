@@ -1,4 +1,4 @@
-import { type AnalyzerInputControl } from "./common";
+import { type TAnalyzerInputControl } from "./common";
 
 function createBufferCopy(context: AudioContext, buffer: Float32Array) {
   const copyNode = context.createScriptProcessor(buffer.length, 1, 1);
@@ -47,7 +47,7 @@ function createHilbertFilter(
   return [delay, hilbert];
 }
 
-export default class ScopeAnalyzer implements AnalyzerInputControl {
+export default class ScopeAnalyzer implements TAnalyzerInputControl {
   public readonly _audioCtx: AudioContext;
   public readonly timeSamples: Float32Array;
   public readonly quadSamples: Float32Array;

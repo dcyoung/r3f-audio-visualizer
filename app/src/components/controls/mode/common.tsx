@@ -1,16 +1,12 @@
-import { useMemo, type HTMLAttributes, type HTMLProps } from "react";
+import { useMemo, type HTMLAttributes } from "react";
 import {
   AUDIO_SOURCE,
   getPlatformSupportedAudioSources,
-  type AudioSource,
+  type TAudioSource,
 } from "@/components/audio/sourceControls/common";
 import { FileUploadControls } from "@/components/controls/audioSource/fileUpload";
 import { SoundcloudControls } from "@/components/controls/audioSource/soundcloud/controls";
-import { Label } from "@/components/ui/label";
-import {
-  useAudioSourceContext,
-  useAudioSourceContextSetters,
-} from "@/context/audioSource";
+import { useAppStateActions, useAudio } from "@/lib/appState";
 import { cn } from "@/lib/utils";
 import {
   FileUp,
@@ -20,32 +16,10 @@ import {
   type LucideProps,
 } from "lucide-react";
 
-export const ValueLabel = ({
-  label,
-  value,
-  className,
-  ...props
-}: HTMLProps<HTMLDivElement> & {
-  label: string;
-  value: string | number;
-}) => {
-  return (
-    <div
-      className={cn("flex w-full items-center justify-between", className)}
-      {...props}
-    >
-      <Label>{label}</Label>
-      <span className="w-12 px-2 py-0.5 text-right text-sm text-muted-foreground">
-        {value}
-      </span>
-    </div>
-  );
-};
-
 const AudioSourceIcon = ({
   audioSource,
   ...props
-}: { audioSource: AudioSource } & LucideProps) => {
+}: { audioSource: TAudioSource } & LucideProps) => {
   switch (audioSource) {
     case AUDIO_SOURCE.SOUNDCLOUD:
       return <Music {...props} />;
@@ -80,8 +54,8 @@ export const AudioSourceSelect = ({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
-  const { audioSource } = useAudioSourceContext();
-  const { setAudioSource } = useAudioSourceContextSetters();
+  const { source: activeSource } = useAudio();
+  const { setAudio } = useAppStateActions();
   const available = useMemo(() => {
     return getPlatformSupportedAudioSources();
   }, []);
@@ -97,8 +71,8 @@ export const AudioSourceSelect = ({
       {available.map((source) => (
         <GridIconWrapper
           key={`grid_icon_${source}`}
-          onClick={() => setAudioSource(source)}
-          aria-selected={audioSource === source}
+          onClick={() => setAudio({ source })}
+          aria-selected={activeSource === source}
         >
           <AudioSourceIcon audioSource={source} />
         </GridIconWrapper>
@@ -108,8 +82,8 @@ export const AudioSourceSelect = ({
 };
 
 export const AudioSourceControls = () => {
-  const { audioSource } = useAudioSourceContext();
-  switch (audioSource) {
+  const { source } = useAudio();
+  switch (source) {
     case AUDIO_SOURCE.SOUNDCLOUD:
       return <SoundcloudControls />;
     case AUDIO_SOURCE.FILE_UPLOAD:
@@ -119,6 +93,6 @@ export const AudioSourceControls = () => {
       // TODO: Add controls
       return null;
     default:
-      return audioSource satisfies never;
+      return source satisfies never;
   }
 };

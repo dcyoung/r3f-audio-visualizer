@@ -1,21 +1,18 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useFFTAnalyzerContext } from "@/context/fftAnalyzer";
 import type FFTAnalyzer from "@/lib/analyzers/fft";
-import {
-  useAppStateActions,
-  useEnergyInfo,
-  useVisualSourceDataX,
-} from "@/lib/appState";
+import { useAnalyzerFFT, useMappers } from "@/lib/appState";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
 
 export const FFTAnalyzerControls = ({
   analyzer,
 }: {
   analyzer: FFTAnalyzer;
 }) => {
-  const { octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
-  const freqData = useVisualSourceDataX();
-  const energyInfo = useEnergyInfo();
-  const { resizeVisualSourceData } = useAppStateActions();
+  const { octaveBandMode, energyMeasure } = useAnalyzerFFT();
+  const { energyTracker } = useMappers();
+  const coordinateMapperData =
+    COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
+  const { setParams } = COORDINATE_MAPPER_REGISTRY.data.hooks.useActions();
   const animationRequestRef = useRef<number>(null!);
 
   /**
@@ -24,18 +21,18 @@ export const FFTAnalyzerControls = ({
   const mapData = useCallback(() => {
     const bars = analyzer.getBars();
 
-    if (freqData.length != bars.length) {
+    if (coordinateMapperData.data.length != bars.length) {
       console.log(`Resizing ${bars.length}`);
-      resizeVisualSourceData(bars.length);
+      setParams({ size: bars.length });
       return;
     }
 
-    energyInfo.current = analyzer.getEnergy(energyMeasure);
+    energyTracker?.set(analyzer.getEnergy(energyMeasure));
 
     bars.forEach(({ value }, index) => {
-      freqData[index] = value;
+      coordinateMapperData.data[index] = value;
     });
-  }, [freqData, analyzer, resizeVisualSourceData, energyInfo, energyMeasure]);
+  }, [coordinateMapperData, analyzer, energyTracker, energyMeasure, setParams]);
 
   /**
    * Re-Synchronize the animation loop if the target data destination changes.
@@ -50,7 +47,7 @@ export const FFTAnalyzerControls = ({
     };
     animationRequestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRequestRef.current);
-  }, [freqData, energyMeasure, mapData]);
+  }, [coordinateMapperData, energyMeasure, mapData]);
 
   /**
    * Make sure an analyzer exists with the correct mode

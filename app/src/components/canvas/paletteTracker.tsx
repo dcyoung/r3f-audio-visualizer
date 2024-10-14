@@ -1,8 +1,6 @@
-import { useVisualContext } from "@/context/visual";
 import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/scalarEventDetector";
-import { useAppStateActions, useEnergyInfo } from "@/lib/appState";
+import { useAppearance, useAppStateActions, useMappers } from "@/lib/appState";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
-import { EnergyTracker } from "@/lib/mappers/valueTracker/energyTracker";
 import { useFrame } from "@react-three/fiber";
 
 const PaletteUpdater = ({
@@ -10,7 +8,7 @@ const PaletteUpdater = ({
 }: {
   scalarTracker: IScalarTracker;
 }) => {
-  const { paletteTrackEnergy: enabled } = useVisualContext();
+  const { paletteTrackEnergy: enabled } = useAppearance();
   const detector = new ScalarMovingAvgEventDetector(0.5, 50, 500);
   const { nextPalette } = useAppStateActions();
 
@@ -19,7 +17,7 @@ const PaletteUpdater = ({
       return;
     }
 
-    if (detector.step(scalarTracker.getNormalizedValue())) {
+    if (detector.step(scalarTracker.get())) {
       nextPalette();
     }
   });
@@ -28,8 +26,8 @@ const PaletteUpdater = ({
 };
 
 export const PaletteTracker = () => {
-  const energyInfo = useEnergyInfo();
-  const scalarTracker = new EnergyTracker(energyInfo);
-
-  return <PaletteUpdater scalarTracker={scalarTracker} />;
+  const { energyTracker } = useMappers();
+  return energyTracker ? (
+    <PaletteUpdater scalarTracker={energyTracker} />
+  ) : null;
 };

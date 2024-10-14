@@ -1,12 +1,28 @@
-import { type MotionVisualProps } from "@/components/visualizers/common";
+import { type ComponentPropsWithoutRef } from "react";
 import Ground from "@/components/visualizers/ground";
-import { useSwarmVisualConfigContext } from "@/context/visualConfig/swarm";
+import { createConfigStore } from "@/lib/storeHelpers";
 import { Vector3 } from "three";
 
-import BaseSwarm from "./base";
+import { type TOmitVisualProps, type TVisualProps } from "../models";
+import BaseVisual from "./base";
 
-const SwarmVisual = ({ motionMapper }: MotionVisualProps) => {
-  const { maxDim, pointSize } = useSwarmVisualConfigContext();
+export type TConfig = Required<
+  TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
+>;
+
+export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
+  {
+    default: {
+      maxPoints: 1000,
+      pointSize: 0.2,
+      maxDim: 2,
+      color: "white",
+    },
+  },
+);
+
+const SwarmVisual = ({ motionMapper }: TVisualProps) => {
+  const params = useParams();
   // const { maxDim, pointSize } = useControls({
   //   Particles: folder(
   //     {
@@ -19,12 +35,8 @@ const SwarmVisual = ({ motionMapper }: MotionVisualProps) => {
 
   return (
     <>
-      <BaseSwarm
-        motionMapper={motionMapper}
-        maxDim={maxDim}
-        pointSize={pointSize}
-      />
-      <Ground position={new Vector3(0, 0, -1.5 * maxDim)} />
+      <BaseVisual motionMapper={motionMapper} {...params} />
+      <Ground position={new Vector3(0, 0, -1.5 * params.maxDim)} />
     </>
   );
 };

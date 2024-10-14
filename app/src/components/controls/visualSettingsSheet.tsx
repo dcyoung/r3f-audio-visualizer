@@ -1,29 +1,22 @@
-import { useState, type HTMLAttributes, type PropsWithChildren } from "react";
+import { type HTMLAttributes } from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import {
-  CAMERA_CONTROLS_MODE,
-  useCameraControlsContext,
-  useCameraControlsContextSetters,
-} from "@/context/cameraControls";
-import { useModeContext } from "@/context/mode";
-import { useVisualContext, useVisualContextSetters } from "@/context/visual";
 import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
-import { useAppStateActions, usePalette } from "@/lib/appState";
+import {
+  useAppearance,
+  useAppStateActions,
+  useCameraState,
+  useMode,
+  usePalette,
+  useVisual,
+} from "@/lib/appState";
 import {
   AVAILABLE_COLOR_PALETTES,
   ColorPalette,
   type ColorPaletteType,
 } from "@/lib/palettes";
 import { cn } from "@/lib/utils";
-
-import { VISUAL } from "../visualizers/common";
-import { CubeVisualSettingsControls } from "./visual/cube";
-import { DiffusedRingVisualSettingsControls } from "./visual/diffusedRing";
-import { GridVisualSettingsControls } from "./visual/grid";
-import { SphereVisualSettingsControls } from "./visual/sphere";
 
 const PaletteBand = ({
   palette,
@@ -33,7 +26,7 @@ const PaletteBand = ({
   const cp = ColorPalette.getPalette(palette);
   return (
     <div
-      className={cn("h-8 w-full rounded-sm", className)}
+      className={cn("h-4 w-full rounded-sm", className)}
       style={{
         background: `linear-gradient(0.25turn, ${cp.colors.join(",")})`,
       }}
@@ -62,103 +55,76 @@ const PaletteIcon = ({
   );
 };
 
-const VisualSettingsControls = () => {
-  const { visual } = useVisualContext();
-  switch (visual) {
-    case VISUAL.CUBE:
-      return CubeVisualSettingsControls();
-    case VISUAL.GRID:
-      return GridVisualSettingsControls();
-    case VISUAL.SPHERE:
-      return SphereVisualSettingsControls();
-    case VISUAL.DIFFUSED_RING:
-      return DiffusedRingVisualSettingsControls();
-    case VISUAL.RIBBONS:
-    case VISUAL.DNA:
-    case VISUAL.BOXES:
-    case VISUAL.WALK:
-      return null;
-    default:
-      return visual satisfies never;
-  }
+const VisualControlsComponent = () => {
+  const visual = useVisual();
+  return visual.ControlsComponent ? <visual.ControlsComponent /> : null;
 };
 
-export const VisualSettingsSheet = ({ children }: PropsWithChildren) => {
-  const [open, setOpen] = useState(false);
-  const { mode } = useModeContext();
-  const { colorBackground, paletteTrackEnergy } = useVisualContext();
-  const { setColorBackground, setPaletteTrackEnergy } =
-    useVisualContextSetters();
+export const VisualSettingsSheetContent = () => {
+  const mode = useMode();
+  const { colorBackground, paletteTrackEnergy } = useAppearance();
   const palette = usePalette();
-  const { setPalette } = useAppStateActions();
-  const { autoOrbitAfterSleepMs } = useCameraControlsContext();
-  const { setMode: setCameraMode, setAutoOrbitAfterSleepMs } =
-    useCameraControlsContextSetters();
+  const { setAppearance } = useAppStateActions();
+  const { autoOrbitAfterSleepMs } = useCameraState();
+  const { setCamera } = useAppStateActions();
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent
-        insertHidden={true}
-        side="right"
-        className="no-scrollbar w-full max-w-full overflow-scroll bg-background/70 sm:w-[540px] sm:max-w-[540px]"
-      >
-        <div className="space-y-4">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="">Palette</div>
-              <PaletteBand palette={palette} />
-              <div className="grid w-full grid-cols-4 justify-items-stretch gap-2 sm:grid-cols-6">
-                {AVAILABLE_COLOR_PALETTES.map((p) => (
-                  <PaletteIcon
-                    key={p}
-                    palette={p}
-                    onClick={() => setPalette(p)}
-                    aria-selected={p === palette}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <Label>Color Background</Label>
-              <Switch
-                defaultChecked={colorBackground}
-                onCheckedChange={(e) => {
-                  setColorBackground(e);
-                }}
+    <div className="space-y-4">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="">Palette</div>
+          <PaletteBand palette={palette} />
+          <div className="grid w-full grid-cols-6 justify-items-stretch gap-2 sm:grid-cols-8">
+            {AVAILABLE_COLOR_PALETTES.map((p) => (
+              <PaletteIcon
+                key={p}
+                palette={p}
+                onClick={() => setAppearance({ palette: p })}
+                aria-selected={p === palette}
               />
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <Label>Colors Follow Music</Label>
-              <Switch
-                disabled={mode !== APPLICATION_MODE.AUDIO}
-                defaultChecked={paletteTrackEnergy}
-                onCheckedChange={(e) => {
-                  setPaletteTrackEnergy(e);
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <Label>Auto Orbit Camera</Label>
-              <Switch
-                disabled={!isCameraMode(mode)}
-                defaultChecked={autoOrbitAfterSleepMs > 0}
-                onCheckedChange={(e) => {
-                  setCameraMode(
-                    e
-                      ? CAMERA_CONTROLS_MODE.AUTO_ORBIT
-                      : CAMERA_CONTROLS_MODE.ORBIT_CONTROLS,
-                  );
-                  setAutoOrbitAfterSleepMs(e ? 3500 : 0);
-                }}
-              />
-            </div>
-          </div>
-          <Separator />
-          <div className="space-y-4">
-            <VisualSettingsControls />
+            ))}
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+        <div className="flex items-center justify-between gap-2">
+          <Label>Color Background</Label>
+          <Switch
+            defaultChecked={colorBackground}
+            onCheckedChange={(e) => setAppearance({ colorBackground: e })}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Label>Colors Follow Music</Label>
+          <Switch
+            disabled={mode !== APPLICATION_MODE.AUDIO}
+            defaultChecked={paletteTrackEnergy}
+            onCheckedChange={(e) => setAppearance({ paletteTrackEnergy: e })}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Label>Auto Orbit Camera</Label>
+          <Switch
+            disabled={!isCameraMode(mode)}
+            defaultChecked={autoOrbitAfterSleepMs > 0}
+            onCheckedChange={(e) => {
+              setCamera(
+                e
+                  ? {
+                      mode: "AUTO_ORBIT",
+                      autoOrbitAfterSleepMs: 3500,
+                    }
+                  : {
+                      mode: "ORBIT_CONTROLS",
+                      autoOrbitAfterSleepMs: 0,
+                    },
+              );
+            }}
+          />
+        </div>
+      </div>
+      <Separator />
+      <div className="space-y-4">
+        <VisualControlsComponent />
+      </div>
+    </div>
   );
 };

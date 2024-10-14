@@ -1,62 +1,84 @@
-import { forwardRef, type HTMLAttributes, type HTMLProps } from "react";
+import { useMemo, useState } from "react";
+import { VISUAL_REGISTRY } from "@/components/visualizers/registry";
+import { useAppStateActions, useMode, useVisual } from "@/lib/appState";
 import { cn } from "@/lib/utils";
+import { Palette, Settings } from "lucide-react";
 
-export const DockItem = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "grid size-10 flex-none grow cursor-pointer snap-center place-items-center rounded-sm bg-gradient-to-b from-slate-700 to-black text-white shadow-inner duration-300 ease-in-out hover:scale-110 hover:from-slate-500 hover:to-slate-900 aria-selected:from-slate-100 aria-selected:to-slate-500 aria-selected:text-black",
-          className,
-        )}
-        // style={{
-        //   animationName: "scale, scale",
-        //   animationFillMode: "both",
-        //   animationTimingFunction: "ease-in-out",
-        //   animationDirection: "normal, reverse",
-        //   animationTimeline: "view(inline)",
-        //   animationRange: "entry 0% entry 150%, exit -50% exit 100%",
-        // }}
-        {...props}
-      />
+import { Dock, DockCard } from "../ui/dock";
+import { Sheet, SheetContent } from "../ui/sheet";
+import { ModeSheetContent } from "./modeSheet";
+import { VisualSettingsSheetContent } from "./visualSettingsSheet";
+
+export const SettingsDockCard = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <DockCard
+        key="settings"
+        id="settings"
+        handleClick={() => setOpen((prev) => !prev)}
+      >
+        <Settings />
+      </DockCard>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          insertHidden={true}
+          side="right"
+          className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
+        >
+          <ModeSheetContent />
+          <VisualSettingsSheetContent />
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+};
+
+export const VisualSettingsSheetDockCard = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <DockCard
+        key="visual-settings"
+        id="visual-settings"
+        handleClick={() => setOpen((prev) => !prev)}
+      >
+        <Palette />
+      </DockCard>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <VisualSettingsSheetContent />
+      </Sheet>
+    </>
+  );
+};
+
+export const ApplicationDock = () => {
+  const activeVisual = useVisual();
+  const { setVisual } = useAppStateActions();
+  const mode = useMode();
+
+  const supportedVisuals = useMemo(() => {
+    return Object.values(VISUAL_REGISTRY).filter((visual) =>
+      [...visual.supportedApplicationModes].includes(mode),
     );
-  },
-);
-DockItem.displayName = "DockItem";
-
-export const DockNav = ({
-  className,
-  children,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) => {
+  }, [mode]);
   return (
-    <div
-      className={cn(
-        "pointer-events-auto flex h-full w-full snap-x snap-mandatory flex-row items-center justify-start gap-4 overflow-auto rounded-xl bg-gradient-to-t from-white/10 to-white/0 p-4 shadow-inner",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </div>
+    <Dock fixedChildren={<SettingsDockCard />}>
+      {supportedVisuals.map((visual) => (
+        <DockCard
+          key={visual.id}
+          id={visual.id}
+          handleClick={() => setVisual(visual.id)}
+          active={activeVisual.id === visual.id}
+          className={cn({
+            "from-slate-500": activeVisual.id === visual.id,
+          })}
+        >
+          <visual.icon />
+        </DockCard>
+      ))}
+    </Dock>
   );
 };
 
-export const Dock = ({
-  className,
-  children,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <div
-      className={cn(
-        "pointer-events-none h-fit overflow-hidden bg-transparent",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+export default ApplicationDock;

@@ -1,28 +1,42 @@
-import { type VisualProps } from "@/components/visualizers/common";
+import { type ComponentPropsWithoutRef } from "react";
 import Ground from "@/components/visualizers/ground";
-import { useSphereVisualConfigContext } from "@/context/visualConfig/sphere";
+import {
+  type TOmitVisualProps,
+  type TVisualProps,
+} from "@/components/visualizers/models";
+import { createConfigStore } from "@/lib/storeHelpers";
 import { Vector3 } from "three";
 
-import BaseSphere from "./base";
+import BaseVisual from "./base";
 
-const SphereVisual = ({ coordinateMapper }: VisualProps) => {
-  const { radius, nPoints, unitSideLength } = useSphereVisualConfigContext();
+export type TConfig = Required<
+  TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
+>;
 
+export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
+  {
+    default: {
+      radius: 2,
+      nPoints: 800,
+      cubeSideLength: 0.05,
+    },
+  },
+);
+
+export default ({ coordinateMapper }: TVisualProps) => {
+  const params = useParams();
   return (
     <>
-      <BaseSphere
-        coordinateMapper={coordinateMapper}
-        radius={radius}
-        nPoints={nPoints}
-        cubeSideLength={unitSideLength}
-      />
+      <BaseVisual coordinateMapper={coordinateMapper} {...params} />
       <Ground
         position={
-          new Vector3(0, 0, -radius * (1 + 0.25 * coordinateMapper.amplitude))
+          new Vector3(
+            0,
+            0,
+            -params.radius * (1 + 0.25 * coordinateMapper.amplitude),
+          )
         }
       />
     </>
   );
 };
-
-export default SphereVisual;

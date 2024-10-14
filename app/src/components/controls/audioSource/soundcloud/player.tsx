@@ -4,8 +4,8 @@ import {
   type ComponentPropsWithoutRef,
   type HTMLAttributes,
 } from "react";
-import { useModeContext } from "@/context/mode";
 import { useSoundcloudContext } from "@/context/soundcloud";
+import { useAppearance } from "@/lib/appState";
 import { getTrackStreamUrl } from "@/lib/soundcloud/api";
 import { type SoundcloudTrack } from "@/lib/soundcloud/models";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export const TrackPlayer = ({
   audio: HTMLAudioElement;
   track: SoundcloudTrack;
 }) => {
-  const { showUI } = useModeContext();
+  const { showUI } = useAppearance();
 
   const { data: streamUrl } = useSuspenseQuery({
     queryKey: ["soundcloud-stream-url", track.id],

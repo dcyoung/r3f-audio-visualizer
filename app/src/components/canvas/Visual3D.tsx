@@ -1,77 +1,43 @@
 import { BackgroundFog, CanvasBackground } from "@/components/canvas/common";
-import AudioVisual from "@/components/visualizers/visualizerAudio";
-import NoiseVisual from "@/components/visualizers/visualizerNoise";
-import ParticleNoiseVisual from "@/components/visualizers/visualizerParticleNoise";
-import WaveformVisual from "@/components/visualizers/visualizerWaveform";
-import {
-  CAMERA_CONTROLS_MODE,
-  useCameraControlsContext,
-  useCameraControlsContextSetters,
-} from "@/context/cameraControls";
-import { useVisualContext } from "@/context/visual";
-import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { useUser } from "@/lib/appState";
+import ModalVisual from "@/components/visualizers/visualizerModal";
+import { useAppStateActions, useCameraState, useUser } from "@/lib/appState";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 
 import { AutoOrbitCameraControls } from "./AutoOrbitCamera";
 import { PaletteTracker } from "./paletteTracker";
 
-const VisualizerComponent = ({
-  mode,
-}: {
-  mode: "WAVE_FORM" | "NOISE" | "AUDIO" | "PARTICLE_NOISE";
-}) => {
-  const { visual } = useVisualContext();
-  switch (mode) {
-    case APPLICATION_MODE.WAVE_FORM:
-      return <WaveformVisual visual={visual} />;
-    case APPLICATION_MODE.NOISE:
-      return <NoiseVisual visual={visual} />;
-    case APPLICATION_MODE.PARTICLE_NOISE:
-      return <ParticleNoiseVisual />;
-    case APPLICATION_MODE.AUDIO:
-      return <AudioVisual visual={visual} />;
-    default:
-      return mode satisfies never;
-  }
-};
-
 const CameraControls = () => {
-  const { mode, autoOrbitAfterSleepMs } = useCameraControlsContext();
-  const { setMode } = useCameraControlsContextSetters();
+  const { mode, autoOrbitAfterSleepMs } = useCameraState();
+  const { setCamera } = useAppStateActions();
   const { canvasInteractionEventTracker } = useUser();
 
   useFrame(() => {
     if (
-      mode === CAMERA_CONTROLS_MODE.ORBIT_CONTROLS &&
+      mode === "ORBIT_CONTROLS" &&
       autoOrbitAfterSleepMs > 0 &&
       canvasInteractionEventTracker.msSinceLastEvent > autoOrbitAfterSleepMs
     ) {
-      setMode(CAMERA_CONTROLS_MODE.AUTO_ORBIT);
+      setCamera({ mode: "AUTO_ORBIT" });
     } else if (
-      mode === CAMERA_CONTROLS_MODE.AUTO_ORBIT &&
+      mode === "AUTO_ORBIT" &&
       canvasInteractionEventTracker.msSinceLastEvent < autoOrbitAfterSleepMs
     ) {
-      setMode(CAMERA_CONTROLS_MODE.ORBIT_CONTROLS);
+      setCamera({ mode: "ORBIT_CONTROLS" });
     }
   });
 
   switch (mode) {
-    case CAMERA_CONTROLS_MODE.ORBIT_CONTROLS:
+    case "ORBIT_CONTROLS":
       return <OrbitControls makeDefault />;
-    case CAMERA_CONTROLS_MODE.AUTO_ORBIT:
+    case "AUTO_ORBIT":
       return <AutoOrbitCameraControls />;
     default:
       return mode satisfies never;
   }
 };
 
-const Visual3DCanvas = ({
-  mode,
-}: {
-  mode: "WAVE_FORM" | "NOISE" | "AUDIO" | "PARTICLE_NOISE";
-}) => {
+const Visual3DCanvas = () => {
   return (
     <Canvas
       camera={{
@@ -86,7 +52,7 @@ const Visual3DCanvas = ({
       <CanvasBackground />
       <ambientLight intensity={Math.PI} />
       <BackgroundFog />
-      <VisualizerComponent mode={mode} />
+      <ModalVisual />
       {/* <Stats /> */}
       <CameraControls />
       <PaletteTracker />

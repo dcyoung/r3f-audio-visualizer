@@ -25,6 +25,7 @@ const config = {
     "plugin:jsx-a11y/recommended",
   ],
   rules: {
+    "@typescript-eslint/consistent-type-definitions": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
       { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
@@ -43,6 +44,7 @@ const config = {
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/heading-has-content": "off",
     "react/no-unknown-property": "off",
+    "react/display-name": "off",
   },
   globals: {
     React: "writable",

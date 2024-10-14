@@ -3,12 +3,14 @@ import AudioAnalyzer from "@/components/analyzers/audioAnalyzer";
 import AudioScopeCanvas from "@/components/canvas/AudioScope";
 import Visual3DCanvas from "@/components/canvas/Visual3D";
 import { ControlsPanel } from "@/components/controls/main";
-import { useModeContext } from "@/context/mode";
-import { APPLICATION_MODE, type ApplicationMode } from "@/lib/applicationModes";
+import {
+  APPLICATION_MODE,
+  type TApplicationMode,
+} from "@/lib/applicationModes";
 
-import { useAppStateActions } from "./lib/appState";
+import { useAppStateActions, useMode } from "./lib/appState";
 
-const getAnalyzerComponent = (mode: ApplicationMode) => {
+const getAnalyzerComponent = (mode: TApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO:
     case APPLICATION_MODE.AUDIO_SCOPE:
@@ -22,7 +24,7 @@ const getAnalyzerComponent = (mode: ApplicationMode) => {
   }
 };
 
-const getCanvasComponent = (mode: ApplicationMode) => {
+const getCanvasComponent = (mode: TApplicationMode) => {
   switch (mode) {
     case APPLICATION_MODE.AUDIO_SCOPE:
       return <AudioScopeCanvas />;
@@ -30,14 +32,14 @@ const getCanvasComponent = (mode: ApplicationMode) => {
     case APPLICATION_MODE.NOISE:
     case APPLICATION_MODE.AUDIO:
     case APPLICATION_MODE.PARTICLE_NOISE:
-      return <Visual3DCanvas mode={mode} />;
+      return <Visual3DCanvas />;
     default:
       return mode satisfies never;
   }
 };
 
 const App = () => {
-  const { mode } = useModeContext();
+  const mode = useMode();
   const { noteCanvasInteraction } = useAppStateActions();
 
   return (

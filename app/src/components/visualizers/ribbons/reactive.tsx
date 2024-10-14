@@ -1,13 +1,11 @@
-import { type VisualProps } from "@/components/visualizers/common";
+import { type TVisualProps } from "@/components/visualizers/models";
 
 import BaseRibbons from "./base";
 
-const RibbonsVisual = ({ coordinateMapper }: VisualProps) => {
+export default ({ coordinateMapper }: TVisualProps) => {
   return (
     <>
       <BaseRibbons coordinateMapper={coordinateMapper} />
     </>
   );
 };
-
-export default RibbonsVisual;

@@ -112,7 +112,7 @@ export interface ICoordinateMapper {
  * A base class for coordinate mapper implementations.
  */
 export abstract class CoordinateMapperBase implements ICoordinateMapper {
-  public readonly amplitude: number;
+  public amplitude: number;
 
   /**
    *

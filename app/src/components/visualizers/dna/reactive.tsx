@@ -1,5 +1,8 @@
-import { type VisualProps } from "@/components/visualizers/common";
-import { useDnaVisualConfigContext } from "@/context/visualConfig/dna";
+import {
+  type TOmitVisualProps,
+  type TVisualProps,
+} from "@/components/visualizers/models";
+import { createConfigStore } from "@/lib/storeHelpers";
 import {
   Bloom,
   DepthOfField,
@@ -8,21 +11,32 @@ import {
   Vignette,
 } from "@react-three/postprocessing";
 
-import BaseDoubleHelix from "./base";
-import MultiStrand from "./multi";
+import {
+  BaseDoubleHelix,
+  MultiStrand,
+  type BaseDoubleHelixProps,
+} from "./base";
 
-const DNAVisual = ({ coordinateMapper }: VisualProps) => {
-  const {
-    multi,
-    helixLength,
-    helixRadius,
-    helixWindingSeparation,
-    strandRadius,
-    baseSpacing,
-    strandOffsetRad,
-    mirrorEffects,
-    fixedBaseGap,
-  } = useDnaVisualConfigContext();
+export type TConfig = Required<TOmitVisualProps<BaseDoubleHelixProps>> & {
+  multi: boolean;
+};
+
+export const { useParams, useActions } = createConfigStore<TConfig>({
+  default: {
+    multi: true,
+    helixLength: 50,
+    helixRadius: 1,
+    helixWindingSeparation: 10,
+    strandRadius: 0.1,
+    baseSpacing: 0.35,
+    strandOffsetRad: Math.PI / 2,
+    mirrorEffects: true,
+    fixedBaseGap: false,
+  },
+});
+
+const DNAVisual = ({ coordinateMapper }: TVisualProps) => {
+  const { multi, ...params } = useParams();
   // const {
   //   multi,
   //   helixLength,
@@ -56,33 +70,13 @@ const DNAVisual = ({ coordinateMapper }: VisualProps) => {
   // });
 
   return multi ? (
-    <MultiStrand
-      coordinateMapper={coordinateMapper}
-      helixLength={helixLength}
-      helixRadius={helixRadius}
-      helixWindingSeparation={helixWindingSeparation}
-      strandRadius={strandRadius}
-      baseSpacing={baseSpacing}
-      strandOffsetRad={strandOffsetRad}
-      mirrorEffects={mirrorEffects}
-      fixedBaseGap={fixedBaseGap}
-    />
+    <MultiStrand coordinateMapper={coordinateMapper} {...params} />
   ) : (
-    <BaseDoubleHelix
-      coordinateMapper={coordinateMapper}
-      helixLength={helixLength}
-      helixRadius={helixRadius}
-      helixWindingSeparation={helixWindingSeparation}
-      strandRadius={strandRadius}
-      baseSpacing={baseSpacing}
-      strandOffsetRad={strandOffsetRad}
-      mirrorEffects={mirrorEffects}
-      fixedBaseGap={fixedBaseGap}
-    />
+    <BaseDoubleHelix coordinateMapper={coordinateMapper} {...params} />
   );
 };
 
-const ComposedDNAVisual = ({ ...props }: VisualProps) => {
+export default (props: TVisualProps) => {
   return (
     <>
       <DNAVisual {...props} />
@@ -100,5 +94,3 @@ const ComposedDNAVisual = ({ ...props }: VisualProps) => {
     </>
   );
 };
-
-export default ComposedDNAVisual;

@@ -1,30 +1,31 @@
 import { useCallback, useEffect, useRef } from "react";
 import type ScopeAnalyzer from "@/lib/analyzers/scope";
-import {
-  useAppStateActions,
-  useVisualSourceDataX,
-  useVisualSourceDataY,
-} from "@/lib/appState";
+import { useAppStateActions, useMappers } from "@/lib/appState";
 
 export const AudioScopeAnalyzerControls = ({
   analyzer,
 }: {
   analyzer: ScopeAnalyzer;
 }) => {
-  const timeData = useVisualSourceDataX();
-  const quadData = useVisualSourceDataY();
-  const { resizeVisualSourceData } = useAppStateActions();
+  const { textureMapper } = useMappers();
+  const { setMappers } = useAppStateActions();
   const animationRequestRef = useRef<number>(null!);
 
   /**
    * Transfers data from the analyzer to the target arrays
    */
   const mapData = useCallback(() => {
+    const timeData = textureMapper.samplesX;
+    const quadData = textureMapper.samplesY;
     // Check if the state sizes need to be updated
     const targetLength = analyzer.quadSamples.length;
     if (timeData.length !== targetLength || quadData.length !== targetLength) {
       console.log(`Resizing ${targetLength}`);
-      resizeVisualSourceData(targetLength);
+      setMappers({
+        textureMapper: textureMapper.clone({
+          size: targetLength,
+        }),
+      });
       return;
     }
     // Copy the data over to state
@@ -34,7 +35,7 @@ export const AudioScopeAnalyzerControls = ({
     analyzer.quadSamples.forEach((v, index) => {
       quadData[index] = v;
     });
-  }, [timeData, quadData, analyzer, resizeVisualSourceData]);
+  }, [analyzer, setMappers, textureMapper]);
 
   /**
    * Re-Synchronize the animation loop if the target data destination changes.
@@ -49,7 +50,7 @@ export const AudioScopeAnalyzerControls = ({
     };
     animationRequestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRequestRef.current);
-  }, [timeData, quadData, mapData]);
+  }, [textureMapper, mapData]);
 
   return <></>;
 };

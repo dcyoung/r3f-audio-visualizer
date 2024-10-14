@@ -1,4 +1,4 @@
-export interface AnalyzerInputControl {
+export interface TAnalyzerInputControl {
   _audioCtx: AudioContext;
   connectInput: (source: AudioNode) => void;
   disconnectInputs: () => void;
@@ -7,7 +7,7 @@ export interface AnalyzerInputControl {
 
 export function useMediaStreamLink(
   audio: HTMLAudioElement,
-  analyzer: AnalyzerInputControl,
+  analyzer: TAnalyzerInputControl,
 ) {
   return {
     onDisabled: () => {

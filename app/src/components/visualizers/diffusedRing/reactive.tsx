@@ -1,28 +1,42 @@
-import { type VisualProps } from "@/components/visualizers/common";
+import { type ComponentPropsWithoutRef } from "react";
 import Ground from "@/components/visualizers/ground";
-import { useRingVisualConfigContext } from "@/context/visualConfig/diffusedRing";
+import {
+  type TOmitVisualProps,
+  type TVisualProps,
+} from "@/components/visualizers/models";
+import { createConfigStore } from "@/lib/storeHelpers";
 import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
 import { Vector3 } from "three";
 
-import BaseDiffusedRing from "./base";
+import BaseVisual from "./base";
 
-const DiffusedRingVisual = ({ coordinateMapper }: VisualProps) => {
-  const { radius, pointSize, mirrorEffects } = useRingVisualConfigContext();
+export type TConfig = Required<
+  TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
+>;
+
+export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
+  {
+    default: {
+      radius: 2,
+      nPoints: 1000,
+      pointSize: 0.2,
+      mirrorEffects: false,
+    },
+  },
+);
+
+const DiffusedRingVisual = ({ coordinateMapper }: TVisualProps) => {
+  const params = useParams();
 
   return (
     <>
-      <BaseDiffusedRing
-        coordinateMapper={coordinateMapper}
-        radius={radius}
-        pointSize={pointSize}
-        mirrorEffects={mirrorEffects}
-      />
+      <BaseVisual coordinateMapper={coordinateMapper} {...params} />
       <Ground position={new Vector3(0, 0, -1.5 * coordinateMapper.amplitude)} />
     </>
   );
 };
 
-const ComposeDiffusedRingVisual = ({ ...props }: VisualProps) => {
+export default (props: TVisualProps) => {
   return (
     <>
       <DiffusedRingVisual {...props} />
@@ -33,5 +47,3 @@ const ComposeDiffusedRingVisual = ({ ...props }: VisualProps) => {
     </>
   );
 };
-
-export default ComposeDiffusedRingVisual;

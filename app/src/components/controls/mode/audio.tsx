@@ -8,40 +8,45 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  useFFTAnalyzerContext,
-  useFFTAnalyzerContextSetters,
-} from "@/context/fftAnalyzer";
-import {
   EnergyMeasureOptions,
   OctaveBandModeMap,
   type EnergyMeasure,
   type OctaveBandMode,
 } from "@/lib/analyzers/fft";
+import { useAnalyzerFFT, useAppStateActions } from "@/lib/appState";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
 
-import { AudioSourceControls, AudioSourceSelect, ValueLabel } from "./common";
+import { ValueLabel } from "../common";
+import { AudioSourceControls, AudioSourceSelect } from "./common";
 
 const FFTAnalyzerControls = () => {
-  const { amplitude, octaveBandMode, energyMeasure } = useFFTAnalyzerContext();
-  const { setAmplitude, setOctaveBand, setEnergyMeasure } =
-    useFFTAnalyzerContextSetters();
+  const { octaveBandMode, energyMeasure } = useAnalyzerFFT();
+  const { setAnalyzerFFT } = useAppStateActions();
+  const mapper = COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
+  const { setParams } = COORDINATE_MAPPER_REGISTRY.data.hooks.useActions();
   return (
     <div className="w-full space-y-4">
-      <ValueLabel label="Amplitude" value={amplitude.toFixed(2)} />
+      <ValueLabel
+        label="Amplitude"
+        value={mapper.params.amplitude.toFixed(2)}
+      />
       <Slider
-        defaultValue={[amplitude]}
-        value={[amplitude]}
+        defaultValue={[mapper.params.amplitude]}
+        value={[mapper.params.amplitude]}
         min={0.0}
         max={5.0}
         step={0.01}
-        onValueChange={(e) => setAmplitude(e[0])}
+        onValueChange={(e) => setParams({ amplitude: e[0] })}
       />
       <div className="flex w-full items-center justify-between">
         <span>Octave Band Mode</span>
 
         <Select
-          onValueChange={(v) => {
-            setOctaveBand(Number(v) as OctaveBandMode);
-          }}
+          onValueChange={(v) =>
+            setAnalyzerFFT({
+              octaveBandMode: Number(v) as OctaveBandMode,
+            })
+          }
         >
           <SelectTrigger className="max-w-1/2 w-[240px]">
             <SelectValue
@@ -68,7 +73,9 @@ const FFTAnalyzerControls = () => {
 
         <Select
           onValueChange={(v) => {
-            setEnergyMeasure(v as EnergyMeasure);
+            setAnalyzerFFT({
+              energyMeasure: v as EnergyMeasure,
+            });
           }}
         >
           <SelectTrigger className="max-w-1/2 w-[240px]">

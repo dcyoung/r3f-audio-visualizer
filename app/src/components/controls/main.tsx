@@ -1,14 +1,10 @@
-import VisualsDock from "@/components/controls/visualsDock";
+import VisualsDock from "@/components/controls/dock";
 import { Switch } from "@/components/ui/switch";
-import { useModeContext, useModeContextSetters } from "@/context/mode";
-import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { cn } from "@/lib/utils";
-
-import SettingsDock from "./settingsDock";
+import { useAppearance, useAppStateActions } from "@/lib/appState";
 
 export const ControlsPanel = () => {
-  const { mode, showUI } = useModeContext();
-  const { setShowUI } = useModeContextSetters();
+  const { showUI } = useAppearance();
+  const { setAppearance } = useAppStateActions();
   return (
     <>
       <div className="pointer-events-none absolute top-0 flex w-full flex-row items-center justify-end gap-2 p-4">
@@ -17,24 +13,11 @@ export const ControlsPanel = () => {
           className="pointer-events-auto cursor-pointer"
           id="controls-visible"
           onCheckedChange={(e) => {
-            setShowUI(e);
+            setAppearance({ showUI: e });
           }}
         />
       </div>
-      {showUI && (
-        <div className="pointer-events-none absolute bottom-0 flex w-full items-end justify-center gap-4 p-4">
-          {mode !== APPLICATION_MODE.AUDIO_SCOPE && (
-            <VisualsDock className="sm:max-w-[60%]" />
-          )}
-          <div
-            className={cn({
-              "absolute bottom-24 right-0 sm:static sm:bottom-0": true,
-            })}
-          >
-            <SettingsDock />
-          </div>
-        </div>
-      )}
+      {showUI && <VisualsDock />}
     </>
   );
 };

@@ -24,7 +24,7 @@ export const SettingsDockCard = () => {
         <SheetContent
           insertHidden={true}
           side="right"
-          className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[540px] sm:max-w-[540px]"
+          className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
         >
           <ModeSheetContent />
           <VisualSettingsSheetContent />

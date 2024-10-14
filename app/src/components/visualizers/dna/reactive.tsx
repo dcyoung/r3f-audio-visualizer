@@ -2,6 +2,7 @@ import {
   type TOmitVisualProps,
   type TVisualProps,
 } from "@/components/visualizers/models";
+import { createConfigStore } from "@/lib/storeHelpers";
 import {
   Bloom,
   DepthOfField,
@@ -10,7 +11,6 @@ import {
   Vignette,
 } from "@react-three/postprocessing";
 
-import { createVisualConfigStore } from "../storeHelpers";
 import {
   BaseDoubleHelix,
   MultiStrand,
@@ -21,24 +21,22 @@ export type TConfig = Required<TOmitVisualProps<BaseDoubleHelixProps>> & {
   multi: boolean;
 };
 
-export const { useVisualParams, useActions } = createVisualConfigStore<TConfig>(
-  {
-    default: {
-      multi: true,
-      helixLength: 50,
-      helixRadius: 1,
-      helixWindingSeparation: 10,
-      strandRadius: 0.1,
-      baseSpacing: 0.35,
-      strandOffsetRad: Math.PI / 2,
-      mirrorEffects: true,
-      fixedBaseGap: false,
-    },
+export const { useParams, useActions } = createConfigStore<TConfig>({
+  default: {
+    multi: true,
+    helixLength: 50,
+    helixRadius: 1,
+    helixWindingSeparation: 10,
+    strandRadius: 0.1,
+    baseSpacing: 0.35,
+    strandOffsetRad: Math.PI / 2,
+    mirrorEffects: true,
+    fixedBaseGap: false,
   },
-);
+});
 
 const DNAVisual = ({ coordinateMapper }: TVisualProps) => {
-  const { multi, ...params } = useVisualParams();
+  const { multi, ...params } = useParams();
   // const {
   //   multi,
   //   helixLength,

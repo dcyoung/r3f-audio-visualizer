@@ -13,7 +13,8 @@ import {
   type EnergyMeasure,
   type OctaveBandMode,
 } from "@/lib/analyzers/fft";
-import { useAnalyzerFFT, useAppStateActions, useMappers } from "@/lib/appState";
+import { useAnalyzerFFT, useAppStateActions } from "@/lib/appState";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
 
 import { ValueLabel } from "../common";
 import { AudioSourceControls, AudioSourceSelect } from "./common";
@@ -21,8 +22,8 @@ import { AudioSourceControls, AudioSourceSelect } from "./common";
 const FFTAnalyzerControls = () => {
   const { octaveBandMode, energyMeasure } = useAnalyzerFFT();
   const { setAnalyzerFFT } = useAppStateActions();
-  const { coordinateMapperData: mapper } = useMappers();
-  const { setMappers } = useAppStateActions();
+  const mapper = COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
+  const { setParams } = COORDINATE_MAPPER_REGISTRY.data.hooks.useActions();
   return (
     <div className="w-full space-y-4">
       <ValueLabel
@@ -35,13 +36,7 @@ const FFTAnalyzerControls = () => {
         min={0.0}
         max={5.0}
         step={0.01}
-        onValueChange={(e) =>
-          setMappers({
-            coordinateMapperData: mapper.clone({
-              amplitude: e[0],
-            }),
-          })
-        }
+        onValueChange={(e) => setParams({ amplitude: e[0] })}
       />
       <div className="flex w-full items-center justify-between">
         <span>Octave Band Mode</span>

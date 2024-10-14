@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-import { useActions, usePresets, useVisualParams } from "./reactive";
+import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { nGridCols, nGridRows, cubeSpacingScalar } = useVisualParams();
-  const { setVisualParams, setPreset } = useActions();
+  const { nGridCols, nGridRows, cubeSpacingScalar } = useParams();
+  const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
@@ -35,7 +35,7 @@ export default () => {
             min={5}
             max={200}
             step={5}
-            onValueChange={(e) => setVisualParams({ nGridRows: e[0] })}
+            onValueChange={(e) => setParams({ nGridRows: e[0] })}
           />
           <ValueLabel label="N x Cols" value={nGridCols} />
           <Slider
@@ -44,7 +44,7 @@ export default () => {
             min={5}
             max={200}
             step={5}
-            onValueChange={(e) => setVisualParams({ nGridCols: e[0] })}
+            onValueChange={(e) => setParams({ nGridCols: e[0] })}
           />
           <ValueLabel
             label="Grid Spacing"
@@ -56,7 +56,7 @@ export default () => {
             min={1}
             max={6}
             step={0.5}
-            onValueChange={(e) => setVisualParams({ cubeSpacingScalar: e[0] })}
+            onValueChange={(e) => setParams({ cubeSpacingScalar: e[0] })}
           />
         </>
       )}

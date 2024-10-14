@@ -26,7 +26,7 @@ const PaletteBand = ({
   const cp = ColorPalette.getPalette(palette);
   return (
     <div
-      className={cn("h-8 w-full rounded-sm", className)}
+      className={cn("h-4 w-full rounded-sm", className)}
       style={{
         background: `linear-gradient(0.25turn, ${cp.colors.join(",")})`,
       }}
@@ -63,7 +63,6 @@ const VisualControlsComponent = () => {
 export const VisualSettingsSheetContent = () => {
   const mode = useMode();
   const { colorBackground, paletteTrackEnergy } = useAppearance();
-  console.log(colorBackground, paletteTrackEnergy);
   const palette = usePalette();
   const { setAppearance } = useAppStateActions();
   const { autoOrbitAfterSleepMs } = useCameraState();
@@ -75,7 +74,7 @@ export const VisualSettingsSheetContent = () => {
         <div className="space-y-2">
           <div className="">Palette</div>
           <PaletteBand palette={palette} />
-          <div className="grid w-full grid-cols-4 justify-items-stretch gap-2 sm:grid-cols-6">
+          <div className="grid w-full grid-cols-6 justify-items-stretch gap-2 sm:grid-cols-8">
             {AVAILABLE_COLOR_PALETTES.map((p) => (
               <PaletteIcon
                 key={p}

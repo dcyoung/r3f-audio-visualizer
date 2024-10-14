@@ -2,20 +2,22 @@ import { useMemo } from "react";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
 import { useMappers, useMode, useVisual } from "@/lib/appState";
 import { type ICoordinateMapper } from "@/lib/mappers/coordinateMappers/common";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
 
 const DummyMapper: ICoordinateMapper = { map: () => 0, amplitude: 0 };
 const useVisualParams = () => {
   const mode = useMode();
-  const {
-    coordinateMapperData,
-    coordinateMapperNoise,
-    coordinateMapperWaveform,
-    ...rest
-  } = useMappers();
+  const rest = useMappers();
+  const coordinateMapperWaveForm =
+    COORDINATE_MAPPER_REGISTRY.waveform.hooks.useInstance();
+  const coordinateMapperNoise =
+    COORDINATE_MAPPER_REGISTRY.noise.hooks.useInstance();
+  const coordinateMapperData =
+    COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
   const coordinateMapper = useMemo(() => {
     switch (mode) {
       case APPLICATION_MODE.WAVE_FORM:
-        return coordinateMapperWaveform;
+        return coordinateMapperWaveForm;
       case APPLICATION_MODE.NOISE:
         return coordinateMapperNoise;
       case APPLICATION_MODE.AUDIO:
@@ -30,7 +32,7 @@ const useVisualParams = () => {
     mode,
     coordinateMapperData,
     coordinateMapperNoise,
-    coordinateMapperWaveform,
+    coordinateMapperWaveForm,
   ]);
 
   return {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import type FFTAnalyzer from "@/lib/analyzers/fft";
-import { useAnalyzerFFT, useAppStateActions, useMappers } from "@/lib/appState";
-import { CoordinateMapper_Data } from "@/lib/mappers/coordinateMappers/data";
+import { useAnalyzerFFT, useMappers } from "@/lib/appState";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
 
 export const FFTAnalyzerControls = ({
   analyzer,
@@ -9,8 +9,10 @@ export const FFTAnalyzerControls = ({
   analyzer: FFTAnalyzer;
 }) => {
   const { octaveBandMode, energyMeasure } = useAnalyzerFFT();
-  const { coordinateMapperData, energyTracker } = useMappers();
-  const { setMappers } = useAppStateActions();
+  const { energyTracker } = useMappers();
+  const coordinateMapperData =
+    COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
+  const { setParams } = COORDINATE_MAPPER_REGISTRY.data.hooks.useActions();
   const animationRequestRef = useRef<number>(null!);
 
   /**
@@ -21,12 +23,7 @@ export const FFTAnalyzerControls = ({
 
     if (coordinateMapperData.data.length != bars.length) {
       console.log(`Resizing ${bars.length}`);
-      setMappers({
-        coordinateMapperData: new CoordinateMapper_Data({
-          ...coordinateMapperData.params,
-          size: bars.length,
-        }),
-      });
+      setParams({ size: bars.length });
       return;
     }
 
@@ -35,13 +32,7 @@ export const FFTAnalyzerControls = ({
     bars.forEach(({ value }, index) => {
       coordinateMapperData.data[index] = value;
     });
-  }, [
-    coordinateMapperData,
-    analyzer,
-    energyTracker,
-    energyMeasure,
-    setMappers,
-  ]);
+  }, [coordinateMapperData, analyzer, energyTracker, energyMeasure, setParams]);
 
   /**
    * Re-Synchronize the animation loop if the target data destination changes.

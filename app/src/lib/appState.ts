@@ -12,9 +12,9 @@ import { create } from "zustand";
 import { type EnergyMeasure, type OctaveBandMode } from "./analyzers/fft";
 import { APPLICATION_MODE, type TApplicationMode } from "./applicationModes";
 import { EventDetector } from "./eventDetector";
-import { CoordinateMapper_Data } from "./mappers/coordinateMappers/data";
-import { CoordinateMapper_Noise } from "./mappers/coordinateMappers/noise";
-import { CoordinateMapper_WaveformSuperposition } from "./mappers/coordinateMappers/waveform";
+import { CoordinateMapper_Data } from "./mappers/coordinateMappers/data/mapper";
+import { CoordinateMapper_Noise } from "./mappers/coordinateMappers/noise/mapper";
+import { CoordinateMapper_WaveformSuperposition } from "./mappers/coordinateMappers/waveform/mapper";
 import { type IMotionMapper } from "./mappers/motionMappers/common";
 import { MotionMapper_Noise } from "./mappers/motionMappers/curlNoise";
 import { TextureMapper } from "./mappers/textureMappers/textureMapper";
@@ -42,9 +42,9 @@ interface ICameraState {
 interface IMappersState {
   textureMapper: TextureMapper;
   motionMapper: IMotionMapper;
-  coordinateMapperWaveform: CoordinateMapper_WaveformSuperposition;
-  coordinateMapperNoise: CoordinateMapper_Noise;
-  coordinateMapperData: CoordinateMapper_Data;
+  // coordinateMapperWaveform: CoordinateMapper_WaveformSuperposition;
+  // coordinateMapperNoise: CoordinateMapper_Noise;
+  // coordinateMapperData: CoordinateMapper_Data;
   energyTracker: IScalarTracker | null;
 }
 interface IAudioState {
@@ -125,14 +125,6 @@ const useAppState = create<IAppState>((set) => ({
               mappers: {
                 ...state.mappers,
                 textureMapper: new TextureMapper(),
-                coordinateMapperWaveform:
-                  new CoordinateMapper_WaveformSuperposition(
-                    newVisualId === "diffusedRing"
-                      ? CoordinateMapper_WaveformSuperposition.PRESETS.DOUBLE
-                      : undefined,
-                  ),
-                coordinateMapperData: new CoordinateMapper_Data(),
-                coordinateMapperNoise: new CoordinateMapper_Noise(),
               },
             }
           : {};

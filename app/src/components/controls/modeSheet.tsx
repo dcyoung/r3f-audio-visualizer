@@ -14,13 +14,11 @@ import {
   type TApplicationMode,
 } from "@/lib/applicationModes";
 import { useAppStateActions, useMode } from "@/lib/appState";
-import { AudioWaveform, Drum, Music, Shell, Waves } from "lucide-react";
+import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
+import { AudioWaveform, Music, Shell, Waves, Wind } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
-// import { AudioScopeModeControls } from "./mode/audioScope";
-import { NoiseGeneratorModeControls } from "./mode/noise";
-import { WaveformModeControls } from "./mode/waveform";
 
 const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
   switch (mode) {
@@ -33,7 +31,7 @@ const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
     case APPLICATION_MODE.AUDIO_SCOPE:
       return <Shell />;
     case APPLICATION_MODE.PARTICLE_NOISE:
-      return <Drum />;
+      return <Wind />;
     default:
       return mode satisfies never;
   }
@@ -93,8 +91,12 @@ export const ModeSheetContent = () => {
         <ModeSelector />
       </div>
       <Separator />
-      {mode === APPLICATION_MODE.WAVE_FORM && <WaveformModeControls />}
-      {mode === APPLICATION_MODE.NOISE && <NoiseGeneratorModeControls />}
+      {mode === APPLICATION_MODE.WAVE_FORM && (
+        <COORDINATE_MAPPER_REGISTRY.waveform.ControlsComponent />
+      )}
+      {mode === APPLICATION_MODE.NOISE && (
+        <COORDINATE_MAPPER_REGISTRY.noise.ControlsComponent />
+      )}
       {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
       {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
     </>

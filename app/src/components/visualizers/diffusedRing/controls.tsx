@@ -4,11 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
-import { useActions, usePresets, useVisualParams } from "./reactive";
+import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { radius, pointSize, mirrorEffects } = useVisualParams();
-  const { setVisualParams, setPreset } = useActions();
+  const { radius, pointSize, mirrorEffects } = useParams();
+  const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
@@ -36,7 +36,7 @@ export default () => {
             min={0.25}
             max={3}
             step={0.25}
-            onValueChange={(e) => setVisualParams({ radius: e[0] })}
+            onValueChange={(e) => setParams({ radius: e[0] })}
           />
           <ValueLabel label="Point Size" value={pointSize.toFixed(2)} />
           <Slider
@@ -45,14 +45,14 @@ export default () => {
             min={0.01}
             max={0.25}
             step={0.01}
-            onValueChange={(e) => setVisualParams({ pointSize: e[0] })}
+            onValueChange={(e) => setParams({ pointSize: e[0] })}
           />
           <div className="flex w-full items-center justify-between">
             <Label>Mirror Effects</Label>
             <Switch
               defaultChecked={mirrorEffects}
               onCheckedChange={(e) => {
-                setVisualParams({ mirrorEffects: e });
+                setParams({ mirrorEffects: e });
               }}
             />
           </div>

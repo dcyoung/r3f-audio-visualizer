@@ -4,17 +4,17 @@ import {
   type TOmitVisualProps,
   type TVisualProps,
 } from "@/components/visualizers/models";
+import { createConfigStore } from "@/lib/storeHelpers";
 import { Vector3 } from "three";
 
-import { createVisualConfigStore } from "../storeHelpers";
 import BaseVisual from "./base";
 
 export type TConfig = Required<
   TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
 >;
 
-export const { useVisualParams, useActions, usePresets } =
-  createVisualConfigStore<TConfig>({
+export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
+  {
     default: {
       nGridCols: 100,
       nGridRows: 100,
@@ -27,10 +27,11 @@ export const { useVisualParams, useActions, usePresets } =
       cubeSideLength: 0.025,
       cubeSpacingScalar: 1,
     },
-  });
+  },
+);
 
 const GridVisual = ({ coordinateMapper }: TVisualProps) => {
-  const params = useVisualParams();
+  const params = useParams();
   return (
     <>
       <BaseVisual coordinateMapper={coordinateMapper} {...params} />

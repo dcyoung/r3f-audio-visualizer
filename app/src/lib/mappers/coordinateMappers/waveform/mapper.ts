@@ -95,6 +95,7 @@ export class CoordinateMapper_WaveformSuperposition
         maxAmplitude: 1.0,
         amplitudeSplitRatio: 0.75,
       },
+      CUSTOM: {},
     };
   }
 
@@ -104,6 +105,7 @@ export class CoordinateMapper_WaveformSuperposition
       ...params,
     });
   }
+
   private mappers: CoordinateMapper_Waveform[];
   private _params: TSuperPositionParams;
   public get params(): TSuperPositionParams {

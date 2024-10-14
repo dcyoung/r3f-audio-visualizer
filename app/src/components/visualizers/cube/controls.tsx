@@ -4,12 +4,12 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
-import { useActions, usePresets, useVisualParams } from "./reactive";
+import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { nPerSide, cubeSpacingScalar, volume } = useVisualParams();
+  const { nPerSide, cubeSpacingScalar, volume } = useParams();
   const { active: activePreset, options: presetOptions } = usePresets();
-  const { setVisualParams, setPreset } = useActions();
+  const { setParams, setPreset } = useActions();
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
@@ -36,7 +36,7 @@ export default () => {
             min={3}
             max={20}
             step={1}
-            onValueChange={(e) => setVisualParams({ nPerSide: e[0] })}
+            onValueChange={(e) => setParams({ nPerSide: e[0] })}
           />
           <ValueLabel
             label="Cube Spacing"
@@ -48,14 +48,14 @@ export default () => {
             min={0}
             max={0.5}
             step={0.1}
-            onValueChange={(e) => setVisualParams({ cubeSpacingScalar: e[0] })}
+            onValueChange={(e) => setParams({ cubeSpacingScalar: e[0] })}
           />
           <div className="flex w-full items-center justify-between">
             <Label>Volume</Label>
             <Switch
               defaultChecked={volume}
               onCheckedChange={(e) => {
-                setVisualParams({ volume: e });
+                setParams({ volume: e });
               }}
             />
           </div>

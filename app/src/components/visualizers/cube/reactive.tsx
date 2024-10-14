@@ -4,27 +4,28 @@ import {
   type TOmitVisualProps,
   type TVisualProps,
 } from "@/components/visualizers/models";
+import { createConfigStore } from "@/lib/storeHelpers";
 import { Vector3 } from "three";
 
-import { createVisualConfigStore } from "../storeHelpers";
 import BaseVisual from "./base";
 
 export type TConfig = Required<
   TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
 >;
 
-export const { useVisualParams, useActions, usePresets } =
-  createVisualConfigStore<TConfig>({
+export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
+  {
     default: {
       nPerSide: 10,
       cubeSideLength: 0.5,
       cubeSpacingScalar: 0.1,
       volume: true,
     },
-  });
+  },
+);
 
-const CubeVisual = ({ coordinateMapper }: TVisualProps) => {
-  const params = useVisualParams();
+export default ({ coordinateMapper }: TVisualProps) => {
+  const params = useParams();
 
   return (
     <>
@@ -44,5 +45,3 @@ const CubeVisual = ({ coordinateMapper }: TVisualProps) => {
     </>
   );
 };
-
-export default CubeVisual;

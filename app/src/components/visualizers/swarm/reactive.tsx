@@ -1,27 +1,28 @@
 import { type ComponentPropsWithoutRef } from "react";
 import Ground from "@/components/visualizers/ground";
+import { createConfigStore } from "@/lib/storeHelpers";
 import { Vector3 } from "three";
 
 import { type TOmitVisualProps, type TVisualProps } from "../models";
-import { createVisualConfigStore } from "../storeHelpers";
 import BaseVisual from "./base";
 
 export type TConfig = Required<
   TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>
 >;
 
-export const { useVisualParams, useActions, usePresets } =
-  createVisualConfigStore<TConfig>({
+export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
+  {
     default: {
       maxPoints: 1000,
       pointSize: 0.2,
       maxDim: 2,
       color: "white",
     },
-  });
+  },
+);
 
 const SwarmVisual = ({ motionMapper }: TVisualProps) => {
-  const params = useVisualParams();
+  const params = useParams();
   // const { maxDim, pointSize } = useControls({
   //   Particles: folder(
   //     {

@@ -15,6 +15,8 @@ export default ({ scalarTracker }: TVisualProps) => {
         scalarTracker={
           scalarTracker ?? {
             get: () => Math.sin(0.0025 * Date.now()) + 1,
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            set: () => {},
           }
         }
         nBoxes={nBoxes}

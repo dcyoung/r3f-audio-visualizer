@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-import { useActions, usePresets, useVisualParams } from "./reactive";
+import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { radius, nPoints } = useVisualParams();
-  const { setVisualParams, setPreset } = useActions();
+  const { radius, nPoints } = useParams();
+  const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
@@ -35,7 +35,7 @@ export default () => {
             min={100}
             max={2000}
             step={25}
-            onValueChange={(e) => setVisualParams({ nPoints: e[0] })}
+            onValueChange={(e) => setParams({ nPoints: e[0] })}
           />
 
           <ValueLabel label="Radius" value={radius.toFixed(2)} />
@@ -45,7 +45,7 @@ export default () => {
             min={0.25}
             max={3}
             step={0.25}
-            onValueChange={(e) => setVisualParams({ radius: e[0] })}
+            onValueChange={(e) => setParams({ radius: e[0] })}
           />
         </>
       )}

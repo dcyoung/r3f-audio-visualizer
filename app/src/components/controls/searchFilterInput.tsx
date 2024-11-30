@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchFiltersContextSetters } from "@/context/searchFilters";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 

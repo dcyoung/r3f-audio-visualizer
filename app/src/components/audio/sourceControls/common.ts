@@ -63,6 +63,7 @@ const webAudioTouchUnlock = (context: AudioContext) => {
             resolve(true);
           },
           function (reason) {
+            /* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
             reject(reason);
           },
         );

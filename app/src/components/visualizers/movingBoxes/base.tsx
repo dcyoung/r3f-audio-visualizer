@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/scalarEventDetector";
 import { usePalette } from "@/lib/appState";
-import { clip, easeInOut, lerp } from "@/lib/easing";
+import { clamp, easeInOut, lerp } from "@/lib/easing";
 import { type IScalarTracker } from "@/lib/mappers/valueTracker/common";
 import { ColorPalette } from "@/lib/palettes";
 import { useFrame } from "@react-three/fiber";
@@ -81,7 +81,7 @@ const BaseBoxes = ({
 
     // smooth the roll
     const alpha = easeInOut(
-      clip(detector.timeSinceLastEventMs / rotateDurationMs),
+      clamp(detector.timeSinceLastEventMs / rotateDurationMs),
     );
     // roll angle for each cube
     const beta = lerp(Math.PI / 4, (3 * Math.PI) / 4, alpha);

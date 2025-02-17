@@ -85,7 +85,8 @@ const useAppState = create<IAppState>((set) => ({
   user: {
     canvasInteractionEventTracker: new EventDetector(),
   },
-  visual: VISUAL_REGISTRY.grid,
+  // visual: VISUAL_REGISTRY.grid,
+  visual: VISUAL_REGISTRY.neuron,
   appearance: {
     palette: COLOR_PALETTE.THREE_COOL_TO_WARM,
     colorBackground: true,

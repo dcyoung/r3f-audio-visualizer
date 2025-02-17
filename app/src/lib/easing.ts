@@ -44,7 +44,7 @@ export const easeOut = (
   return easeInOut(t, fxn);
 };
 
-export const clip = (t: number, min = 0, max = 1) => {
+export const clamp = (t: number, min = 0, max = 1) => {
   return Math.min(max, Math.max(min, t));
 };
 

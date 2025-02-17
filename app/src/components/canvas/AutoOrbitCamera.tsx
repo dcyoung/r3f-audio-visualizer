@@ -52,6 +52,7 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
+    case "neuron":
     case "diffusedRing":
       return {
         rMin: 10,

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import { type ICoordinateMapper } from "@/lib/mappers/coordinateMappers/common";
-import { ColorPalette } from "@/lib/palettes";
 import { useFrame } from "@react-three/fiber";
 import {
   BoxGeometry,
@@ -43,55 +42,79 @@ const NeuronVisual = () => {
   const ring = useHistory();
   const cubeSideLength = 0.02;
   const n = ring.getSize();
-  const meshRef = useRef<InstancedMesh>(null!);
+  const vMMeshRef = useRef<InstancedMesh>(null!);
+  const iKMeshRef = useRef<InstancedMesh>(null!);
+  const iNaMeshRef = useRef<InstancedMesh>(null!);
+  const iKLeakMeshRef = useRef<InstancedMesh>(null!);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
-  const palette = usePalette();
-  const lut = ColorPalette.getPalette(palette).buildLut();
-
-  // Recolor
-  useEffect(() => {
-    if (!lut) {
-      return;
-    }
-    for (let instanceIdx = 0; instanceIdx < n; instanceIdx++) {
-      meshRef.current.setColorAt(
-        instanceIdx,
-        lut.getColor(instanceIdx / (n - 1)),
-      );
-    }
-    meshRef.current.instanceColor!.needsUpdate = true;
-  });
 
   useFrame(() => {
     // in ms
     const sizeX = n * 2 * cubeSideLength;
-    let normX, x, data, z, Vm;
+    let normX, x, data, Vm, Ik, INa, IKLeak;
     for (let instanceIdx = 0; instanceIdx < n; instanceIdx++) {
       data = ring.get(instanceIdx);
       normX = instanceIdx / (n - 1);
       x = sizeX * (normX - 0.5);
       // console.log(data?.VM);
       Vm = data?.VM ?? NaN;
-      z = isNaN(Vm) ? 0 : Vm * cubeSideLength;
-      tmpMatrix.setPosition(x, 0, z);
-      meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
+      Ik = data?.IK ?? NaN;
+      INa = data?.INa ?? NaN;
+      IKLeak = data?.IKleak ?? NaN;
+      tmpMatrix.setPosition(
+        x,
+        0 * cubeSideLength,
+        isNaN(Vm) ? 0 : Vm * cubeSideLength,
+      );
+      vMMeshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
+      tmpMatrix.setPosition(
+        x,
+        2 * cubeSideLength,
+        isNaN(Ik) ? 0 : (Ik * cubeSideLength) / 10,
+      );
+      iKMeshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
+      tmpMatrix.setPosition(
+        x,
+        4 * cubeSideLength,
+        isNaN(INa) ? 0 : (INa * cubeSideLength) / 10,
+      );
+      iNaMeshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
+      tmpMatrix.setPosition(
+        x,
+        6 * cubeSideLength,
+        isNaN(INa) ? 0 : IKLeak * cubeSideLength,
+      );
+      iKLeakMeshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
     }
+    // console.log(data?.IK, data?.INa);
     // Update the instance
-    meshRef.current.instanceMatrix.needsUpdate = true;
+    vMMeshRef.current.instanceMatrix.needsUpdate = true;
+    iKMeshRef.current.instanceMatrix.needsUpdate = true;
+    iNaMeshRef.current.instanceMatrix.needsUpdate = true;
+    iKLeakMeshRef.current.instanceMatrix.needsUpdate = true;
   });
   return (
-    <instancedMesh
-      ref={meshRef}
-      castShadow={true}
-      receiveShadow={true}
-      args={[new BoxGeometry(), new MeshBasicMaterial(), n]}
-    >
-      <boxGeometry
-        attach="geometry"
-        args={[cubeSideLength, cubeSideLength, cubeSideLength, 1]}
-      />
-      <meshPhongMaterial attach="material" color="white" toneMapped={false} />
-    </instancedMesh>
+    <>
+      {[vMMeshRef, iKMeshRef, iNaMeshRef, iKLeakMeshRef].map((ref, idx) => (
+        <instancedMesh
+          ref={ref}
+          key={`instancedMesh-${idx}`}
+          castShadow={true}
+          receiveShadow={true}
+          args={[new BoxGeometry(), new MeshBasicMaterial(), n]}
+        >
+          <boxGeometry
+            attach="geometry"
+            args={[cubeSideLength, cubeSideLength, cubeSideLength, 1]}
+          />
+          <meshPhongMaterial
+            attach="material"
+            color={["white", "yellow", "red", "green"][idx]}
+            toneMapped={false}
+          />
+        </instancedMesh>
+      ))}
+    </>
   );
 };
 const BaseNeuron = (_: { coordinateMapper: ICoordinateMapper }) => {

@@ -30,7 +30,7 @@ const BaseBoxes = ({
     () => new ScalarMovingAvgEventDetector(0.65, 150, 2 * rotateDurationMs),
     [rotateDurationMs],
   );
-  const meshRef = useRef<InstancedMesh>(null!);
+  const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
@@ -38,7 +38,9 @@ const BaseBoxes = ({
   const cellAssignments = useMemo(
     () =>
       Array.from({ length: nBoxes }, (_) => {
+        // eslint-disable-next-line react-hooks/purity
         const row = Math.floor(nRows * Math.random());
+        // eslint-disable-next-line react-hooks/purity
         const col = Math.floor(nCols * Math.random());
         return {
           fromRow: row,
@@ -52,22 +54,30 @@ const BaseBoxes = ({
 
   //   Recolor;
   useEffect(() => {
+    if (!meshRef.current) {
+      return;
+    }
     for (let instanceIdx = 0; instanceIdx < nBoxes; instanceIdx++) {
       meshRef.current.setColorAt(
         instanceIdx,
         lut.getColor(instanceIdx / (nBoxes - 1)),
       );
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     meshRef.current.instanceColor!.needsUpdate = true;
   }, [lut, nBoxes]);
 
   useFrame(() => {
+    if (!meshRef.current) {
+      return;
+    }
     if (detector.step(scalarTracker?.get() ?? 0)) {
       // random jitter in one direction or the other
       const [rowJitter, colJitter] =
         Math.random() > 0.5 ? [true, false] : [false, true];
 
       for (let i = 0; i < nBoxes; i++) {
+        // eslint-disable-next-line react-hooks/immutability
         cellAssignments[i].fromRow = cellAssignments[i].toRow;
         cellAssignments[i].fromCol = cellAssignments[i].toCol;
         if (rowJitter) {
@@ -90,32 +100,33 @@ const BaseBoxes = ({
     const rollV = (0.5 * cellSize * Math.sin(beta)) / Math.sqrt(2);
 
     let normCubeX, normCubeY, x, y, z, deltaRow, deltaCol;
-    cellAssignments.forEach(
-      ({ fromRow, fromCol, toRow, toCol }, instanceIdx) => {
-        deltaRow = toRow - fromRow;
-        deltaCol = toCol - fromCol;
-        const row = fromRow + deltaRow * (rollU + 0.5);
-        const col = fromCol + deltaCol * (rollU + 0.5);
+    for (const [
+      instanceIdx,
+      { fromRow, fromCol, toRow, toCol },
+    ] of cellAssignments.entries()) {
+      deltaRow = toRow - fromRow;
+      deltaCol = toCol - fromCol;
+      const row = fromRow + deltaRow * (rollU + 0.5);
+      const col = fromCol + deltaCol * (rollU + 0.5);
 
-        if (deltaRow !== 0) {
-          tmpMatrix.makeRotationY((beta - Math.PI / 4) * deltaRow);
-        }
-        if (deltaCol !== 0) {
-          tmpMatrix.makeRotationX(-(beta - Math.PI / 4) * deltaCol);
-        }
+      if (deltaRow !== 0) {
+        tmpMatrix.makeRotationY((beta - Math.PI / 4) * deltaRow);
+      }
+      if (deltaCol !== 0) {
+        tmpMatrix.makeRotationX(-(beta - Math.PI / 4) * deltaCol);
+      }
 
-        normCubeX = row / (nRows - 1);
-        normCubeY = col / (nCols - 1);
+      normCubeX = row / (nRows - 1);
+      normCubeY = col / (nCols - 1);
 
-        x = nRows * cellSize * (normCubeX - 0.5);
-        y = nCols * cellSize * (normCubeY - 0.5);
-        z = rollV - cellSize / 4;
-        // Position
-        tmpMatrix.setPosition(x, y, z);
+      x = nRows * cellSize * (normCubeX - 0.5);
+      y = nCols * cellSize * (normCubeY - 0.5);
+      z = rollV - cellSize / 4;
+      // Position
+      tmpMatrix.setPosition(x, y, z);
 
-        meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
-      },
-    );
+      meshRef.current.setMatrixAt(instanceIdx, tmpMatrix);
+    }
 
     // Update the instance
     meshRef.current.instanceMatrix.needsUpdate = true;

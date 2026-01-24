@@ -80,9 +80,7 @@ export type TSuperPositionParams = {
 /**
  * Maps input coordinates to output values based on the superposition of multiple time varying waveforms.
  */
-export class CoordinateMapper_WaveformSuperposition
-  implements ICoordinateMapper
-{
+export class CoordinateMapper_WaveformSuperposition implements ICoordinateMapper {
   public static get PRESETS() {
     return {
       DEFAULT: {

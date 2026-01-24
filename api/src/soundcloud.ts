@@ -1,7 +1,4 @@
 import { z } from 'zod';
-import { createZodFetcher } from "zod-fetch";
-
-const fetchWithZod = createZodFetcher();
 
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -50,23 +47,21 @@ class ScTokenFetcher {
             test: 'true',
         };
 
-        const data = await fetchWithZod(
-            z.object({
-                access_token: z.string(),
-                expires_in: z.number(),
-                // refresh_token: z.string(),
-                // scope: z.string(),
-                // token_type: z.string(),
-            }),
-            'https://api.soundcloud.com/oauth2/token',
+        const response = await fetch('https://api.soundcloud.com/oauth2/token',
             {
                 method: 'POST',
                 body: new URLSearchParams(form),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            }
-        );
+            });
+        const data = z.object({
+            access_token: z.string(),
+            expires_in: z.number(),
+            // refresh_token: z.string(),
+            // scope: z.string(),
+            // token_type: z.string(),
+        }).parse(await response.json());
 
         this.token = data.access_token;
         this.expirationAtMs = Date.now() + ((data.expires_in - 10) * 1000);

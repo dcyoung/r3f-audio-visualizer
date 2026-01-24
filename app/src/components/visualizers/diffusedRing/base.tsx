@@ -22,9 +22,12 @@ const BaseDiffusedRing = ({
   mirrorEffects?: boolean;
 }) => {
   const noise = Array.from({ length: nPoints }).map(gaussianRandom);
-  const refPoints = useRef<Points>(null!);
+  const refPoints = useRef<Points>(null);
 
   useFrame(({ clock }) => {
+    if (!refPoints.current) {
+      return;
+    }
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
     let effectiveRadius, normIdx, angRad;

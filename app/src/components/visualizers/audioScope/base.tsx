@@ -21,7 +21,7 @@ const BaseScopeVisual = ({
 }) => {
   const { tex, textureData } = textureMapper.generateSupportedTextureAndData();
   tex.needsUpdate = true;
-  const matRef = useRef<ShaderMaterial>(null!);
+  const matRef = useRef<ShaderMaterial>(null);
   const size = useThree((state) => state.size);
   const particlesIndices = useMemo(() => {
     return new Float32Array(nParticles).fill(0).map((_, i) => i);
@@ -56,6 +56,10 @@ const BaseScopeVisual = ({
     // update the texture data
     textureMapper.updateTextureData(textureData);
     tex.needsUpdate = true;
+
+    if (!matRef.current) {
+      return;
+    }
     // update the any changing uniforms
     matRef.current.uniforms.max_amplitude.value = textureMapper.maxAmplitude;
     matRef.current.uniforms.samples.value = tex;
@@ -72,7 +76,6 @@ const BaseScopeVisual = ({
 
   useEffect(() => {
     if (matRef.current?.uniforms) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.b_should_interpolate.value = interpolate;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       matRef.current.uniforms.color.value.x = color.r;

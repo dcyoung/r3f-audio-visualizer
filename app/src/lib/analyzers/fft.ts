@@ -67,7 +67,7 @@ export default class FFTAnalyzer implements TAnalyzerInputControl {
   public readonly _audioCtx: AudioContext;
   public readonly _sources: AudioNode[];
   private _outNodes: AudioDestinationNode[];
-  private _fftData: Uint8Array;
+  private _fftData: Uint8Array<ArrayBuffer>;
   private _freqBinInfos: FreqBinInfo[] = [];
   public getBars(): FreqBinInfo[] {
     return this._freqBinInfos;
@@ -313,9 +313,7 @@ export default class FFTAnalyzer implements TAnalyzerInputControl {
 
   public toggleAnalyzer(value: boolean | undefined = undefined): boolean {
     const started = this.isOn;
-    if (value === undefined) {
-      value = !started;
-    }
+    value ??= !started;
 
     if (started && !value && this._runId !== undefined) {
       cancelAnimationFrame(this._runId);

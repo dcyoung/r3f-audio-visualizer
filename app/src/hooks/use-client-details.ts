@@ -11,6 +11,7 @@ export const useClientDetails = () => {
   const supportsHover = useMedia("(hover: hover)", false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
   }, [md]);
 

@@ -30,17 +30,24 @@ const BaseSphere = ({
   cubeSideLength?: number;
 }) => {
   const palette = usePalette();
-  const meshRef = useRef<InstancedMesh>(null!);
+  const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const lut = ColorPalette.getPalette(palette).buildLut();
   useEffect(() => {
+    if (!meshRef.current) {
+      return;
+    }
     for (let i = 0; i < nPoints; i++) {
       meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     meshRef.current.instanceColor!.needsUpdate = true;
   }, [lut, meshRef, nPoints]);
 
   useFrame(({ clock }) => {
+    if (!meshRef.current) {
+      return;
+    }
     // in ms
     const elapsedTimeSec = clock.getElapsedTime();
     let k, phi, theta, x, y, z, effectiveRadius;

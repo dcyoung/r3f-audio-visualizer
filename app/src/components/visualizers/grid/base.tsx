@@ -26,14 +26,14 @@ const BaseGrid = ({
   cubeSideLength?: number;
   cubeSpacingScalar?: number;
 }) => {
-  const meshRef = useRef<InstancedMesh>(null!);
+  const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor
   useEffect(() => {
-    if (!lut) {
+    if (!lut || !meshRef.current) {
       return;
     }
     const normQuadrantHypotenuse = Math.hypot(0.5, 0.5);
@@ -48,10 +48,14 @@ const BaseGrid = ({
         meshRef.current.setColorAt(instanceIdx, lut.getColor(normRadialOffset));
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     meshRef.current.instanceColor!.needsUpdate = true;
   });
 
   useFrame(({ clock }) => {
+    if (!meshRef.current) {
+      return;
+    }
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
     const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;

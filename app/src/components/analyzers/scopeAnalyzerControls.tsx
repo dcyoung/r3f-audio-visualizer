@@ -9,7 +9,7 @@ export const AudioScopeAnalyzerControls = ({
 }) => {
   const { textureMapper } = useMappers();
   const { setMappers } = useAppStateActions();
-  const animationRequestRef = useRef<number>(null!);
+  const animationRequestRef = useRef<number | null>(null);
 
   /**
    * Transfers data from the analyzer to the target arrays
@@ -41,7 +41,7 @@ export const AudioScopeAnalyzerControls = ({
    * Re-Synchronize the animation loop if the target data destination changes.
    */
   useEffect(() => {
-    if (animationRequestRef.current) {
+    if (animationRequestRef.current !== null) {
       cancelAnimationFrame(animationRequestRef.current);
     }
     const animate = (): void => {
@@ -49,7 +49,11 @@ export const AudioScopeAnalyzerControls = ({
       animationRequestRef.current = requestAnimationFrame(animate);
     };
     animationRequestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationRequestRef.current);
+    return () => {
+      if (animationRequestRef.current !== null) {
+        cancelAnimationFrame(animationRequestRef.current);
+      }
+    };
   }, [textureMapper, mapData]);
 
   return <></>;

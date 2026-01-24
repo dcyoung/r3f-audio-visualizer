@@ -44,6 +44,7 @@ const useAudioFile = (audio: HTMLAudioElement) => {
     }
 
     console.log("Setting source...");
+    // eslint-disable-next-line react-hooks/immutability
     audio.src = URL.createObjectURL(audioFile);
     setLoaded(true);
 

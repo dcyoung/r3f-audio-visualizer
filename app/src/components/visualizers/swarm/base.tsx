@@ -18,11 +18,14 @@ export default ({
 }) => {
   const nPerSide = Math.max(1, Math.floor(Math.cbrt(maxPoints)));
   const nPoints = Math.pow(nPerSide, 3);
-  const refPoints = useRef<Points>(null!);
+  const refPoints = useRef<Points>(null);
   const tmpPosBefore = useMemo(() => new Vector3(), []);
   const tmpPosAfter = useMemo(() => new Vector3(), []);
 
   useEffect(() => {
+    if (!refPoints.current) {
+      return;
+    }
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     const spacing = maxDim / nPerSide;
     let i = 0;
@@ -43,6 +46,9 @@ export default ({
   });
 
   useFrame(({ clock }, delta) => {
+    if (!refPoints.current) {
+      return;
+    }
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
     const positionsBuffer = refPoints.current.geometry.attributes.position;

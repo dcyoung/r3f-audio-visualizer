@@ -25,11 +25,11 @@ const BaseRibbons = ({
   zScale?: number;
 }) => {
   const ribbonRefs = [
-    useRef<Mesh>(null!),
-    useRef<Mesh>(null!),
-    useRef<Mesh>(null!),
-    useRef<Mesh>(null!),
-    useRef<Mesh>(null!),
+    useRef<Mesh>(null),
+    useRef<Mesh>(null),
+    useRef<Mesh>(null),
+    useRef<Mesh>(null),
+    useRef<Mesh>(null),
   ];
   const ribbonCount = ribbonRefs.length;
 

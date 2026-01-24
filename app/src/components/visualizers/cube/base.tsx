@@ -27,7 +27,7 @@ const BaseCube = ({
   cubeSpacingScalar?: number;
   volume?: boolean;
 }) => {
-  const meshRef = useRef<InstancedMesh>(null!);
+  const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const inputCoordinateType = volume
     ? COORDINATE_TYPE.CARTESIAN_3D
@@ -37,6 +37,9 @@ const BaseCube = ({
 
   // Recolor
   useEffect(() => {
+    if (!meshRef.current) {
+      return;
+    }
     let instanceIdx, normCubeX, normCubeY, normCubeZ, normRadialOffset;
     // interior
     for (let row = 0; row < nPerSide; row++) {
@@ -70,10 +73,14 @@ const BaseCube = ({
         }
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     meshRef.current.instanceColor!.needsUpdate = true;
   });
 
   useFrame(({ clock }) => {
+    if (!meshRef.current) {
+      return;
+    }
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
     const faceSize = nPerSide * (1 + cubeSpacingScalar) * cubeSideLength;
@@ -102,6 +109,7 @@ const BaseCube = ({
                 normCubeZ,
                 elapsedTimeSec,
               );
+          // eslint-disable-next-line react-hooks/immutability
           tmpMatrix.elements[0] = normalizedScale;
           tmpMatrix.elements[5] = normalizedScale;
           tmpMatrix.elements[10] = normalizedScale;

@@ -13,7 +13,7 @@ export const FFTAnalyzerControls = ({
   const coordinateMapperData =
     COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
   const { setParams } = COORDINATE_MAPPER_REGISTRY.data.hooks.useActions();
-  const animationRequestRef = useRef<number>(null!);
+  const animationRequestRef = useRef<number | null>(null);
 
   /**
    * Transfers data from the analyzer to the target array
@@ -38,7 +38,7 @@ export const FFTAnalyzerControls = ({
    * Re-Synchronize the animation loop if the target data destination changes.
    */
   useEffect(() => {
-    if (animationRequestRef.current) {
+    if (animationRequestRef.current !== null) {
       cancelAnimationFrame(animationRequestRef.current);
     }
     const animate = (): void => {
@@ -46,13 +46,18 @@ export const FFTAnalyzerControls = ({
       animationRequestRef.current = requestAnimationFrame(animate);
     };
     animationRequestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationRequestRef.current);
+    return () => {
+      if (animationRequestRef.current !== null) {
+        cancelAnimationFrame(animationRequestRef.current);
+      }
+    };
   }, [coordinateMapperData, energyMeasure, mapData]);
 
   /**
    * Make sure an analyzer exists with the correct mode
    */
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     analyzer.mode = octaveBandMode;
   }, [octaveBandMode, analyzer]);
   return <></>;

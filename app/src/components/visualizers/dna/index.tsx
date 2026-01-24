@@ -6,11 +6,7 @@ import { type TVisualProps } from "../models";
 
 const ReactiveComponent = (props: TVisualProps) => {
   const VisualComponent = useMemo(
-    () =>
-      lazy(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        async () => await import(`./reactive`),
-      ),
+    () => lazy(async () => await import(`./reactive`)),
     [],
   );
   return (

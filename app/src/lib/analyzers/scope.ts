@@ -1,6 +1,9 @@
 import { type TAnalyzerInputControl } from "./common";
 
-function createBufferCopy(context: AudioContext, buffer: Float32Array) {
+function createBufferCopy(
+  context: AudioContext,
+  buffer: Float32Array<ArrayBuffer>,
+) {
   const copyNode = context.createScriptProcessor(buffer.length, 1, 1);
   copyNode.onaudioprocess = (e) => {
     e.inputBuffer.copyFromChannel(buffer, 0);
@@ -49,8 +52,8 @@ function createHilbertFilter(
 
 export default class ScopeAnalyzer implements TAnalyzerInputControl {
   public readonly _audioCtx: AudioContext;
-  public readonly timeSamples: Float32Array;
-  public readonly quadSamples: Float32Array;
+  public readonly timeSamples: Float32Array<ArrayBuffer>;
+  public readonly quadSamples: Float32Array<ArrayBuffer>;
   private _sources: AudioNode[];
   private _inputs: AudioNode[];
   public volume = 1.0;

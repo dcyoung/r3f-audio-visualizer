@@ -36,16 +36,15 @@ export const TrackPlayer = ({
     if (!streamUrl) {
       audio.pause();
     } else {
+      // eslint-disable-next-line react-hooks/immutability
       audio.src = streamUrl;
-      const promise = audio.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => console.log(`Playing ${track.title}`))
-          .catch((_) => {
-            // Auto-play was prevented
-            console.error(`Error playing ${track.title}`);
-          });
-      }
+      audio
+        .play()
+        ?.then(() => console.log(`Playing ${track.title}`))
+        .catch((_) => {
+          // Auto-play was prevented
+          console.error(`Error playing ${track.title}`);
+        });
     }
     return () => {
       audio.pause();

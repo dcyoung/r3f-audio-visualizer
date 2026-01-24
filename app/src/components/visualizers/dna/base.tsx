@@ -95,7 +95,7 @@ export const BaseDoubleHelix = forwardRef<
     const palette = usePalette();
     const lut = ColorPalette.getPalette(palette).buildLut();
     const nBasePairs = Math.floor(helixLength / baseSpacing);
-    const refBaseMesh = useRef<InstancedMesh>(null!);
+    const refBaseMesh = useRef<InstancedMesh>(null);
     const matBase = useMemo(() => {
       return new MeshBasicMaterial({ color: "#606060" });
     }, []);
@@ -120,8 +120,8 @@ export const BaseDoubleHelix = forwardRef<
       geo.attributes.position.needsUpdate = true;
       return geo;
     }, [helixRadius, strandRadius, strandOffsetRad]);
-    const refHelixMeshA = useRef<Mesh>(null!);
-    const refHelixMeshB = useRef<Mesh>(null!);
+    const refHelixMeshA = useRef<Mesh>(null);
+    const refHelixMeshB = useRef<Mesh>(null);
     const matHelix = useMemo(() => {
       // return new MeshBasicMaterial({ color: "#d9d9d9" });
       return new MeshBasicMaterial({ color: lut.getColor(0.5) });
@@ -161,6 +161,9 @@ export const BaseDoubleHelix = forwardRef<
     const upVec = useMemo(() => new Vector3(0, 0, 1), []);
 
     useEffect(() => {
+      if (!refBaseMesh.current) {
+        return;
+      }
       // Initialize positions
       let normBpIdx = 0;
       for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
@@ -184,6 +187,7 @@ export const BaseDoubleHelix = forwardRef<
         refBaseMesh.current.setColorAt(bpIdx * 2 + 1, lut.getColor(tagB / 3));
       }
       refBaseMesh.current.instanceMatrix.needsUpdate = true;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       refBaseMesh.current.instanceColor!.needsUpdate = true;
     }, [
       curveHelixA,
@@ -198,6 +202,9 @@ export const BaseDoubleHelix = forwardRef<
     ]);
 
     useFrame(({ clock }) => {
+      if (!refBaseMesh.current) {
+        return;
+      }
       const elapsedTimeSec = clock.getElapsedTime();
       let normBpIdx = 0,
         targetScale = 0,
@@ -277,15 +284,16 @@ BaseDoubleHelix.displayName = "BaseDoubleHelix";
 
 export const MultiStrand = (props: BaseDoubleHelixProps) => {
   const strandRefs = [
-    useRef<Group>(null!),
-    useRef<Group>(null!),
-    useRef<Group>(null!),
-    useRef<Group>(null!),
-    useRef<Group>(null!),
+    useRef<Group>(null),
+    useRef<Group>(null),
+    useRef<Group>(null),
+    useRef<Group>(null),
+    useRef<Group>(null),
   ];
   const strandCount = strandRefs.length;
   const bounds = 15;
 
+  // eslint-disable-next-line react-hooks/refs
   const strandPositions = Array.from({ length: strandCount }).map((_, i) => {
     return new Vector3()
       .fromArray(
@@ -328,21 +336,24 @@ export const MultiStrand = (props: BaseDoubleHelixProps) => {
 
   return (
     <>
-      {strandRefs.map((ref, i) => (
-        <BaseDoubleHelix
-          key={i}
-          ref={ref}
-          position={strandPositions[i]}
-          rotation={
-            new Euler(
-              ...Array.from({ length: 3 }).map(
-                (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1),
-              ),
-            )
-          }
-          {...props}
-        />
-      ))}
+      {
+        // eslint-disable-next-line react-hooks/refs
+        strandRefs.map((ref, i) => (
+          <BaseDoubleHelix
+            key={i}
+            ref={ref}
+            position={strandPositions[i]}
+            rotation={
+              new Euler(
+                ...Array.from({ length: 3 }).map(
+                  (_, j) => Math.PI * (2 * MathUtils.seededRandom(i + j) - 1),
+                ),
+              )
+            }
+            {...props}
+          />
+        ))
+      }
     </>
   );
 };

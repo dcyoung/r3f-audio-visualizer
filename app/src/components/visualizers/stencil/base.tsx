@@ -66,8 +66,8 @@ const BaseStencil = ({
     (referencePositions) =>
       computeNormals(referencePositions.map((v) => new Vector2(v.x, v.y))),
   );
-  const refPoints = useRef<Points>(null!);
-  const refBufGeo = useRef<BufferGeometry>(null!);
+  const refPoints = useRef<Points>(null);
+  const refBufGeo = useRef<BufferGeometry>(null);
   useLayoutEffect(() => {
     if (refBufGeo.current) {
       refBufGeo.current.setFromPoints(referencePositionsByPoly[0]);
@@ -77,6 +77,9 @@ const BaseStencil = ({
   const totalCycleSec = transitionSpeedSec * polyStates.length;
 
   useFrame(({ clock }) => {
+    if (!refPoints.current) {
+      return;
+    }
     //in ms
     const elapsedTimeSec = clock.getElapsedTime();
     const normCycleTime = (elapsedTimeSec % totalCycleSec) / totalCycleSec;

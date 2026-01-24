@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>three.js webgpu - attractors particles</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <link type="text/css" rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+      WebGPU - Compute Attractors Particles
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.webgpu.js",
+          "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.webgpu.js",
+          "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.tsl.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.173.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import {
+        float,
+        If,
+        PI,
+        color,
+        cos,
+        instanceIndex,
+        Loop,
+        mix,
+        mod,
+        sin,
+        instancedArray,
+        Fn,
+        uint,
+        uniform,
+        uniformArray,
+        hash,
+        vec3,
+        vec4,
+        time,
+      } from "three/tsl";
+
+      import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      import { TransformControls } from "three/addons/controls/TransformControls.js";
+
+      let camera, scene, renderer, controls, updateCompute;
+
+      init();
+
+      function init() {
+        camera = new THREE.PerspectiveCamera(
+          25,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          100
+        );
+        camera.position.set(3, 5, 8);
+
+        scene = new THREE.Scene();
+
+        // ambient light
+
+        const ambientLight = new THREE.AmbientLight("#ffffff", 0.5);
+        scene.add(ambientLight);
+
+        // directional light
+
+        const directionalLight = new THREE.DirectionalLight("#ffffff", 1.5);
+        directionalLight.position.set(4, 2, 0);
+        scene.add(directionalLight);
+
+        // renderer
+
+        renderer = new THREE.WebGPURenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setAnimationLoop(animate);
+        renderer.setClearColor("#000000");
+        document.body.appendChild(renderer.domElement);
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.minDistance = 0.1;
+        controls.maxDistance = 50;
+
+        window.addEventListener("resize", onWindowResize);
+
+        // particles
+        const count = Math.pow(2, 18);
+        const material = new THREE.SpriteNodeMaterial({
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+
+        const timeScale = uniform(1);
+        const scale = uniform(0.008);
+        const positionBuffer = instancedArray(count, "vec3");
+        const velocityBuffer = instancedArray(count, "vec3");
+
+        const sphericalToVec3 = Fn(([phi, theta]) => {
+          const sinPhiRadius = sin(phi);
+
+          return vec3(
+            sinPhiRadius.mul(sin(theta)),
+            cos(phi),
+            sinPhiRadius.mul(cos(theta))
+          );
+        });
+
+        // init compute
+        const init = Fn(() => {
+          const position = positionBuffer.element(instanceIndex);
+          const velocity = velocityBuffer.element(instanceIndex);
+
+          const basePosition = vec3(
+            hash(instanceIndex.add(uint(Math.random() * 0xffffff))),
+            hash(instanceIndex.add(uint(Math.random() * 0xffffff))),
+            hash(instanceIndex.add(uint(Math.random() * 0xffffff)))
+          )
+            .sub(0.5)
+            .mul(vec3(5, 0.2, 5));
+          position.assign(basePosition);
+
+          const phi = hash(instanceIndex.add(uint(Math.random() * 0xffffff)))
+            .mul(PI)
+            .mul(2);
+          const theta = hash(
+            instanceIndex.add(uint(Math.random() * 0xffffff))
+          ).mul(PI);
+          const baseVelocity = sphericalToVec3(phi, theta).mul(0.05);
+          velocity.assign(baseVelocity);
+        });
+
+        const initCompute = init().compute(count);
+
+        const reset = () => {
+          renderer.computeAsync(initCompute);
+        };
+
+        reset();
+
+        const randomNegPos1 = Fn(([seed]) => {
+          return hash(seed).mul(2).sub(1);
+        });
+        // update compute
+        const update = Fn(() => {
+          // const delta = timerDelta().mul( timeScale ).min( 1 / 30 ).toVar();
+          const delta = float(1 / 60)
+            .mul(timeScale)
+            .toVar(); // uses fixed delta to consistent result
+          const position = positionBuffer.element(instanceIndex);
+          const velocity = velocityBuffer.element(instanceIndex);
+
+          // position
+          position.y = time.add(position.x).sin().mul(0.1);
+        });
+        updateCompute = update().compute(count);
+
+        // nodes
+
+        material.positionNode = positionBuffer.toAttribute();
+
+        material.colorNode = Fn(() => {
+          return vec4(1, 1, 1, 1);
+        })();
+
+        material.scaleNode = scale;
+
+        // mesh
+        const geometry = new THREE.PlaneGeometry(1, 1);
+        const mesh = new THREE.InstancedMesh(geometry, material, count);
+        scene.add(mesh);
+
+        // debug
+
+        const gui = new GUI();
+
+        // gui.add(maxSpeed, "value", 0, 10, 0.01).name("maxSpeed");
+        gui.add(scale, "value", 0, 0.1, 0.001).name("scale");
+        gui.add({ reset }, "reset");
+      }
+
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      async function animate() {
+        controls.update();
+
+        renderer.compute(updateCompute);
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>

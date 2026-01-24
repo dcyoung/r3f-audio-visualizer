@@ -1,5 +1,4 @@
 import { type ComponentPropsWithoutRef } from "react";
-import Ground from "@/components/visualizers/ground";
 import {
   type TOmitVisualProps,
   type TVisualProps,
@@ -7,6 +6,7 @@ import {
 import { createConfigStore } from "@/lib/storeHelpers";
 
 import BaseVisual from "./base";
+import Ground from "./ground";
 
 export type TConfig = Required<
   TOmitVisualProps<ComponentPropsWithoutRef<typeof BaseVisual>>

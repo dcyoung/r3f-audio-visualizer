@@ -4,14 +4,14 @@ import { usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { type Group } from "three";
+import { type AnimationClip, type Group, type Mesh } from "three";
 import { type GLTF } from "three-stdlib";
 
 import MODEL_HORSE from "./horse.png";
 
 type GLTFResult = GLTF & {
   nodes: {
-    mesh_0: THREE.Mesh;
+    mesh_0: Mesh;
   };
   materials: Record<string, never>;
   animations: GLTFAction[];
@@ -19,7 +19,7 @@ type GLTFResult = GLTF & {
 
 type ActionName = "horse_A_";
 
-interface GLTFAction extends THREE.AnimationClip {
+interface GLTFAction extends AnimationClip {
   name: ActionName;
 }
 

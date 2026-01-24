@@ -1,14 +1,14 @@
 import { MeshReflectorMaterial } from "@react-three/drei";
-import { type MeshProps } from "@react-three/fiber";
+import { type ThreeElements } from "@react-three/fiber";
 
 const Ground = ({
   size = 250,
   ...props
-}: MeshProps & {
+}: ThreeElements["mesh"] & {
   size?: number;
 }) => {
   return (
-    <mesh {...props}>
+    <mesh {...props} receiveShadow>
       <planeGeometry args={[size, size]} />
       <MeshReflectorMaterial
         mirror={1}

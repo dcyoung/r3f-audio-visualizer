@@ -6,7 +6,7 @@ import {
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 import { ColorPalette } from "@/lib/palettes";
-import { useFrame, type GroupProps } from "@react-three/fiber";
+import { useFrame, type ThreeElements } from "@react-three/fiber";
 import {
   BoxGeometry,
   Curve,
@@ -75,7 +75,7 @@ export interface BaseDoubleHelixProps {
 
 export const BaseDoubleHelix = forwardRef<
   Group,
-  Omit<GroupProps, "children"> & BaseDoubleHelixProps
+  Omit<ThreeElements["group"], "children"> & BaseDoubleHelixProps
 >(
   (
     {

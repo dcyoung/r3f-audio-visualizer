@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef } from "react";
-import { usePalette } from "@/lib/appState";
 import { type ICoordinateMapper } from "@/lib/mappers/coordinateMappers/common";
 import { useFrame } from "@react-three/fiber";
 import {
@@ -9,6 +8,7 @@ import {
   type InstancedMesh,
 } from "three";
 
+import { IonsVisual } from "./ions";
 import { useActions, useHistory } from "./store";
 
 const StimulusCurrentControls = () => {
@@ -117,12 +117,14 @@ const NeuronVisual = () => {
     </>
   );
 };
+
 const BaseNeuron = (_: { coordinateMapper: ICoordinateMapper }) => {
   return (
     <>
       <StimulusCurrentControls />
       <NeuronSim />
       <NeuronVisual />
+      <IonsVisual />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { Color, SRGBColorSpace } from "three";
-import { Lut } from "three/examples/jsm/math/Lut";
+import { Lut } from "three/addons/math/Lut.js";
 
 /**
  * Describes a color palette type

@@ -2,10 +2,11 @@ import { BackgroundFog, CanvasBackground } from "@/components/canvas/common";
 import ModalVisual from "@/components/visualizers/visualizerModal";
 import { useAppStateActions, useCameraState, useUser } from "@/lib/appState";
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 
 import { AutoOrbitCameraControls } from "./AutoOrbitCamera";
 import { PaletteTracker } from "./paletteTracker";
+import { WebGPUCanvas3D } from "./webgpu/WebGPUCanvas3D";
 
 const CameraControls = () => {
   const { mode, autoOrbitAfterSleepMs } = useCameraState();
@@ -39,16 +40,7 @@ const CameraControls = () => {
 
 const Visual3DCanvas = () => {
   return (
-    <Canvas
-      camera={{
-        fov: 45,
-        near: 1,
-        far: 1000,
-        position: [-17, -6, 6.5],
-        up: [0, 0, 1],
-      }}
-      linear={true}
-    >
+    <WebGPUCanvas3D>
       <CanvasBackground />
       <ambientLight intensity={Math.PI} />
       <BackgroundFog />
@@ -56,7 +48,7 @@ const Visual3DCanvas = () => {
       {/* <Stats /> */}
       <CameraControls />
       <PaletteTracker />
-    </Canvas>
+    </WebGPUCanvas3D>
   );
 };
 

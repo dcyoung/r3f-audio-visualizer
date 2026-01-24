@@ -1,0 +1,1 @@
+const E={LINEAR:"LINEAR",BEZIER:"BEZIER"},a=(e,r=E.BEZIER)=>{switch(r){case"LINEAR":return e;case"QUADRATIC":return e<=.5?2*e*e:2*(e-.5)*(1-(e-.5))+.5;case"BEZIER":return e*e*(3-2*e);case"PARAMETRIC":return e*e/(2*(e*e-e)+1);default:return r}},n=(e,r=0,s=1)=>Math.min(s,Math.max(r,e)),I=(e,r,s)=>e+s*(r-e);export{E,n as c,a as e,I as l};

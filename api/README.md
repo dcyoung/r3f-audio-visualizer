@@ -1,34 +1,39 @@
 # API
 
-An application accessible API proxy to the soundcloud API.   
+An application-accessible API proxy for the SoundCloud API.
+
+**Stack:** [Effect](https://effect.website) v4 (beta), [@effect/platform-node](https://github.com/Effect-TS/effect-smol/tree/main/packages/platform-node), [Bun](https://bun.sh).
 
 ## Quickstart
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
-## Run with docker:
+Uses `../.env` for `SOUNDCLOUD_CLIENT_ID` and `SOUNDCLOUD_SECRET` via `--env-file=../.env`.
+
+## Scripts
+
+| Command       | Description                    |
+|---------------|--------------------------------|
+| `bun run dev` | Run from source with env file  |
+| `bun run build` | Compile TypeScript to `dist/` |
+| `bun run start` | Run compiled `dist/app.js`   |
+| `bun run lint`  | Run ESLint                    |
+
+## Docker
 
 ```bash
 docker build -t api-server .
 docker run -t -i \
-      --env SOUNDCLOUD_CLIENT_ID=... \
-      --env SOUNDCLOUD_SECRET=... \
-      -p 3000:8080 \
-      api-server
+  --env SOUNDCLOUD_CLIENT_ID=... \
+  --env SOUNDCLOUD_SECRET=... \
+  -p 3000:8080 \
+  api-server
 ```
 
-Then, the equivalent of:
-
-```bash
-curl "https://api.soundcloud.com/playlists?q=test" \
-      -H "Authorization: OAuth <AUTH_TOKEN>" \
-      | jq
-```
-
-becomes...
+Then:
 
 ```bash
 curl "localhost:3000/proxy/playlists?q=test" | jq
@@ -37,30 +42,11 @@ curl "localhost:3000/proxy/playlists?q=test" | jq
 ## Fly Deployment
 
 ```bash
-APP_NAME="CHANGE_ME"
-REGION="CHANGE_ME"
-ORG="CHANGE_ME"
+flyctl launch --remote-only --no-deploy --auto-confirm \
+  --dockerfile Dockerfile --path . -r $REGION --copy-config --org $ORG --name $APP_NAME
 
-flyctl launch \
-      --remote-only \
-      --no-deploy \
-      --auto-confirm \
-      --dockerfile Dockerfile \
-      --path . \
-      -r $REGION \
-      --copy-config \
-      --org $ORG \
-      --name $APP_NAME
+flyctl secrets set -a $APP_NAME --stage \
+  SOUNDCLOUD_CLIENT_ID=... SOUNDCLOUD_SECRET=...
 
-flyctl secrets set \
-      -a $APP_NAME \
-      --stage \
-      SOUNDCLOUD_CLIENT_ID=CHANGE_ME \
-      SOUNDCLOUD_SECRET=CHANGE_ME
-
-flyctl deploy \
-      --remote-only \
-      -a $APP_NAME \
-      --config fly.toml \
-      --dockerfile Dockerfile
+flyctl deploy --remote-only -a $APP_NAME --config fly.toml --dockerfile Dockerfile
 ```

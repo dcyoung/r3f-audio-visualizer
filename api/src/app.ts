@@ -1,61 +1,116 @@
-import express from 'express';
-import proxy from 'express-http-proxy';
+import * as Http from "node:http"
+import * as Cause from "effect/Cause"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import {
+  FetchHttpClient,
+  HttpClient,
+  HttpClientRequest,
+  HttpRouter,
+  HttpServer,
+  HttpServerRequest,
+  HttpServerResponse,
+} from "effect/unstable/http"
+import { NodeHttpServer } from "@effect/platform-node"
+import { getConfig } from "./config.js"
+import { SoundCloudToken, SoundCloudTokenLive } from "./soundcloud.js"
 
-import { getSoundcloudToken } from './soundcloud';
+const SOUNDCLOUD_API = "https://api.soundcloud.com"
 
-const port = process.env.PORT || 3000;
-const app = express();
+const config = getConfig()
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
-});
+const proxyHandler = Effect.gen(function* () {
+  const req = yield* HttpServerRequest.HttpServerRequest
+  const tokenService = yield* SoundCloudToken
+  const token = yield* tokenService.getToken()
+  const client = yield* HttpClient.HttpClient
 
-/*
-Example: 
-    curl "https://api.soundcloud.com/playlists?q=test" -H "Authorization: OAuth <AUTH_TOKEN>"
+  const pathAndQuery = req.url.startsWith("/proxy")
+    ? req.url.slice("/proxy".length) || "/"
+    : req.url
+  const targetUrl = `${SOUNDCLOUD_API}${pathAndQuery}`
 
-will be proxied through:
+  yield* Effect.log(`Proxying request to SoundCloud: ${pathAndQuery}`)
 
-    curl "localhost:3000/proxy/playlists?q=test"
-*/
-app.use("/proxy", proxy("https://api.soundcloud.com", {
-    proxyReqOptDecorator: async (proxyReqOpts, srcReq) => {
-        console.log(`Proxying request to Soundcloud: ${srcReq.path}`)
-        const token = await getSoundcloudToken();
-        proxyReqOpts.headers = { "Authorization": `OAuth ${token}` };
-        return proxyReqOpts;
+  const request = HttpClientRequest.make(
+    req.method as "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS" | "TRACE"
+  )(targetUrl, {
+    headers: {
+      ...Object.fromEntries(
+        Object.entries(req.headers).filter(
+          ([k]) => k.toLowerCase() !== "host" && k.toLowerCase() !== "connection"
+        )
+      ) as Record<string, string>,
+      Authorization: `OAuth ${token}`,
     },
-    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
-        if (proxyRes.statusCode === 429) {
-            try {
-                const body = JSON.parse(proxyResData.toString("utf8"));
-                console.warn(
-                    "SoundCloud stream rate limit (429):",
-                    body.remaining_requests != null && `remaining=${body.remaining_requests}`,
-                    body.reset_time != null && `resets=${body.reset_time}`,
-                    body.time_window != null && `window=${body.time_window}`,
-                    body
-                );
-            } catch {
-                console.warn("SoundCloud stream rate limit (429). Response:", proxyResData.toString("utf8").slice(0, 200));
-            }
-        }
-        return proxyResData;
-    },
-}));
+  })
 
-app.use("/healthz", (req, res) => {
-    res.status(200).send({ "healthy": true });
-});
+  const response = yield* client.execute(request).pipe(
+    Effect.mapError((e) => new Error(e.message))
+  )
 
-const server = app.listen(port, () => {
-    return console.log(`Express is listening at http://localhost:${port}`);
-});
+  const body = yield* response.arrayBuffer.pipe(
+    Effect.mapError((e) => new Error(String(e)))
+  )
 
-server.on('error', (err) => {
-    console.error(err);
-});
+  if (response.status === 429) {
+    yield* Effect.try({
+      try: () => JSON.parse(new TextDecoder().decode(body)) as Record<string, unknown>,
+      catch: (e) => e,
+    }).pipe(
+      Effect.match({
+        onSuccess: (json) =>
+          Effect.logWarning(
+            "SoundCloud stream rate limit (429):",
+            json.remaining_requests != null && `remaining=${json.remaining_requests}`,
+            json.reset_time != null && `resets=${json.reset_time}`,
+            json
+          ),
+        onFailure: () => Effect.logWarning("SoundCloud stream rate limit (429)"),
+      })
+    )
+  }
 
-process.on('SIGINT', () => server.close());
-process.on('SIGTERM', () => server.close());
+  const headers: Record<string, string> = { "Access-Control-Allow-Origin": "*" }
+  const skipHeaders = new Set(["content-encoding", "content-length"])
+  for (const [k, v] of Object.entries(response.headers)) {
+    if (v !== undefined && !skipHeaders.has(k.toLowerCase())) headers[k] = v
+  }
+
+  return HttpServerResponse.uint8Array(new Uint8Array(body), {
+    status: response.status,
+    headers,
+  })
+})
+
+const healthzHandler = HttpServerResponse.json(
+  { healthy: true },
+  { status: 200, headers: { "Access-Control-Allow-Origin": "*" } }
+)
+
+const app = Effect.gen(function* () {
+  const router = yield* HttpRouter.make
+  yield* router.add("GET", "/healthz", healthzHandler)
+  yield* router.add("*", "/proxy/*", proxyHandler)
+  yield* HttpServer.serveEffect(router.asHttpEffect())
+  yield* HttpServer.logAddress
+  yield* Effect.never
+})
+
+const mainLayer = Layer.mergeAll(
+  NodeHttpServer.layer(() => Http.createServer(), { port: config.PORT }),
+  FetchHttpClient.layer,
+  SoundCloudTokenLive(config).pipe(Layer.provide(FetchHttpClient.layer))
+)
+
+const program = Effect.scoped(
+  app.pipe(
+    Effect.provide(mainLayer),
+    Effect.catchCause((cause) => Effect.logError(cause))
+  )
+) as Effect.Effect<void, never, never>
+
+Effect.runPromise(program).catch((e) => {
+  Effect.runSync(Effect.logError(Cause.die(e)))
+  process.exit(1)
+})

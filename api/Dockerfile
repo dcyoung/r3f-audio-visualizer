@@ -1,22 +1,23 @@
-FROM node:18.16.0-alpine as base
+FROM oven/bun:1.2-alpine AS base
 
 WORKDIR /app
 
-# Add package file
-COPY package*.json .
-RUN npm install
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY . .
+RUN bun run build
 
-RUN npm run build
+FROM oven/bun:1.2-alpine AS server
 
-FROM node:18.16.0-alpine as server
-# Start production image build
-# Copy node modules and build directory
+WORKDIR /app
+
 COPY --from=base /app/node_modules /app/node_modules
 COPY --from=base /app/dist /app/dist
+COPY --from=base /app/package.json /app/package.json
 
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
-CMD ["/app/dist/app.js"]
+
+CMD ["bun", "run", "dist/app.js"]

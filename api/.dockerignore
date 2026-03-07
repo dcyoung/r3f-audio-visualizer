@@ -1,5 +1,6 @@
 **
 !package*.json
+!bun.lock
 !src/
 !tsconfig.json
-!.esclintrc.js
+!eslint.config.js

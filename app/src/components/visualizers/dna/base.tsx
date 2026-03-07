@@ -199,11 +199,11 @@ export const BaseDoubleHelix = forwardRef<
       upVec,
     ]);
 
-    useFrame(({ clock }) => {
+    useFrame(({ elapsed }) => {
       if (!refBaseMesh.current) {
         return;
       }
-      const elapsedTimeSec = clock.getElapsedTime();
+      const elapsedTimeSec = elapsed;
       const targetScaleMin = 0.25;
       const targetScaleMax = 1.0;
       for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
@@ -297,8 +297,8 @@ export const MultiStrand = (props: BaseDoubleHelixProps) => {
       .multiplyScalar(bounds);
   });
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
+  useFrame(({ elapsed }) => {
+    const t = elapsed;
     const amplitude = 0.0005;
     const speed = 0.05;
     let tmpVec;

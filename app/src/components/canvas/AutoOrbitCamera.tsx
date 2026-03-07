@@ -117,7 +117,7 @@ export const AutoOrbitCameraControls = () => {
   const limits = useSphericalLimits();
   const target = new Spherical();
 
-  useFrame(({ clock }) => {
+  useFrame(({ elapsed }) => {
     if (!limits) {
       return;
     }
@@ -132,7 +132,7 @@ export const AutoOrbitCameraControls = () => {
       phiMax,
       phiSpeed,
     } = limits;
-    const t = clock.elapsedTime;
+    const t = elapsed;
 
     const rAlpha = 0.5 * (1 + Math.sin(t * rSpeed));
     const r = rMin + rAlpha * (rMax - rMin);

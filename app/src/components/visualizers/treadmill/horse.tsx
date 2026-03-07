@@ -52,8 +52,8 @@ const Horse = (_: TVisualProps) => {
     actions?.horse_A_?.play();
   });
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
+  useFrame(({ elapsed }) => {
+    const t = elapsed;
 
     const rateOfChange = 0.5;
     const tScale = (Math.sin(rateOfChange * t) + 1) / 2;

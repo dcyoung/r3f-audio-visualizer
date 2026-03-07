@@ -44,12 +44,11 @@ const BaseSphere = ({
     meshRef.current.instanceColor!.needsUpdate = true;
   }, [lut, meshRef, nPoints]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ elapsed }) => {
     if (!meshRef.current) {
       return;
     }
-    // in ms
-    const elapsedTimeSec = clock.getElapsedTime();
+    const elapsedTimeSec = elapsed;
     let k, phi, theta, x, y, z, effectiveRadius;
     for (let i = 0; i < nPoints; i++) {
       k = i + 0.5;

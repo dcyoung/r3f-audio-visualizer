@@ -77,12 +77,11 @@ const BaseCube = ({
     meshRef.current.instanceColor!.needsUpdate = true;
   });
 
-  useFrame(({ clock }) => {
+  useFrame(({ elapsed }) => {
     if (!meshRef.current) {
       return;
     }
-    //in ms
-    const elapsedTimeSec = clock.getElapsedTime();
+    const elapsedTimeSec = elapsed;
     const faceSize = nPerSide * (1 + cubeSpacingScalar) * cubeSideLength;
     let instanceIdx, normCubeX, normCubeY, normCubeZ, x, y, z, normalizedScale;
     for (let row = 0; row < nPerSide; row++) {

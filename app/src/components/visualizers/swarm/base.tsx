@@ -44,12 +44,11 @@ export default ({
     positionsBuffer.needsUpdate = true;
   });
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ elapsed, delta }) => {
     if (!refPoints.current) {
       return;
     }
-    //in ms
-    const elapsedTimeSec = clock.getElapsedTime();
+    const elapsedTimeSec = elapsed;
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     for (let i = 0; i < nPoints; i++) {
       tmpPosBefore.x = positionsBuffer.getX(i);

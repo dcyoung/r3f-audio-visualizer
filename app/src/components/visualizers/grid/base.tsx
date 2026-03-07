@@ -52,12 +52,11 @@ const BaseGrid = ({
     meshRef.current.instanceColor!.needsUpdate = true;
   });
 
-  useFrame(({ clock }) => {
+  useFrame(({ elapsed }) => {
     if (!meshRef.current) {
       return;
     }
-    //in ms
-    const elapsedTimeSec = clock.getElapsedTime();
+    const elapsedTimeSec = elapsed;
     const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
     const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;
     // const baseHeight = cubeSideLength + coordinateMapper.amplitude;

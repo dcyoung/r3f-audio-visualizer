@@ -76,12 +76,11 @@ const BaseStencil = ({
 
   const totalCycleSec = transitionSpeedSec * polyStates.length;
 
-  useFrame(({ clock }) => {
+  useFrame(({ elapsed }) => {
     if (!refPoints.current) {
       return;
     }
-    //in ms
-    const elapsedTimeSec = clock.getElapsedTime();
+    const elapsedTimeSec = elapsed;
     const normCycleTime = (elapsedTimeSec % totalCycleSec) / totalCycleSec;
     const currPolyIdx = Math.floor(normCycleTime * polyStates.length);
     const nextPolyIdx =

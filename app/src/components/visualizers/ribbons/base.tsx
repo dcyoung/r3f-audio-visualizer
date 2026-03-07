@@ -55,9 +55,8 @@ const BaseRibbons = ({
     );
   }, [colorPalette]);
 
-  useFrame(({ clock }) => {
-    //in ms
-    const elapsedTimeSec = clock.getElapsedTime();
+  useFrame(({ elapsed }) => {
+    const elapsedTimeSec = elapsed;
 
     let w, h, vIdx, normX, normY, z, alpha;
     ribbonRefs.forEach((ribbonRef, ribbonIdx) => {

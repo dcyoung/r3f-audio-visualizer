@@ -70,11 +70,11 @@ export const Treadmill = ({
     stoneRef.current.instanceColor!.needsUpdate = true;
   }, [stoneRef, lut, nStones]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ elapsed }) => {
     if (!stoneRef.current) {
       return;
     }
-    const t = clock.getElapsedTime();
+    const t = elapsed;
     const speed = 0.025;
 
     const q = 0.5;

@@ -3,6 +3,7 @@ import Cube from "./cube";
 import DiffusedRing from "./diffusedRing";
 import Dna from "./dna";
 import Grid from "./grid";
+import Membrane from "./membrane";
 import MovingBoxes from "./movingBoxes";
 import Neuron from "./neuron";
 import Ribbons from "./ribbons";
@@ -18,6 +19,7 @@ export const VISUAL_REGISTRY = {
   [DiffusedRing.id]: DiffusedRing,
   [Dna.id]: Dna,
   [Neuron.id]: Neuron,
+  [Membrane.id]: Membrane,
   [MovingBoxes.id]: MovingBoxes,
   [Ribbons.id]: Ribbons,
   [Treadmill.id]: Treadmill,

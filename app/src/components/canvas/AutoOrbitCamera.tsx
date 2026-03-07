@@ -114,6 +114,18 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
+    case "membrane":
+      return {
+        rMin: 8,
+        rMax: 14,
+        rSpeed: 0.08,
+        thetaMin: 0,
+        thetaMax: 2 * Math.PI,
+        thetaSpeed: 0.02,
+        phiMin: Math.PI / 4,
+        phiMax: Math.PI / 2.5,
+        phiSpeed: 0.15,
+      };
     case "scope":
       return null;
     default:

@@ -1,9 +1,4 @@
 import { Suspense, useState } from "react";
-import { SearchFilterInput } from "@/components/controls/searchFilterInput";
-import {
-  SearchFiltersContextProvider,
-  useSearchFiltersContext,
-} from "@/context/searchFilters";
 import { useSoundcloudContextSetters } from "@/context/soundcloud";
 import { getUsers } from "@/lib/soundcloud/api";
 import { type SoundcloudUser } from "@/lib/soundcloud/models";
@@ -12,7 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { UserTrackList } from "./track";
 import { UserList } from "./user";
 
-const SouncloudUserSearch = ({ query }: { query: string }) => {
+const SoundcloudUserResults = ({ query }: { query: string }) => {
   const { data: users } = useSuspenseQuery({
     queryKey: ["soundcloud-user-search", query],
     queryFn: async () => {
@@ -42,28 +37,14 @@ const SouncloudUserSearch = ({ query }: { query: string }) => {
   );
 };
 
-const SearchedUserList = () => {
-  const { query } = useSearchFiltersContext();
-
-  if (!query) {
-    return <span className="text-foreground">No results...</span>;
-  }
+export const SoundcloudSearchResults = ({ query }: { query: string }) => {
   return (
-    <Suspense fallback={<span className="text-foreground">Searching...</span>}>
-      <SouncloudUserSearch query={query} />
+    <Suspense
+      fallback={
+        <span className="text-muted-foreground text-xs">Searching...</span>
+      }
+    >
+      <SoundcloudUserResults query={query} />
     </Suspense>
   );
-};
-
-const SoundcloudUserSearch = () => {
-  return (
-    <SearchFiltersContextProvider>
-      <SearchFilterInput placeholder="Search Soundcloud users..." />
-      <SearchedUserList />
-    </SearchFiltersContextProvider>
-  );
-};
-
-export const SoundcloudControls = () => {
-  return <SoundcloudUserSearch />;
 };

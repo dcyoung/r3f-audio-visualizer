@@ -1,16 +1,20 @@
-import { Clock } from "three";
-
 export class ScalarMovingAvgEventDetector {
-  private clock = new Clock(true);
+  private startMs = performance.now();
   private bufferSize = 1000;
   private lastEventElapsedMs = 0;
-  public get timeSinceLastEventMs() {
-    return this.clock.elapsedTime * 1000 - this.lastEventElapsedMs;
+
+  private get elapsedMs() {
+    return performance.now() - this.startMs;
   }
+
+  public get timeSinceLastEventMs() {
+    return this.elapsedMs - this.lastEventElapsedMs;
+  }
+
   private buffer: {
     value: number;
     elapsedTimeMs: number;
-  }[] = Array.from({ length: this.bufferSize }).map((_) => ({
+  }[] = Array.from({ length: this.bufferSize }).map(() => ({
     value: 0,
     elapsedTimeMs: 0,
   }));
@@ -45,22 +49,18 @@ export class ScalarMovingAvgEventDetector {
   }
 
   public step(scalar: number) {
-    const ms = this.clock.getElapsedTime() * 1000;
-    // Add the observation
+    const ms = this.elapsedMs;
     const idx = this.observationCount % this.bufferSize;
     this.buffer[idx].value = scalar;
     this.buffer[idx].elapsedTimeMs = ms;
     this.observationCount++;
 
-    // Can't trigger in cooldown
     if (this.timeSinceLastEventMs < this.cooldownMs) {
       return false;
     }
 
-    // Check for trigger
     const avg = this.getBufferAvg(ms);
     if (avg > this.threshold) {
-      // reset
       this.lastEventElapsedMs = ms;
       return true;
     }

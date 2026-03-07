@@ -8,8 +8,7 @@ import { Settings } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { MobileDrawer } from "./mobile-drawer";
-import { ModeSheetContent } from "./modeSheet";
-import { VisualSettingsSheetContent } from "./visualSettingsSheet";
+import { SettingsPanel } from "./settingsPanel";
 
 export const SettingsPanelTrigger = () => {
   const [open, setOpen] = useState(false);
@@ -24,18 +23,16 @@ export const SettingsPanelTrigger = () => {
       </DockItem>
       {isSmallScreen ? (
         <MobileDrawer open={open} onOpenChange={setOpen}>
-          <ModeSheetContent />
-          <VisualSettingsSheetContent />
+          <SettingsPanel />
         </MobileDrawer>
       ) : (
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent
             insertHidden={true}
             side="right"
-            className="no-scrollbar bg-background/70 w-full max-w-full space-y-4 overflow-scroll p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
+            className="no-scrollbar bg-background/70 w-full max-w-full overflow-scroll p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
           >
-            <ModeSheetContent />
-            <VisualSettingsSheetContent />
+            <SettingsPanel />
           </SheetContent>
         </Sheet>
       )}

@@ -1,7 +1,4 @@
-import { ValueLabel } from "@/components/controls/common";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { PresetBar, SliderField } from "@/components/controls/common";
 
 import { useActions, useInstance, usePresets } from "./store";
 
@@ -12,63 +9,50 @@ export default () => {
   const params = mapper.params;
 
   return (
-    <div className="flex w-full flex-col items-start justify-start gap-4">
-      <Label>Noise</Label>
-      <div className="flex w-full items-center justify-start gap-2">
-        {[...Object.keys(presetOptions), "custom"].map((p) => (
-          <Button
-            key={`po_${p}`}
-            variant="ghost"
-            aria-selected={activePreset === p}
-            className="aria-selected:bg-primary/20 p-2"
-            onClick={() => setPreset(p === "custom" ? undefined : p)}
-          >
-            {p}
-          </Button>
-        ))}
-      </div>
+    <div className="space-y-4">
+      <PresetBar
+        activePreset={activePreset}
+        presetOptions={presetOptions}
+        onSelect={setPreset}
+      />
       {!activePreset && (
-        <>
-          <ValueLabel label="Amplitude" value={params.amplitude.toFixed(2)} />
-          <Slider
-            defaultValue={[params.amplitude]}
-            value={[params.amplitude]}
+        <div className="space-y-3">
+          <SliderField
+            label="Amplitude"
+            value={params.amplitude}
+            displayValue={params.amplitude.toFixed(2)}
             min={0.0}
             max={5.0}
             step={0.01}
-            onValueChange={(e) => setParams({ amplitude: e[0] })}
+            onChange={(v) => setParams({ amplitude: v })}
           />
-          <ValueLabel
+          <SliderField
             label="Spatial Scale"
-            value={params.spatialScale.toFixed(2)}
-          />
-          <Slider
-            defaultValue={[params.spatialScale]}
-            value={[params.spatialScale]}
+            value={params.spatialScale}
+            displayValue={params.spatialScale.toFixed(2)}
             min={0.1}
             max={5.0}
             step={0.1}
-            onValueChange={(e) => setParams({ spatialScale: e[0] })}
+            onChange={(v) => setParams({ spatialScale: v })}
           />
-          <ValueLabel label="Time Scale" value={params.timeScale.toFixed(2)} />
-          <Slider
-            defaultValue={[params.timeScale]}
-            value={[params.timeScale]}
+          <SliderField
+            label="Time Scale"
+            value={params.timeScale}
+            displayValue={params.timeScale.toFixed(2)}
             min={0.01}
             max={2.0}
             step={0.01}
-            onValueChange={(e) => ({ timeScale: e[0] })}
+            onChange={(v) => setParams({ timeScale: v })}
           />
-          <ValueLabel label="Iteration Count" value={params.nIterations} />
-          <Slider
-            defaultValue={[params.nIterations]}
-            value={[params.nIterations]}
+          <SliderField
+            label="Iterations"
+            value={params.nIterations}
             min={1}
             max={16}
             step={1}
-            onValueChange={(e) => ({ nIterations: e[0] })}
+            onChange={(v) => setParams({ nIterations: v })}
           />
-        </>
+        </div>
       )}
     </div>
   );

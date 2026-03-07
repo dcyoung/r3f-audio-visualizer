@@ -5,8 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   EnergyMeasureOptions,
   OctaveBandModeMap,
@@ -16,7 +14,7 @@ import {
 import { useAnalyzerFFT, useAppStateActions } from "@/lib/appState";
 import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
 
-import { ValueLabel } from "../common";
+import { SelectRow, SliderField } from "../common";
 import { AudioSourceControls, AudioSourceSelect } from "./common";
 
 const FFTAnalyzerControls = () => {
@@ -25,22 +23,17 @@ const FFTAnalyzerControls = () => {
   const mapper = COORDINATE_MAPPER_REGISTRY.data.hooks.useInstance();
   const { setParams } = COORDINATE_MAPPER_REGISTRY.data.hooks.useActions();
   return (
-    <div className="w-full space-y-4">
-      <ValueLabel
+    <div className="space-y-4">
+      <SliderField
         label="Amplitude"
-        value={mapper.params.amplitude.toFixed(2)}
-      />
-      <Slider
-        defaultValue={[mapper.params.amplitude]}
-        value={[mapper.params.amplitude]}
+        value={mapper.params.amplitude}
+        displayValue={mapper.params.amplitude.toFixed(2)}
         min={0.0}
         max={5.0}
         step={0.01}
-        onValueChange={(e) => setParams({ amplitude: e[0] })}
+        onChange={(v) => setParams({ amplitude: v })}
       />
-      <div className="flex w-full items-center justify-between">
-        <span>Octave Band Mode</span>
-
+      <SelectRow label="Octave Bands">
         <Select
           onValueChange={(v) =>
             setAnalyzerFFT({
@@ -48,11 +41,10 @@ const FFTAnalyzerControls = () => {
             })
           }
         >
-          <SelectTrigger className="w-[240px] max-w-1/2">
+          <SelectTrigger className="w-[180px]">
             <SelectValue
               placeholder={OctaveBandModeMap[octaveBandMode]}
               defaultValue={octaveBandMode}
-              className="w-full"
             />
           </SelectTrigger>
           <SelectContent className="max-h-36">
@@ -67,10 +59,8 @@ const FFTAnalyzerControls = () => {
             ))}
           </SelectContent>
         </Select>
-      </div>
-      <div className="flex w-full items-center justify-between">
-        <span>Energy Measure</span>
-
+      </SelectRow>
+      <SelectRow label="Energy">
         <Select
           onValueChange={(v) => {
             setAnalyzerFFT({
@@ -78,11 +68,10 @@ const FFTAnalyzerControls = () => {
             });
           }}
         >
-          <SelectTrigger className="w-[240px] max-w-1/2">
+          <SelectTrigger className="w-[180px]">
             <SelectValue
               placeholder={energyMeasure}
               defaultValue={energyMeasure}
-              className="w-full"
             />
           </SelectTrigger>
           <SelectContent className="max-h-36">
@@ -93,36 +82,29 @@ const FFTAnalyzerControls = () => {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </SelectRow>
     </div>
   );
 };
 
+const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+  <span className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
+    {children}
+  </span>
+);
+
 export const AudioModeControls = () => {
   return (
-    <Tabs defaultValue="source" className="w-full">
-      <TabsList className="w-full">
-        <TabsTrigger value="source" className="grow">
-          Audio Source
-        </TabsTrigger>
-        <TabsTrigger value="analyzer" className="grow">
-          Audio Analyzer
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent
-        value="source"
-        className="space-y-4 p-4"
-        // className="flex flex-col items-start justify-start gap-4 py-2"
-      >
+    <div className="space-y-5">
+      <div className="space-y-3">
+        <SectionLabel>Source</SectionLabel>
         <AudioSourceSelect />
         <AudioSourceControls />
-      </TabsContent>
-      <TabsContent
-        value="analyzer"
-        // className="flex flex-col items-start justify-start gap-4"
-      >
+      </div>
+      <div className="space-y-3">
+        <SectionLabel>Analyzer</SectionLabel>
         <FFTAnalyzerControls />
-      </TabsContent>
-    </Tabs>
+      </div>
+    </div>
   );
 };

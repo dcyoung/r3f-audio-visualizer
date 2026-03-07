@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import {
   APPLICATION_MODE,
   getPlatformSupportedApplicationModes,
@@ -20,28 +19,37 @@ import { AudioWaveform, Music, Shell, Waves, Wind } from "lucide-react";
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
 
+const MODE_DISPLAY_NAMES: Record<TApplicationMode, string> = {
+  [APPLICATION_MODE.WAVE_FORM]: "Waveform",
+  [APPLICATION_MODE.NOISE]: "Noise",
+  [APPLICATION_MODE.AUDIO]: "Audio",
+  [APPLICATION_MODE.AUDIO_SCOPE]: "Oscilloscope",
+  [APPLICATION_MODE.PARTICLE_NOISE]: "Particle Noise",
+};
+
 const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
   switch (mode) {
     case APPLICATION_MODE.WAVE_FORM:
-      return <AudioWaveform />;
+      return <AudioWaveform className="h-4 w-4" />;
     case APPLICATION_MODE.NOISE:
-      return <Waves />;
+      return <Waves className="h-4 w-4" />;
     case APPLICATION_MODE.AUDIO:
-      return <Music />;
+      return <Music className="h-4 w-4" />;
     case APPLICATION_MODE.AUDIO_SCOPE:
-      return <Shell />;
+      return <Shell className="h-4 w-4" />;
     case APPLICATION_MODE.PARTICLE_NOISE:
-      return <Wind />;
+      return <Wind className="h-4 w-4" />;
     default:
       return mode satisfies never;
   }
 };
+
 const ModeSelectEntry = ({ mode }: { mode: TApplicationMode }) => {
   return (
-    <div className="flex w-full items-center justify-start gap-2">
-      <div className="w-4">{isAudioMode(mode) && "🎧"}</div>
+    <div className="flex w-full items-center gap-2.5">
+      {isAudioMode(mode) && <span className="text-xs opacity-60">🎧</span>}
       <ModeIcon mode={mode} />
-      {mode}
+      <span className="text-sm">{MODE_DISPLAY_NAMES[mode]}</span>
     </div>
   );
 };
@@ -85,12 +93,8 @@ const ModeSelector = () => {
 export const ModeSheetContent = () => {
   const mode = useMode();
   return (
-    <>
-      <div className="flex items-center justify-start gap-4">
-        <span className="text-xl font-bold">MODE</span>
-        <ModeSelector />
-      </div>
-      <Separator />
+    <div className="space-y-4">
+      <ModeSelector />
       {mode === APPLICATION_MODE.WAVE_FORM && (
         <COORDINATE_MAPPER_REGISTRY.waveform.ControlsComponent />
       )}
@@ -99,6 +103,6 @@ export const ModeSheetContent = () => {
       )}
       {mode === APPLICATION_MODE.AUDIO && <AudioModeControls />}
       {mode === APPLICATION_MODE.AUDIO_SCOPE && <AudioScopeModeControls />}
-    </>
+    </div>
   );
 };

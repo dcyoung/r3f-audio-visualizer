@@ -1,7 +1,4 @@
-import { ValueLabel } from "@/components/controls/common";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { PresetBar, SliderField } from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
@@ -11,43 +8,32 @@ export default () => {
   const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
-    <div className="flex w-full flex-col items-start justify-start gap-4">
-      <Label>Sphere Presets</Label>
-      <div className="flex w-full items-center justify-start gap-2">
-        {[...Object.keys(presetOptions), "custom"].map((p) => (
-          <Button
-            key={`po_${p}`}
-            variant="ghost"
-            aria-selected={activePreset === p}
-            className="aria-selected:bg-primary/20 p-2"
-            onClick={() => setPreset(p === "custom" ? undefined : p)}
-          >
-            {p}
-          </Button>
-        ))}
-      </div>
+    <div className="space-y-4">
+      <PresetBar
+        activePreset={activePreset}
+        presetOptions={presetOptions}
+        onSelect={setPreset}
+      />
       {!activePreset && (
-        <>
-          <ValueLabel label="Point Count" value={nPoints} />
-          <Slider
-            defaultValue={[nPoints]}
-            value={[nPoints]}
+        <div className="space-y-3">
+          <SliderField
+            label="Point Count"
+            value={nPoints}
             min={100}
             max={2000}
             step={25}
-            onValueChange={(e) => setParams({ nPoints: e[0] })}
+            onChange={(v) => setParams({ nPoints: v })}
           />
-
-          <ValueLabel label="Radius" value={radius.toFixed(2)} />
-          <Slider
-            defaultValue={[radius]}
-            value={[radius]}
+          <SliderField
+            label="Radius"
+            value={radius}
+            displayValue={radius.toFixed(2)}
             min={0.25}
             max={3}
             step={0.25}
-            onValueChange={(e) => setParams({ radius: e[0] })}
+            onChange={(v) => setParams({ radius: v })}
           />
-        </>
+        </div>
       )}
     </div>
   );

@@ -1,18 +1,16 @@
-import { Clock } from "three";
-
 export class EventDetector {
-  private clock = new Clock(true);
+  private startMs = performance.now();
   private lastEventElapsedMs = 0;
 
-  constructor() {
-    this.clock.getElapsedTime();
+  private get elapsedMs() {
+    return performance.now() - this.startMs;
   }
 
   public get msSinceLastEvent() {
-    return this.clock.getElapsedTime() * 1000 - this.lastEventElapsedMs;
+    return this.elapsedMs - this.lastEventElapsedMs;
   }
 
   public addEvent() {
-    this.lastEventElapsedMs = this.clock.getElapsedTime() * 1000;
+    this.lastEventElapsedMs = this.elapsedMs;
   }
 }

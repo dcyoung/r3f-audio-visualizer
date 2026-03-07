@@ -1,7 +1,4 @@
-import { ValueLabel } from "@/components/controls/common";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { PresetBar, SliderField } from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
@@ -11,54 +8,40 @@ export default () => {
   const { active: activePreset, options: presetOptions } = usePresets();
 
   return (
-    <div className="flex w-full flex-col items-start justify-start gap-4">
-      <Label>Grid Presets</Label>
-      <div className="flex w-full items-center justify-start gap-2">
-        {[...Object.keys(presetOptions), "custom"].map((p) => (
-          <Button
-            key={`po_${p}`}
-            variant="ghost"
-            aria-selected={activePreset === p}
-            className="aria-selected:bg-primary/20 p-2"
-            onClick={() => setPreset(p === "custom" ? undefined : p)}
-          >
-            {p}
-          </Button>
-        ))}
-      </div>
+    <div className="space-y-4">
+      <PresetBar
+        activePreset={activePreset}
+        presetOptions={presetOptions}
+        onSelect={setPreset}
+      />
       {!activePreset && (
-        <>
-          <ValueLabel label="N x Rows" value={nGridRows} />
-          <Slider
-            defaultValue={[nGridRows]}
-            value={[nGridRows]}
+        <div className="space-y-3">
+          <SliderField
+            label="Rows"
+            value={nGridRows}
             min={5}
             max={200}
             step={5}
-            onValueChange={(e) => setParams({ nGridRows: e[0] })}
+            onChange={(v) => setParams({ nGridRows: v })}
           />
-          <ValueLabel label="N x Cols" value={nGridCols} />
-          <Slider
-            defaultValue={[nGridCols]}
-            value={[nGridCols]}
+          <SliderField
+            label="Columns"
+            value={nGridCols}
             min={5}
             max={200}
             step={5}
-            onValueChange={(e) => setParams({ nGridCols: e[0] })}
+            onChange={(v) => setParams({ nGridCols: v })}
           />
-          <ValueLabel
+          <SliderField
             label="Grid Spacing"
-            value={cubeSpacingScalar.toFixed(2)}
-          />
-          <Slider
-            defaultValue={[cubeSpacingScalar]}
-            value={[cubeSpacingScalar]}
+            value={cubeSpacingScalar}
+            displayValue={cubeSpacingScalar.toFixed(2)}
             min={1}
             max={6}
             step={0.5}
-            onValueChange={(e) => setParams({ cubeSpacingScalar: e[0] })}
+            onChange={(v) => setParams({ cubeSpacingScalar: v })}
           />
-        </>
+        </div>
       )}
     </div>
   );

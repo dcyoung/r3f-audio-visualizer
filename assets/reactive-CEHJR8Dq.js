@@ -1,11 +1,11 @@
-import{r as o,u as b,V as m,a as h,b as g,C as w,j as a,c as y,d as z}from"./index-OyPexJXT.js";const j=`
+import{u as w,r as e,a as y,C as z,V as j,b as d,c as D,j as o}from"./index-YNAAgOdW.js";const S=`
 precision mediump float;
 uniform vec3 color;
 
 void main() {
     gl_FragColor = vec4(color, 1.0);
 }
-`,D=`
+`,A=`
 precision mediump float;
 
 uniform float max_amplitude;
@@ -107,4 +107,4 @@ void main() {
     // vec2 diff = next_pos - prev_pos;
     // // angle = ...
 }
-`,S=({textureMapper:r,nParticles:t=512,usePoints:u=!0,interpolate:n=!1,color:i=new w("green")})=>{const{tex:l,textureData:p}=r.generateSupportedTextureAndData();l.needsUpdate=!0;const e=o.useRef(null),s=b(_=>_.size),d=o.useMemo(()=>new Float32Array(t).fill(0).map((_,v)=>v),[t]),f=o.useMemo(()=>new Float32Array(t*3).fill(0),[t]),x=o.useMemo(()=>({color:{value:new h},max_amplitude:{value:r.maxAmplitude},sample_scale:{value:new m(t,1)},samples:{type:"t",value:l},resolution:{value:new m(s.width,s.height)},b_should_interpolate:{value:n}}),[t,r,n,s,l]);g(()=>{r.updateTextureData(p),l.needsUpdate=!0,e.current&&(e.current.uniforms.max_amplitude.value=r.maxAmplitude,e.current.uniforms.samples.value=l)}),o.useEffect(()=>{e.current?.uniforms&&(e.current.uniforms.resolution.value.x=s.width,e.current.uniforms.resolution.value.y=s.height)},[s]),o.useEffect(()=>{e.current?.uniforms&&(e.current.uniforms.b_should_interpolate.value=n,e.current.uniforms.color.value.x=i.r,e.current.uniforms.color.value.y=i.g,e.current.uniforms.color.value.z=i.b)},[n,i]),o.useEffect(()=>{e.current?.uniforms&&(e.current.uniforms.sample_scale.value.x=t,e.current.uniforms.sample_scale.value.y=1)},[t]);const c=a.jsxs(o.Fragment,{children:[a.jsxs("bufferGeometry",{children:[a.jsx("bufferAttribute",{attach:"attributes-position",count:t,array:f,itemSize:3}),a.jsx("bufferAttribute",{attach:"attributes-index",count:t,array:d,itemSize:1})]}),a.jsx("shaderMaterial",{ref:e,depthWrite:!1,fragmentShader:j,vertexShader:D,uniforms:x})]});return u?a.jsx("points",{children:c}):a.jsx("line",{children:c})},C=({textureMapper:r})=>{const t=y(),u=z.getPalette(t).lerpColor(.5);return a.jsx(S,{textureMapper:r,usePoints:!0,interpolate:!1,color:u})};export{C as default};
+`,F=({textureMapper:t,nParticles:a=512,usePoints:x=!0,interpolate:i=!1})=>{const c=w(),{tex:l,textureData:f}=e.useMemo(()=>t.generateSupportedTextureAndData(),[t]),r=e.useRef(null),n=y(s=>s.size),v=e.useMemo(()=>new Float32Array(a).fill(0).map((s,g)=>g),[a]),b=e.useMemo(()=>new Float32Array(a*3).fill(0),[a]),_=e.useMemo(()=>{const s=z.getPalette(c).lerpColor(.5);return new j(s.r,s.g,s.b)},[c]),u=e.useMemo(()=>new d(n.width,n.height),[n.width,n.height]),m=e.useMemo(()=>new d(a,1),[a]),h=e.useMemo(()=>({color:{value:_},max_amplitude:{value:t.maxAmplitude},sample_scale:{value:m},samples:{type:"t",value:l},resolution:{value:u},b_should_interpolate:{value:i}}),[t,l]);D(()=>{t.updateTextureData(f),l.needsUpdate=!0,r.current&&(r.current.uniforms.max_amplitude.value=t.maxAmplitude,r.current.uniforms.samples.value=l)});const p=o.jsxs(e.Fragment,{children:[o.jsxs("bufferGeometry",{children:[o.jsx("bufferAttribute",{attach:"attributes-position",args:[b,3]}),o.jsx("bufferAttribute",{attach:"attributes-index",args:[v,1]})]}),o.jsx("shaderMaterial",{ref:r,depthWrite:!1,fragmentShader:S,vertexShader:A,uniforms:h,"uniforms-color-value":_,"uniforms-resolution-value":u,"uniforms-sample_scale-value":m,"uniforms-b_should_interpolate-value":i})]});return x?o.jsx("points",{children:p}):o.jsx("line",{children:p})},C=({textureMapper:t})=>o.jsx(F,{textureMapper:t,usePoints:!0,interpolate:!1});export{C as default};

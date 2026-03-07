@@ -102,6 +102,18 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
+    case "neuron":
+      return {
+        rMin: 10,
+        rMax: 18,
+        rSpeed: 0.1,
+        thetaMin: 0,
+        thetaMax: 2 * Math.PI,
+        thetaSpeed: 0.025,
+        phiMin: Math.PI / 4,
+        phiMax: Math.PI / 2,
+        phiSpeed: 0.25,
+      };
     case "scope":
       return null;
     default:

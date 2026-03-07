@@ -4,6 +4,7 @@ import DiffusedRing from "./diffusedRing";
 import Dna from "./dna";
 import Grid from "./grid";
 import MovingBoxes from "./movingBoxes";
+import Neuron from "./neuron";
 import Ribbons from "./ribbons";
 import Sphere from "./sphere";
 import Swarm from "./swarm";
@@ -16,6 +17,7 @@ export const VISUAL_REGISTRY = {
   [Sphere.id]: Sphere,
   [DiffusedRing.id]: DiffusedRing,
   [Dna.id]: Dna,
+  [Neuron.id]: Neuron,
   [MovingBoxes.id]: MovingBoxes,
   [Ribbons.id]: Ribbons,
   [Treadmill.id]: Treadmill,

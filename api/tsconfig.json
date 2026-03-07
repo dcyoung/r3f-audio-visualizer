@@ -6,7 +6,8 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "strict": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "skipLibCheck": true
     },
     "include": [
         "src/**/*.ts"

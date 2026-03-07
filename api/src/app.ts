@@ -25,7 +25,24 @@ app.use("/proxy", proxy("https://api.soundcloud.com", {
         const token = await getSoundcloudToken();
         proxyReqOpts.headers = { "Authorization": `OAuth ${token}` };
         return proxyReqOpts;
-    }
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+        if (proxyRes.statusCode === 429) {
+            try {
+                const body = JSON.parse(proxyResData.toString("utf8"));
+                console.warn(
+                    "SoundCloud stream rate limit (429):",
+                    body.remaining_requests != null && `remaining=${body.remaining_requests}`,
+                    body.reset_time != null && `resets=${body.reset_time}`,
+                    body.time_window != null && `window=${body.time_window}`,
+                    body
+                );
+            } catch {
+                console.warn("SoundCloud stream rate limit (429). Response:", proxyResData.toString("utf8").slice(0, 200));
+            }
+        }
+        return proxyResData;
+    },
 }));
 
 app.use("/healthz", (req, res) => {
@@ -36,7 +53,7 @@ const server = app.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);
 });
 
-app.on('error', (err) => {
+server.on('error', (err) => {
     console.error(err);
 });
 

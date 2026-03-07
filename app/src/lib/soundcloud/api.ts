@@ -46,11 +46,21 @@ export const getTrackStreamUrl = async (id: number) => {
   const response = await fetch(`${PROXY_URL}/tracks/${id}/streams`, {
     method: "GET",
   });
+  const raw = await response.json();
+
+  if (!response.ok) {
+    const msg =
+      response.status === 429
+        ? "SoundCloud stream limit reached. Try again later."
+        : `SoundCloud streams failed (${response.status}).`;
+    throw new Error(msg);
+  }
+
   const { http_mp3_128_url } = z
     .object({
       http_mp3_128_url: z.string(),
     })
-    .parse(await response.json());
+    .parse(raw);
 
   return http_mp3_128_url.replace("https://api.soundcloud.com", PROXY_URL);
 };

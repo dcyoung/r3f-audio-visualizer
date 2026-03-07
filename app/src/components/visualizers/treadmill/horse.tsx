@@ -4,28 +4,28 @@ import { usePalette } from "@/lib/appState";
 import { ColorPalette } from "@/lib/palettes";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { type Group } from "three";
+import { type AnimationClip, type Group, type Mesh } from "three";
 import { type GLTF } from "three-stdlib";
 
 import MODEL_HORSE from "./horse.png";
 
+type ActionName = "horse_A_";
+
+interface GLTFAction extends AnimationClip {
+  name: ActionName;
+}
+
 type GLTFResult = GLTF & {
   nodes: {
-    mesh_0: THREE.Mesh;
+    mesh_0: Mesh;
   };
   materials: Record<string, never>;
   animations: GLTFAction[];
 };
 
-type ActionName = "horse_A_";
-
-interface GLTFAction extends THREE.AnimationClip {
-  name: ActionName;
-}
-
 const Horse = (_: TVisualProps) => {
   const group = useRef<Group>(null);
-  const { nodes, animations } = useGLTF(MODEL_HORSE) as GLTFResult;
+  const { nodes, animations } = useGLTF(MODEL_HORSE) as unknown as GLTFResult;
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 

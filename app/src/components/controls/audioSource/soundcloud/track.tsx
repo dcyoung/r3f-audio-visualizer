@@ -33,8 +33,8 @@ export const TrackCard = ({
         <Image />
       )}
       <div className="flex flex-col items-start justify-center gap-0.5">
-        <span className="truncate text-xs text-foreground">{track.title}</span>
-        <span className="truncate text-xs text-foreground/50">
+        <span className="text-foreground truncate text-xs">{track.title}</span>
+        <span className="text-foreground/50 truncate text-xs">
           playcount:{" "}
           {track.playback_count?.toLocaleString("en-US", {
             maximumFractionDigits: 0,

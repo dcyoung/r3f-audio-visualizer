@@ -20,7 +20,7 @@ export const SearchFilterInput = ({
   }, [debouncedQueryFilter, setQuery]);
 
   return (
-    <div className="flex flex-row items-center justify-start gap-2 rounded-[6px] border-[#4E4E4E] bg-background px-2">
+    <div className="bg-background flex flex-row items-center justify-start gap-2 rounded-[6px] border-[#4E4E4E] px-2">
       <Search />
       <input
         id="search-filter-input"
@@ -30,7 +30,7 @@ export const SearchFilterInput = ({
           setQueryFilter(e.target.value);
         }}
         className={cn(
-          "search-cancel:appearance-none search-cancel:cursor-pointer flex-grow bg-transparent text-sm text-foreground outline-none placeholder:text-xs placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+          "search-cancel:appearance-none search-cancel:cursor-pointer text-foreground placeholder:text-muted-foreground flex-grow bg-transparent text-sm outline-none placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-50",
           props.className,
         )}
       />

@@ -28,11 +28,10 @@ export default ({
     }
     const positionsBuffer = refPoints.current.geometry.attributes.position;
     const spacing = maxDim / nPerSide;
-    let i = 0;
     for (let x = 0; x < nPerSide; x++) {
       for (let y = 0; y < nPerSide; y++) {
         for (let z = 0; z < nPerSide; z++) {
-          i = x * (nPerSide * nPerSide) + y * nPerSide + z;
+          const i = x * (nPerSide * nPerSide) + y * nPerSide + z;
           positionsBuffer.setXYZ(
             i,
             -maxDim / 2 + x * spacing,
@@ -67,9 +66,7 @@ export default ({
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          array={new Float32Array(nPoints * 3)}
-          count={nPoints}
-          itemSize={3}
+          args={[new Float32Array(nPoints * 3), 3]}
         />
       </bufferGeometry>
       <pointsMaterial attach="material" color={color} size={pointSize} />

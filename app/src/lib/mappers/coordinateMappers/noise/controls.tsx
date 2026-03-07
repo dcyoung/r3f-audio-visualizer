@@ -20,7 +20,7 @@ export default () => {
             key={`po_${p}`}
             variant="ghost"
             aria-selected={activePreset === p}
-            className="p-2 aria-selected:bg-primary/20"
+            className="aria-selected:bg-primary/20 p-2"
             onClick={() => setPreset(p === "custom" ? undefined : p)}
           >
             {p}

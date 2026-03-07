@@ -9,20 +9,19 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
       - name: Install and Build
         run: |
           cd app
-          pnpm i
-          pnpm build
+          bun install --frozen-lockfile
+          bun run build
         env:
           CI: ""
-      - name: Deploy 🚀
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: app/dist # The folder the action should deploy.
+          folder: app/dist
 

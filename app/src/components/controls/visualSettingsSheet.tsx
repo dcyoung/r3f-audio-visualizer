@@ -44,7 +44,7 @@ const PaletteIcon = ({
   return (
     <div
       className={cn(
-        "aspect-square cursor-pointer rounded-full transition-all duration-200 ease-in-out hover:ring-2 hover:ring-primary aria-selected:animate-pulse aria-selected:ring-2 aria-selected:ring-primary",
+        "hover:ring-primary aria-selected:ring-primary aspect-square cursor-pointer rounded-full transition-all duration-200 ease-in-out hover:ring-2 aria-selected:animate-pulse aria-selected:ring-2",
         className,
       )}
       style={{

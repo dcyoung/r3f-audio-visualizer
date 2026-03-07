@@ -25,7 +25,7 @@ export const UserCard = ({
       ) : (
         <Image />
       )}
-      <span className="w-full truncate text-xs text-foreground">
+      <span className="text-foreground w-full truncate text-xs">
         {user.username}
       </span>
     </div>

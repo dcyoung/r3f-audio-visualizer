@@ -48,7 +48,7 @@ const FFTAnalyzerControls = () => {
             })
           }
         >
-          <SelectTrigger className="max-w-1/2 w-[240px]">
+          <SelectTrigger className="w-[240px] max-w-1/2">
             <SelectValue
               placeholder={OctaveBandModeMap[octaveBandMode]}
               defaultValue={octaveBandMode}
@@ -78,7 +78,7 @@ const FFTAnalyzerControls = () => {
             });
           }}
         >
-          <SelectTrigger className="max-w-1/2 w-[240px]">
+          <SelectTrigger className="w-[240px] max-w-1/2">
             <SelectValue
               placeholder={energyMeasure}
               defaultValue={energyMeasure}

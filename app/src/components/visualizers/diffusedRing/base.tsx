@@ -62,9 +62,7 @@ const BaseDiffusedRing = ({
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          array={new Float32Array(nPoints * 3)}
-          count={nPoints}
-          itemSize={3}
+          args={[new Float32Array(nPoints * 3), 3]}
         />
       </bufferGeometry>
       <pointsMaterial attach="material" size={pointSize} />

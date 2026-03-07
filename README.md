@@ -18,6 +18,6 @@ git clone https://github.com/dcyoung/r3f-audio-visualizer.git
 cd r3f-audio-visualizer
 
 cd app/
-pnpm i
-pnpm dev
+bun install
+bun run dev
 ```

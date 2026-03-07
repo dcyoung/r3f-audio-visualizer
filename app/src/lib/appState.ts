@@ -120,13 +120,13 @@ const useAppState = create<IAppState>((set) => ({
         const newVisual = VISUAL_REGISTRY[newVisualId];
         return [...newVisual.supportedApplicationModes].includes(state.mode)
           ? {
-            visual: newVisual,
-            // mappers values whenever the visual changes
-            mappers: {
-              ...state.mappers,
-              textureMapper: new TextureMapper(),
-            },
-          }
+              visual: newVisual,
+              // mappers values whenever the visual changes
+              mappers: {
+                ...state.mappers,
+                textureMapper: new TextureMapper(),
+              },
+            }
           : {};
       }),
     noteCanvasInteraction: () =>
@@ -166,10 +166,10 @@ const useAppState = create<IAppState>((set) => ({
           mode: newMode,
           ...(![...state.visual.supportedApplicationModes].includes(newMode)
             ? {
-              visual: Object.values(VISUAL_REGISTRY).find((v) =>
-                [...v.supportedApplicationModes].includes(newMode),
-              ),
-            }
+                visual: Object.values(VISUAL_REGISTRY).find((v) =>
+                  [...v.supportedApplicationModes].includes(newMode),
+                ),
+              }
             : {}),
           mappers: {
             ...state.mappers,
@@ -185,8 +185,8 @@ const useAppState = create<IAppState>((set) => ({
             // Set default appearance settings for audio scope mode
             ...(newMode === APPLICATION_MODE.AUDIO_SCOPE
               ? {
-                palette: "rainbow",
-              }
+                  palette: "rainbow",
+                }
               : {}),
           },
         };

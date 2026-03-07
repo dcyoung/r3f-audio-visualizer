@@ -46,7 +46,7 @@ export const getTrackStreamUrl = async (id: number) => {
   const response = await fetch(`${PROXY_URL}/tracks/${id}/streams`, {
     method: "GET",
   });
-  const raw = await response.json();
+  const raw: unknown = await response.json();
 
   if (!response.ok) {
     const msg =

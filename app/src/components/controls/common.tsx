@@ -22,7 +22,7 @@ export const ValueLabel = ({
       {...props}
     >
       <Label>{label}</Label>
-      <span className="w-12 px-2 py-0.5 text-right text-sm text-muted-foreground">
+      <span className="text-muted-foreground w-12 px-2 py-0.5 text-right text-sm">
         {value}
       </span>
     </div>

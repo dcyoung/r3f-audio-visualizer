@@ -6,7 +6,7 @@ import {
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
 import { ColorPalette } from "@/lib/palettes";
-import { useFrame, type GroupProps } from "@react-three/fiber";
+import { useFrame, type ThreeElements } from "@react-three/fiber";
 import {
   BoxGeometry,
   Curve,
@@ -75,7 +75,7 @@ export interface BaseDoubleHelixProps {
 
 export const BaseDoubleHelix = forwardRef<
   Group,
-  Omit<GroupProps, "children"> & BaseDoubleHelixProps
+  Omit<ThreeElements["group"], "children"> & BaseDoubleHelixProps
 >(
   (
     {
@@ -164,10 +164,8 @@ export const BaseDoubleHelix = forwardRef<
       if (!refBaseMesh.current) {
         return;
       }
-      // Initialize positions
-      let normBpIdx = 0;
       for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
-        normBpIdx = bpIdx / Math.max(nBasePairs - 1, 1);
+        const normBpIdx = bpIdx / Math.max(nBasePairs - 1, 1);
         const tagA = Math.floor(3.99 * MathUtils.seededRandom(bpIdx));
         const tagB = 3 - tagA;
 
@@ -206,17 +204,13 @@ export const BaseDoubleHelix = forwardRef<
         return;
       }
       const elapsedTimeSec = clock.getElapsedTime();
-      let normBpIdx = 0,
-        targetScale = 0,
-        targetScaleA = 0,
-        targetScaleB = 0;
       const targetScaleMin = 0.25;
       const targetScaleMax = 1.0;
       for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
-        normBpIdx = bpIdx / Math.max(nBasePairs - 1, 1);
+        const normBpIdx = bpIdx / Math.max(nBasePairs - 1, 1);
 
-        // Range -1:1
-        targetScale =
+        // Range -1:1 → 0:1
+        const rawScale =
           coordinateMapper.map(
             COORDINATE_TYPE.CARTESIAN_1D,
             mirrorEffects ? 2 * Math.abs(normBpIdx - 0.5) : normBpIdx,
@@ -224,15 +218,13 @@ export const BaseDoubleHelix = forwardRef<
             0,
             elapsedTimeSec,
           ) / coordinateMapper.amplitude;
-        // Range 0:1
-        targetScale = (1 + targetScale) / 2;
+        const targetScale = (1 + rawScale) / 2;
 
-        // Range min:max
-        targetScaleA =
+        const targetScaleA =
           targetScaleMin +
           (fixedBaseGap ? 2 * targetScale : targetScale) *
             (targetScaleMax - targetScaleMin);
-        targetScaleB = fixedBaseGap
+        const targetScaleB = fixedBaseGap
           ? targetScaleMin +
             2 * (1 - targetScale) * (targetScaleMax - targetScaleMin)
           : targetScaleA;

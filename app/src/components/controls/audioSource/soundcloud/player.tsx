@@ -87,10 +87,10 @@ export const TrackPlayer = ({
         {play ? <PauseCircle /> : <PlayCircle />}
       </div>
       <div className="hidden flex-col items-start justify-center gap-1 sm:flex">
-        <span className="w-64 max-w-64 truncate text-sm text-foreground">
+        <span className="text-foreground w-64 max-w-64 truncate text-sm">
           {track.title}
         </span>
-        <span className="truncate text-xs text-foreground/50">
+        <span className="text-foreground/50 truncate text-xs">
           {track.user?.username ?? "Unknown Artist"}
         </span>
       </div>

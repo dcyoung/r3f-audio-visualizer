@@ -32,7 +32,7 @@ export const SettingsPanelTrigger = () => {
           <SheetContent
             insertHidden={true}
             side="right"
-            className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
+            className="no-scrollbar bg-background/70 w-full max-w-full space-y-4 overflow-scroll p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
           >
             <ModeSheetContent />
             <VisualSettingsSheetContent />

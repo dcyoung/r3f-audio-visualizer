@@ -100,15 +100,11 @@ const BaseScopeVisual = ({
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={nParticles}
-          array={particlesPosition}
-          itemSize={3}
+          args={[particlesPosition, 3]}
         />
         <bufferAttribute
           attach="attributes-index"
-          count={nParticles}
-          array={particlesIndices}
-          itemSize={1}
+          args={[particlesIndices, 1]}
         />
       </bufferGeometry>
       <shaderMaterial

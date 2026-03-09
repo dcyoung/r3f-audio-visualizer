@@ -29,6 +29,8 @@ import { Eye, Orbit, Palette, Radio } from "lucide-react";
 import { SwitchRow } from "./common";
 import { ModeSheetContent } from "./modeSheet";
 
+const FLUID_VISUAL_IDS = new Set(["fluidBox", "fluidSpeaker", "fluidBall"]);
+
 const PaletteBand = ({
   palette,
   className,
@@ -190,13 +192,15 @@ const BehaviorSection = () => {
 
 export const SettingsPanel = () => {
   const mode = useMode();
+  const visual = useVisual();
   const isScope = isAudioScopeMode(mode);
+  const isFluid = FLUID_VISUAL_IDS.has(visual.id);
 
   return (
     <Accordion type="multiple" defaultValue={["input-mode"]} className="w-full">
       <InputModeSection />
       <VisualizerSection />
-      {!isScope && <AppearanceSection />}
+      {!isScope && !isFluid && <AppearanceSection />}
       {!isScope && <BehaviorSection />}
     </Accordion>
   );

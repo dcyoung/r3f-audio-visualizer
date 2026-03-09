@@ -102,6 +102,31 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
+    case "fluidBox":
+    case "fluidSpeaker":
+      return {
+        rMin: 1.8,
+        rMax: 2.8,
+        rSpeed: 0.08,
+        thetaMin: 0,
+        thetaMax: 2 * Math.PI,
+        thetaSpeed: 0.02,
+        phiMin: Math.PI / 4,
+        phiMax: Math.PI / 2.25,
+        phiSpeed: 0.2,
+      };
+    case "fluidBall":
+      return {
+        rMin: 1.5,
+        rMax: 2.4,
+        rSpeed: 0.08,
+        thetaMin: 0,
+        thetaMax: 2 * Math.PI,
+        thetaSpeed: 0.02,
+        phiMin: Math.PI / 3,
+        phiMax: Math.PI / 1.8,
+        phiSpeed: 0.12,
+      };
     case "scope":
       return null;
     default:

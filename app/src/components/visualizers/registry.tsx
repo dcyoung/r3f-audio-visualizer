@@ -3,11 +3,14 @@ import Cube from "./cube";
 import DiffusedRing from "./diffusedRing";
 import Dna from "./dna";
 import Grid from "./grid";
+import FluidBox from "./fluidBox";
+import FluidSpeaker from "./fluidSpeaker";
 import MovingBoxes from "./movingBoxes";
 import Ribbons from "./ribbons";
 import Sphere from "./sphere";
 import Swarm from "./swarm";
 import Treadmill from "./treadmill";
+import FluidBall from "./fluidBall";
 
 export const VISUAL_REGISTRY = {
   [Scope.id]: Scope,
@@ -20,6 +23,9 @@ export const VISUAL_REGISTRY = {
   [Ribbons.id]: Ribbons,
   [Treadmill.id]: Treadmill,
   [Swarm.id]: Swarm,
+  [FluidBox.id]: FluidBox,
+  [FluidSpeaker.id]: FluidSpeaker,
+  [FluidBall.id]: FluidBall,
 } as const;
 
 export type TVisual = (typeof VISUAL_REGISTRY)[keyof typeof VISUAL_REGISTRY];

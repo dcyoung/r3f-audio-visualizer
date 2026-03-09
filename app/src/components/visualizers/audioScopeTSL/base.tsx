@@ -9,9 +9,14 @@ import {
   AdditiveBlending,
   Color,
   InstancedBufferAttribute,
+  InterleavedBufferAttribute,
+  Line2NodeMaterial,
   PointsNodeMaterial,
+  type Mesh,
   type Sprite,
 } from "three/webgpu";
+import { Line2 } from "three/addons/lines/webgpu/Line2.js";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
 import { type IScopeSettings } from "../audioScope/reactive";
 
@@ -38,7 +43,90 @@ function hsv2rgb(h: number, s: number, v: number, out: Color): Color {
   }
 }
 
-const BaseScopeTSLVisual = ({
+/**
+ * Shared hook: computes positions (Float32Array, 3 per vertex) and
+ * colors (Float32Array, 3 per vertex, RGB) each frame from the scope data.
+ */
+function useScopeData(
+  textureMapper: TextureMapper,
+  nParticles: number,
+  settings: {
+    baseHue: number;
+    decay: number;
+    desaturation: number;
+    minSaturation: number;
+  },
+) {
+  const { textureData } = useMemo(
+    () => textureMapper.generateSupportedTextureAndData(),
+    [textureMapper],
+  );
+  const size = useThree((state) => state.size);
+  const tmpColor = useMemo(() => new Color(), []);
+  const positionsRef = useRef(new Float32Array(nParticles * 3));
+  const colorsRef = useRef(new Float32Array(nParticles * 3));
+  const alphasRef = useRef(new Float32Array(nParticles));
+
+  if (positionsRef.current.length !== nParticles * 3) {
+    positionsRef.current = new Float32Array(nParticles * 3);
+    colorsRef.current = new Float32Array(nParticles * 3);
+    alphasRef.current = new Float32Array(nParticles);
+  }
+
+  return {
+    textureData,
+    compute: () => {
+      textureMapper.updateTextureData(textureData);
+      const positions = positionsRef.current;
+      const colors = colorsRef.current;
+      const alphas = alphasRef.current;
+      const N = Math.min(nParticles, textureMapper.samplesX.length);
+      const { width, height } = size;
+      const side = Math.min(width, height);
+      const scaleX = side / width;
+      const scaleY = side / height;
+      const portrait = width < height;
+
+      for (let i = 0; i < N; i++) {
+        const j = i * 4;
+        const rawX = textureData[j];
+        const rawY = textureData[j + 1];
+        const angVel = textureData[j + 2];
+        const noise = textureData[j + 3];
+
+        let px = rawX * scaleX;
+        let py = rawY * scaleY;
+        if (portrait) {
+          const tmp = px;
+          px = py;
+          py = tmp;
+        }
+
+        const pi = i * 3;
+        positions[pi] = px;
+        positions[pi + 1] = py;
+        positions[pi + 2] = 0;
+
+        const phase = Math.log2(Math.max(angVel, 1e-10));
+        const sat = Math.max(
+          settings.minSaturation,
+          1.0 / (1.0 + settings.desaturation * noise),
+        );
+        hsv2rgb(settings.baseHue + phase, sat, 1.0, tmpColor);
+
+        colors[pi] = tmpColor.r;
+        colors[pi + 1] = tmpColor.g;
+        colors[pi + 2] = tmpColor.b;
+
+        alphas[i] = (1.0 - settings.decay) + settings.decay * (i / N);
+      }
+
+      return { positions, colors, alphas, N };
+    },
+  };
+}
+
+const PointsMode = ({
   textureMapper,
   nParticles,
   pointScale,
@@ -46,42 +134,24 @@ const BaseScopeTSLVisual = ({
   decay,
   desaturation,
   minSaturation,
-}: {
-  textureMapper: TextureMapper;
-} & IScopeSettings) => {
-  const { textureData } = useMemo(
-    () => textureMapper.generateSupportedTextureAndData(),
-    [textureMapper],
-  );
-  const size = useThree((state) => state.size);
+}: { textureMapper: TextureMapper } & IScopeSettings) => {
   const spriteRef = useRef<Sprite>(null);
   const posAttrRef = useRef<InstancedBufferAttribute | null>(null);
   const colorAttrRef = useRef<InstancedBufferAttribute | null>(null);
   const sizeUniformRef = useRef(tslUniform(3.0 * pointScale));
+  const settingsRef = useRef({ pointScale, baseHue, decay, desaturation, minSaturation });
+  settingsRef.current = { pointScale, baseHue, decay, desaturation, minSaturation };
 
-  const settingsRef = useRef({
-    pointScale,
-    baseHue,
-    decay,
-    desaturation,
-    minSaturation,
-  });
-  settingsRef.current = {
-    pointScale,
-    baseHue,
-    decay,
-    desaturation,
-    minSaturation,
-  };
+  const { compute } = useScopeData(textureMapper, nParticles, settingsRef.current);
 
   useEffect(() => {
     const sprite = spriteRef.current;
     if (!sprite) return;
 
-    const positions = new Float32Array(nParticles * 3);
-    const colors = new Float32Array(nParticles * 4);
-    const posAttr = new InstancedBufferAttribute(positions, 3);
-    const colorAttr = new InstancedBufferAttribute(colors, 4);
+    const posArr = new Float32Array(nParticles * 3);
+    const colorArr = new Float32Array(nParticles * 4);
+    const posAttr = new InstancedBufferAttribute(posArr, 3);
+    const colorAttr = new InstancedBufferAttribute(colorArr, 4);
     posAttrRef.current = posAttr;
     colorAttrRef.current = colorAttr;
 
@@ -107,69 +177,144 @@ const BaseScopeTSLVisual = ({
     };
   }, [nParticles]);
 
-  const tmpColor = useMemo(() => new Color(), []);
-
   useFrame(() => {
     const posAttr = posAttrRef.current;
     const colorAttr = colorAttrRef.current;
     if (!posAttr || !colorAttr) return;
 
-    textureMapper.updateTextureData(textureData);
+    sizeUniformRef.current.value = 3.0 * settingsRef.current.pointScale;
+    const { positions, colors, alphas, N } = compute();
 
-    const s = settingsRef.current;
-    sizeUniformRef.current.value = 3.0 * s.pointScale;
-    const positions = posAttr.array as Float32Array;
-    const colors = colorAttr.array as Float32Array;
-    const N = Math.min(nParticles, textureMapper.samplesX.length);
-    const { width, height } = size;
-    const side = Math.min(width, height);
-    const scaleX = side / width;
-    const scaleY = side / height;
-    const portrait = width < height;
-
+    const posOut = posAttr.array as Float32Array;
+    const colorOut = colorAttr.array as Float32Array;
     for (let i = 0; i < N; i++) {
-      const j = i * 4;
-      const rawX = textureData[j + 0];
-      const rawY = textureData[j + 1];
-      const angVel = textureData[j + 2];
-      const noise = textureData[j + 3];
-
-      let px = rawX * scaleX;
-      let py = rawY * scaleY;
-      if (portrait) {
-        const tmp = px;
-        px = py;
-        py = tmp;
-      }
-
       const pi = i * 3;
-      positions[pi] = px;
-      positions[pi + 1] = py;
-      positions[pi + 2] = 0;
-
-      const phase = Math.log2(Math.max(angVel, 1e-10));
-      const sat = Math.max(
-        s.minSaturation,
-        1.0 / (1.0 + s.desaturation * noise),
-      );
-      hsv2rgb(s.baseHue + phase, sat, 1.0, tmpColor);
-
-      const norm = i / N;
-      const alpha = (1.0 - s.decay) + s.decay * norm;
+      posOut[pi] = positions[pi];
+      posOut[pi + 1] = positions[pi + 1];
+      posOut[pi + 2] = 0;
 
       const ci = i * 4;
-      colors[ci] = tmpColor.r;
-      colors[ci + 1] = tmpColor.g;
-      colors[ci + 2] = tmpColor.b;
-      colors[ci + 3] = alpha;
+      colorOut[ci] = colors[pi];
+      colorOut[ci + 1] = colors[pi + 1];
+      colorOut[ci + 2] = colors[pi + 2];
+      colorOut[ci + 3] = alphas[i];
     }
 
     posAttr.needsUpdate = true;
     colorAttr.needsUpdate = true;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <sprite ref={spriteRef as any} frustumCulled={false} />;
+};
+
+/**
+ * Convert polyline points [p0,p1,...,pN-1] to the pairs format used by
+ * LineSegmentsGeometry: [p0,p1, p1,p2, p2,p3, ...] where each segment
+ * stores both start and end as 3 floats each (stride 6 per segment).
+ */
+function writePolylinePairs(
+  src: Float32Array,
+  dst: Float32Array,
+  nPoints: number,
+  components: number,
+) {
+  const nSegs = nPoints - 1;
+  for (let i = 0; i < nSegs; i++) {
+    const si = i * components;
+    const di = i * components * 2;
+    for (let c = 0; c < components; c++) {
+      dst[di + c] = src[si + c];
+      dst[di + components + c] = src[si + components + c];
+    }
+  }
+}
+
+const LinesMode = ({
+  textureMapper,
+  nParticles,
+  pointScale,
+  baseHue,
+  decay,
+  desaturation,
+  minSaturation,
+}: { textureMapper: TextureMapper } & IScopeSettings) => {
+  const meshRef = useRef<Mesh>(null);
+  const lineRef = useRef<Line2 | null>(null);
+  const settingsRef = useRef({ pointScale, baseHue, decay, desaturation, minSaturation });
+  settingsRef.current = { pointScale, baseHue, decay, desaturation, minSaturation };
+
+  const { compute } = useScopeData(textureMapper, nParticles, settingsRef.current);
+
+  useEffect(() => {
+    const container = meshRef.current;
+    if (!container) return;
+
+    const geom = new LineGeometry();
+    const initPos = new Float32Array(nParticles * 3);
+    const initCol = new Float32Array(nParticles * 3).fill(1);
+    geom.setPositions(initPos);
+    geom.setColors(initCol);
+
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+    const mat = new Line2NodeMaterial({
+      linewidth: 2,
+      vertexColors: true,
+      transparent: true,
+      depthWrite: false,
+      blending: AdditiveBlending as any,
+      alphaToCoverage: false,
+    } as any);
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+
+    const line = new Line2(geom, mat);
+    line.frustumCulled = false;
+    lineRef.current = line;
+    container.add(line);
+
+    return () => {
+      container.remove(line);
+      geom.dispose();
+      mat.dispose();
+      lineRef.current = null;
+    };
+  }, [nParticles]);
+
+  useFrame(() => {
+    const line = lineRef.current;
+    if (!line) return;
+    const geom = line.geometry;
+
+    const s = settingsRef.current;
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+    (line.material as any).linewidth = 1.5 * s.pointScale;
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+
+    const { positions, colors } = compute();
+
+    const posAttr = geom.getAttribute("instanceStart") as InterleavedBufferAttribute | null;
+    const colAttr = geom.getAttribute("instanceColorStart") as InterleavedBufferAttribute | null;
+    if (!posAttr?.data?.array || !colAttr?.data?.array) return;
+
+    writePolylinePairs(positions, posAttr.data.array as Float32Array, nParticles, 3);
+    writePolylinePairs(colors, colAttr.data.array as Float32Array, nParticles, 3);
+
+    posAttr.data.needsUpdate = true;
+    colAttr.data.needsUpdate = true;
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <mesh ref={meshRef as any} frustumCulled={false} />;
+};
+
+const BaseScopeTSLVisual = (
+  props: { textureMapper: TextureMapper } & IScopeSettings,
+) => {
+  return props.useLines ? (
+    <LinesMode {...props} />
+  ) : (
+    <PointsMode {...props} />
+  );
 };
 
 export default BaseScopeTSLVisual;

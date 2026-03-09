@@ -1,10 +1,17 @@
-import { PresetBar, SliderField } from "@/components/controls/common";
+import { PresetBar, SliderField, SwitchRow } from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { nParticles, pointScale, baseHue, decay, desaturation, minSaturation } =
-    useParams();
+  const {
+    nParticles,
+    pointScale,
+    baseHue,
+    decay,
+    desaturation,
+    minSaturation,
+    useLines,
+  } = useParams();
   const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
 
@@ -17,8 +24,13 @@ export default () => {
       />
       {!activePreset && (
         <div className="space-y-3">
+          <SwitchRow
+            label="Draw Lines"
+            checked={useLines}
+            onCheckedChange={(v) => setParams({ useLines: v })}
+          />
           <SliderField
-            label="Particle Count"
+            label={useLines ? "Sample Count" : "Particle Count"}
             value={nParticles}
             min={128}
             max={2048}
@@ -26,7 +38,7 @@ export default () => {
             onChange={(v) => setParams({ nParticles: v })}
           />
           <SliderField
-            label="Point Size"
+            label={useLines ? "Line Width" : "Point Size"}
             value={pointScale}
             displayValue={pointScale.toFixed(1)}
             min={0.2}

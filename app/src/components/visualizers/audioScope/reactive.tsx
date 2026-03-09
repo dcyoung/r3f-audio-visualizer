@@ -7,6 +7,7 @@ export interface IScopeSettings {
   decay: number;
   desaturation: number;
   minSaturation: number;
+  useLines: boolean;
 }
 
 export const { useParams, useActions, usePresets } =
@@ -18,5 +19,15 @@ export const { useParams, useActions, usePresets } =
       decay: 0.1,
       desaturation: 0.15,
       minSaturation: 0.65,
+      useLines: false,
+    },
+    lines: {
+      nParticles: 512,
+      pointScale: 1.0,
+      baseHue: 0.0,
+      decay: 0.1,
+      desaturation: 0.15,
+      minSaturation: 0.65,
+      useLines: true,
     },
   });

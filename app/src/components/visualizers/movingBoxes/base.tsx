@@ -35,22 +35,25 @@ const BaseBoxes = ({
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
-  const cellAssignments = useMemo(
-    () =>
-      Array.from({ length: nBoxes }, (_) => {
+  const cellAssignments = useMemo(() => {
+    const occupied = new Set<string>();
+    return Array.from({ length: nBoxes }, () => {
+      let row: number, col: number;
+
+      while (true) {
         // eslint-disable-next-line react-hooks/purity
-        const row = Math.floor(nRows * Math.random());
+        row = Math.floor(nRows * Math.random());
         // eslint-disable-next-line react-hooks/purity
-        const col = Math.floor(nCols * Math.random());
-        return {
-          fromRow: row,
-          fromCol: col,
-          toRow: row,
-          toCol: col,
-        };
-      }),
-    [nBoxes, nRows, nCols],
-  );
+        col = Math.floor(nCols * Math.random());
+        const key = `${row},${col}`;
+        if (!occupied.has(key)) {
+          occupied.add(key);
+          break;
+        }
+      }
+      return { fromRow: row, fromCol: col, toRow: row, toCol: col };
+    });
+  }, [nBoxes, nRows, nCols]);
 
   //   Recolor;
   useEffect(() => {
@@ -72,7 +75,6 @@ const BaseBoxes = ({
       return;
     }
     if (detector.step(scalarTracker?.get() ?? 0)) {
-      // random jitter in one direction or the other
       const [rowJitter, colJitter] =
         Math.random() > 0.5 ? [true, false] : [false, true];
 
@@ -80,12 +82,45 @@ const BaseBoxes = ({
         // eslint-disable-next-line react-hooks/immutability
         cellAssignments[i].fromRow = cellAssignments[i].toRow;
         cellAssignments[i].fromCol = cellAssignments[i].toCol;
-        if (rowJitter) {
-          cellAssignments[i].toRow += Math.random() > 0.5 ? 1 : -1;
+      }
+
+      // Greedy collision avoidance: each box claims a target cell.
+      // If blocked, try the opposite direction, then stay put.
+      // Also prevent swaps (A→B while B→A) which cause pass-through.
+      const claimed = new Set<string>();
+      const edges = new Set<string>();
+      for (let i = 0; i < nBoxes; i++) {
+        const fR = cellAssignments[i].fromRow;
+        const fC = cellAssignments[i].fromCol;
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        const dRow = rowJitter ? dir : 0;
+        const dCol = colJitter ? dir : 0;
+
+        const tR1 = fR + dRow;
+        const tC1 = fC + dCol;
+        const key1 = `${tR1},${tC1}`;
+        if (!claimed.has(key1) && !edges.has(`${tR1},${tC1}>${fR},${fC}`)) {
+          claimed.add(key1);
+          edges.add(`${fR},${fC}>${tR1},${tC1}`);
+          cellAssignments[i].toRow = tR1;
+          cellAssignments[i].toCol = tC1;
+          continue;
         }
-        if (colJitter) {
-          cellAssignments[i].toCol += Math.random() > 0.5 ? 1 : -1;
+
+        const tR2 = fR - dRow;
+        const tC2 = fC - dCol;
+        const key2 = `${tR2},${tC2}`;
+        if (!claimed.has(key2) && !edges.has(`${tR2},${tC2}>${fR},${fC}`)) {
+          claimed.add(key2);
+          edges.add(`${fR},${fC}>${tR2},${tC2}`);
+          cellAssignments[i].toRow = tR2;
+          cellAssignments[i].toCol = tC2;
+          continue;
         }
+
+        claimed.add(`${fR},${fC}`);
+        cellAssignments[i].toRow = fR;
+        cellAssignments[i].toCol = fC;
       }
     }
 

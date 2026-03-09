@@ -2,7 +2,7 @@
 
 An application-accessible API proxy for the SoundCloud API.
 
-**Stack:** [Effect](https://effect.website) v4 (beta), [@effect/platform-node](https://github.com/Effect-TS/effect-smol/tree/main/packages/platform-node), [Bun](https://bun.sh).
+**Stack:** [Bun](https://bun.sh) (zero runtime dependencies).
 
 ## Quickstart
 
@@ -15,12 +15,13 @@ Uses `../.env` for `SOUNDCLOUD_CLIENT_ID` and `SOUNDCLOUD_SECRET` via `--env-fil
 
 ## Scripts
 
-| Command       | Description                    |
-|---------------|--------------------------------|
-| `bun run dev` | Run from source with env file  |
-| `bun run build` | Compile TypeScript to `dist/` |
-| `bun run start` | Run compiled `dist/app.js`   |
-| `bun run lint`  | Run ESLint                    |
+| Command            | Description                    |
+|--------------------|--------------------------------|
+| `bun run dev`      | Run from source with env file  |
+| `bun run build`    | Bundle to `dist/` via Bun      |
+| `bun run start`    | Run compiled `dist/app.js`     |
+| `bun run lint`     | Run ESLint                     |
+| `bun run typecheck`| Type-check without emitting    |
 
 ## Docker
 

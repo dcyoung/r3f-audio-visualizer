@@ -6,7 +6,7 @@ import { type TVisualProps } from "../models";
 
 const ReactiveComponent = (props: TVisualProps) => {
   const VisualComponent = useMemo(
-    () => lazy(async () => await import(`./reactive`)),
+    () => lazy(async () => await import("./reactive")),
     [],
   );
   return (
@@ -18,7 +18,7 @@ const ReactiveComponent = (props: TVisualProps) => {
 
 const ControlsComponent = () => {
   const ControlsComponent = useMemo(
-    () => lazy(async () => await import(`./controls`)),
+    () => lazy(async () => await import("./controls")),
     [],
   );
   return (

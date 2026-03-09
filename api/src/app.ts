@@ -2,7 +2,16 @@ import { getConfig } from "./config.js"
 import { createTokenService } from "./soundcloud.js"
 
 const SOUNDCLOUD_API = "https://api.soundcloud.com"
-const SKIP_HEADERS = new Set(["content-encoding", "content-length", "transfer-encoding"])
+const SKIP_HEADERS = new Set([
+  "content-encoding",
+  "content-length",
+  "transfer-encoding",
+  "access-control-allow-origin",
+  "access-control-allow-credentials",
+  "access-control-allow-methods",
+  "access-control-allow-headers",
+  "access-control-expose-headers",
+])
 
 const config = getConfig()
 const getToken = createTokenService(config.SOUNDCLOUD_CLIENT_ID, config.SOUNDCLOUD_SECRET)

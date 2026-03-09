@@ -44,7 +44,7 @@ export const SoundcloudSearchResults = ({ query }: { query: string }) => {
         <span className="text-muted-foreground text-xs">Searching...</span>
       }
     >
-      <SoundcloudUserResults query={query} />
+      <SoundcloudUserResults key={query} query={query} />
     </Suspense>
   );
 };

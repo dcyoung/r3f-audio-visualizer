@@ -3,6 +3,7 @@ import { APPLICATION_MODE } from "@/lib/applicationModes";
 import { Shell } from "lucide-react";
 
 import { type TVisualProps } from "../models";
+import ScopeControls from "./controls";
 
 const ReactiveComponent = (props: TVisualProps) => {
   const VisualComponent = useMemo(
@@ -20,6 +21,6 @@ export default {
   id: "scope",
   icon: Shell,
   ReactiveComponent,
-  ControlsComponent: null,
+  ControlsComponent: ScopeControls,
   supportedApplicationModes: [APPLICATION_MODE.AUDIO_SCOPE],
 } as const;

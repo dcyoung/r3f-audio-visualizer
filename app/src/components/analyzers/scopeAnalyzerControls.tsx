@@ -15,11 +15,8 @@ export const AudioScopeAnalyzerControls = ({
    * Transfers data from the analyzer to the target arrays
    */
   const mapData = useCallback(() => {
-    const timeData = textureMapper.samplesX;
-    const quadData = textureMapper.samplesY;
-    // Check if the state sizes need to be updated
     const targetLength = analyzer.quadSamples.length;
-    if (timeData.length !== targetLength || quadData.length !== targetLength) {
+    if (textureMapper.samplesX.length !== targetLength) {
       console.log(`Resizing ${targetLength}`);
       setMappers({
         textureMapper: textureMapper.clone({
@@ -28,13 +25,13 @@ export const AudioScopeAnalyzerControls = ({
       });
       return;
     }
-    // Copy the data over to state
-    analyzer.timeSamples.forEach((v, index) => {
-      timeData[index] = v;
-    });
-    analyzer.quadSamples.forEach((v, index) => {
-      quadData[index] = v;
-    });
+
+    analyzer.computeColorData();
+
+    textureMapper.samplesX.set(analyzer.timeSamples);
+    textureMapper.samplesY.set(analyzer.quadSamples);
+    textureMapper.angularVelocity.set(analyzer.angularVelocity);
+    textureMapper.noise.set(analyzer.noise);
   }, [analyzer, setMappers, textureMapper]);
 
   /**

@@ -1,4 +1,9 @@
-import { DataTexture, RGBAFormat } from "three";
+import {
+  DataTexture,
+  FloatType,
+  NearestFilter,
+  RGBAFormat,
+} from "three";
 
 export type TTextureMapperParams = {
   size: number;
@@ -25,13 +30,17 @@ export class TextureMapper {
   }
   public samplesX: Float32Array;
   public samplesY: Float32Array;
+  public angularVelocity: Float32Array;
+  public noise: Float32Array;
   public maxAmplitude = 4.0;
-  private readonly M: number = 4;
+  private readonly CHANNELS: number = 4;
 
   constructor(params: TTextureMapperParams = TextureMapper.PRESETS.DEFAULT) {
     this._params = params;
     this.samplesX = new Float32Array(params.size).fill(0);
     this.samplesY = new Float32Array(params.size).fill(0);
+    this.angularVelocity = new Float32Array(params.size).fill(0);
+    this.noise = new Float32Array(params.size).fill(0);
   }
 
   public updateParams(params: Partial<TTextureMapperParams>): void {
@@ -39,50 +48,42 @@ export class TextureMapper {
       ...this._params,
       ...params,
     };
-    this.samplesX = new Float32Array(this._params.size).fill(0);
-    this.samplesY = new Float32Array(this._params.size).fill(0);
+    const n = this._params.size;
+    this.samplesX = new Float32Array(n).fill(0);
+    this.samplesY = new Float32Array(n).fill(0);
+    this.angularVelocity = new Float32Array(n).fill(0);
+    this.noise = new Float32Array(n).fill(0);
   }
 
-  public updateTextureData(data: Uint8Array): void {
-    const B = (1 << 16) - 1;
-    let j, x, y;
+  /**
+   * Pack [x, y, angularVelocity, noise] as raw floats into the RGBA float texture.
+   */
+  public updateTextureData(data: Float32Array): void {
     for (let i = 0; i < this.samplesX.length; i++) {
-      x = Math.max(
-        0,
-        Math.min(
-          2 * this.maxAmplitude,
-          0.5 + (0.5 * this.samplesX[i]) / this.maxAmplitude,
-        ),
-      );
-      y = Math.max(
-        0,
-        Math.min(
-          2 * this.maxAmplitude,
-          0.5 + (0.5 * this.samplesY[i]) / this.maxAmplitude,
-        ),
-      );
-
-      x = (x * B) | 0;
-      y = (y * B) | 0;
-      j = i * this.M;
-      data[j + 0] = x >> 8;
-      data[j + 1] = x & 0xff;
-      data[j + 2] = y >> 8;
-      data[j + 3] = y & 0xff;
+      const j = i * this.CHANNELS;
+      data[j + 0] = this.samplesX[i];
+      data[j + 1] = this.samplesY[i];
+      data[j + 2] = this.angularVelocity[i];
+      data[j + 3] = this.noise[i];
     }
   }
 
   public generateSupportedTextureAndData() {
-    const textureData = new Uint8Array(this.samplesX.length * this.M);
+    const textureData = new Float32Array(
+      this.samplesX.length * this.CHANNELS,
+    );
     const tex = new DataTexture(
       textureData,
       this.samplesX.length,
       1,
       RGBAFormat,
+      FloatType,
     );
+    tex.minFilter = NearestFilter;
+    tex.magFilter = NearestFilter;
     return {
-      tex: tex,
-      textureData: textureData,
+      tex,
+      textureData,
     };
   }
 }

@@ -50,13 +50,72 @@ function createHilbertFilter(
   return [delay, hilbert];
 }
 
+/**
+ * Compute the angle between two complex vectors, scaled to [0, 0.5].
+ * Uses the numerically stable half-angle formula:
+ *   2 * atan2(|‖v‖u − ‖u‖v|, |‖v‖u + ‖u‖v|)
+ */
+function getAngle(
+  vRe: number,
+  vIm: number,
+  uRe: number,
+  uIm: number,
+): number {
+  const lenV = Math.sqrt(vRe * vRe + vIm * vIm);
+  const lenU = Math.sqrt(uRe * uRe + uIm * uIm);
+  const lvuRe = lenV * uRe;
+  const lvuIm = lenV * uIm;
+  const luvRe = lenU * vRe;
+  const luvIm = lenU * vIm;
+  const leftRe = lvuRe - luvRe;
+  const leftIm = lvuIm - luvIm;
+  const left = Math.sqrt(leftRe * leftRe + leftIm * leftIm);
+  const rightRe = lvuRe + luvRe;
+  const rightIm = lvuIm + luvIm;
+  const right = Math.sqrt(rightRe * rightRe + rightIm * rightIm);
+  return Math.atan2(left, right) / Math.PI;
+}
+
+/**
+ * Biquad lowpass filter (Direct Form II Transposed).
+ * @param n - normalized cutoff frequency (0..1, where 1 = Nyquist)
+ * @param q - quality factor
+ */
+function createLowpass(n: number, q: number): (x: number) => number {
+  const k = Math.tan(0.5 * n * Math.PI);
+  const norm = 1.0 / (1.0 + k / q + k * k);
+  const a0 = k * k * norm;
+  const a1 = 2.0 * a0;
+  const a2 = a0;
+  const b1 = 2.0 * (k * k - 1.0) * norm;
+  const b2 = (1.0 - k / q + k * k) * norm;
+  let w1 = 0;
+  let w2 = 0;
+  return (x: number) => {
+    const w0 = x - b1 * w1 - b2 * w2;
+    const y = a0 * w0 + a1 * w1 + a2 * w2;
+    w2 = w1;
+    w1 = w0;
+    return y;
+  };
+}
+
 export default class ScopeAnalyzer implements TAnalyzerInputControl {
   public readonly _audioCtx: AudioContext;
   public readonly timeSamples: Float32Array<ArrayBuffer>;
   public readonly quadSamples: Float32Array<ArrayBuffer>;
+  public readonly angularVelocity: Float32Array<ArrayBuffer>;
+  public readonly noise: Float32Array<ArrayBuffer>;
   private _sources: AudioNode[];
   private _inputs: AudioNode[];
   public volume = 1.0;
+
+  private _prevRe = 0;
+  private _prevIm = 0;
+  private _prevDiffRe = 0;
+  private _prevDiffIm = 0;
+  private _angleLp: (x: number) => number;
+  private _noiseLp: (x: number) => number;
 
   constructor(
     source: HTMLAudioElement,
@@ -71,6 +130,11 @@ export default class ScopeAnalyzer implements TAnalyzerInputControl {
     }
     this.timeSamples = new Float32Array(n);
     this.quadSamples = new Float32Array(n);
+    this.angularVelocity = new Float32Array(n);
+    this.noise = new Float32Array(n);
+    this._angleLp = createLowpass(0.05, 0.7);
+    this._noiseLp = createLowpass(0.05, 0.7);
+
     const [delay, hilbert] = createHilbertFilter(this._audioCtx, fftSize - n);
     this._inputs = [delay, hilbert];
     const time = createBufferCopy(this._audioCtx, this.timeSamples);
@@ -88,6 +152,36 @@ export default class ScopeAnalyzer implements TAnalyzerInputControl {
     time.connect(this._audioCtx.destination);
     quad.connect(this._audioCtx.destination);
     sourceNode.connect(this._audioCtx.destination);
+  }
+
+  /**
+   * Compute per-sample angular velocity and noise from the current
+   * analytic signal (timeSamples = imaginary/Hilbert, quadSamples = real/delayed).
+   * Must be called each frame after the ScriptProcessors have updated the buffers.
+   */
+  computeColorData(): void {
+    const N = this.timeSamples.length;
+    for (let i = 0; i < N; i++) {
+      const re = this.quadSamples[i];
+      const im = this.timeSamples[i];
+
+      const diffRe = re - this._prevRe;
+      const diffIm = im - this._prevIm;
+      this._prevRe = re;
+      this._prevIm = im;
+
+      const angle = Math.abs(
+        getAngle(diffRe, diffIm, this._prevDiffRe, this._prevDiffIm),
+      );
+      const logAngle = Math.max(-1e12, Math.log2(Math.max(angle, 1e-20)));
+
+      this._prevDiffRe = diffRe;
+      this._prevDiffIm = diffIm;
+
+      const smoothed = this._angleLp(logAngle);
+      this.angularVelocity[i] = Math.pow(2, smoothed);
+      this.noise[i] = this._noiseLp(Math.abs(logAngle - smoothed));
+    }
   }
 
   disconnectInputs(): void {

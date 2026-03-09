@@ -23,7 +23,7 @@ const MODE_DISPLAY_NAMES: Record<TApplicationMode, string> = {
   [APPLICATION_MODE.WAVE_FORM]: "Waveform",
   [APPLICATION_MODE.NOISE]: "Noise",
   [APPLICATION_MODE.AUDIO]: "Audio",
-  [APPLICATION_MODE.AUDIO_SCOPE]: "Oscilloscope",
+  [APPLICATION_MODE.AUDIO_SCOPE]: "AudioScope",
   [APPLICATION_MODE.PARTICLE_NOISE]: "Particle Noise",
 };
 

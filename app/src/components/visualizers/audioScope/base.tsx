@@ -1,25 +1,27 @@
-import { Fragment, useMemo, useRef } from "react";
-import { usePalette } from "@/lib/appState";
+import { useMemo, useRef } from "react";
 import { type TextureMapper } from "@/lib/mappers/textureMappers/textureMapper";
-import { ColorPalette } from "@/lib/palettes";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Vector2, Vector3, type ShaderMaterial } from "three";
+import {
+  AdditiveBlending,
+  Vector2,
+  type ShaderMaterial,
+} from "three";
 
+import { type IScopeSettings } from "./reactive";
 import fragmentShader from "./shaders/fragment";
 import vertexShader from "./shaders/vertex";
 
 const BaseScopeVisual = ({
   textureMapper,
-  nParticles = 512,
-  usePoints = true,
-  interpolate = false,
+  nParticles,
+  pointScale,
+  baseHue,
+  decay,
+  desaturation,
+  minSaturation,
 }: {
   textureMapper: TextureMapper;
-  nParticles?: number;
-  usePoints?: boolean;
-  interpolate?: boolean;
-}) => {
-  const palette = usePalette();
+} & IScopeSettings) => {
   const { tex, textureData } = useMemo(
     () => textureMapper.generateSupportedTextureAndData(),
     [textureMapper],
@@ -36,42 +38,39 @@ const BaseScopeVisual = ({
     [nParticles],
   );
 
-  const colorVec = useMemo(() => {
-    const c = ColorPalette.getPalette(palette).lerpColor(0.5);
-    return new Vector3(c.r, c.g, c.b);
-  }, [palette]);
-
   const resolution = useMemo(
     () => new Vector2(size.width, size.height),
     [size.width, size.height],
   );
 
-  const sampleScale = useMemo(() => new Vector2(nParticles, 1), [nParticles]);
+  const uniformsRef = useRef({
+    samples: { value: tex },
+    n_samples: { value: nParticles },
+    resolution: { value: resolution },
+    u_point_scale: { value: pointScale },
+    u_base_hue: { value: baseHue },
+    u_decay: { value: decay },
+    u_desaturation: { value: desaturation },
+    u_min_saturation: { value: minSaturation },
+  });
 
-  const uniforms = useMemo(
-    () => ({
-      color: { value: colorVec },
-      max_amplitude: { value: textureMapper.maxAmplitude },
-      sample_scale: { value: sampleScale },
-      samples: { type: "t", value: tex },
-      resolution: { value: resolution },
-      b_should_interpolate: { value: interpolate },
-    }),
-    // Only recreate on mount-level changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [textureMapper, tex],
-  );
+  const uniforms = uniformsRef.current;
+  uniforms.samples.value = tex;
+  uniforms.n_samples.value = nParticles;
+  uniforms.resolution.value = resolution;
+  uniforms.u_point_scale.value = pointScale;
+  uniforms.u_base_hue.value = baseHue;
+  uniforms.u_decay.value = decay;
+  uniforms.u_desaturation.value = desaturation;
+  uniforms.u_min_saturation.value = minSaturation;
 
   useFrame(() => {
     textureMapper.updateTextureData(textureData);
     tex.needsUpdate = true;
-    if (!matRef.current) return;
-    matRef.current.uniforms.max_amplitude.value = textureMapper.maxAmplitude;
-    matRef.current.uniforms.samples.value = tex;
   });
 
-  const internals = (
-    <Fragment>
+  return (
+    <points>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -84,18 +83,15 @@ const BaseScopeVisual = ({
       </bufferGeometry>
       <shaderMaterial
         ref={matRef}
+        transparent
         depthWrite={false}
+        blending={AdditiveBlending}
         fragmentShader={fragmentShader}
         vertexShader={vertexShader}
         uniforms={uniforms}
-        uniforms-color-value={colorVec}
-        uniforms-resolution-value={resolution}
-        uniforms-sample_scale-value={sampleScale}
-        uniforms-b_should_interpolate-value={interpolate}
       />
-    </Fragment>
+    </points>
   );
-  return usePoints ? <points>{internals}</points> : <line>{internals}</line>;
 };
 
 export default BaseScopeVisual;

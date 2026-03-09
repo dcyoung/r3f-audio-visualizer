@@ -185,12 +185,15 @@ const BehaviorSection = () => {
 };
 
 export const SettingsPanel = () => {
+  const mode = useMode();
+  const isScope = mode === APPLICATION_MODE.AUDIO_SCOPE;
+
   return (
     <Accordion type="multiple" defaultValue={["input-mode"]} className="w-full">
       <InputModeSection />
       <VisualizerSection />
-      <AppearanceSection />
-      <BehaviorSection />
+      {!isScope && <AppearanceSection />}
+      {!isScope && <BehaviorSection />}
     </Accordion>
   );
 };

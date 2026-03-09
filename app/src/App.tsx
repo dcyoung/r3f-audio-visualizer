@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import AudioAnalyzer from "@/components/analyzers/audioAnalyzer";
-import AudioScopeCanvas from "@/components/canvas/AudioScope";
+import AudioScopeCanvas from "@/components/canvas/AudioScopeTSL";
 import Visual3DCanvas from "@/components/canvas/Visual3D";
 import { ControlsPanel } from "@/components/controls/main";
 import {

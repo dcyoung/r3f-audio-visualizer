@@ -85,11 +85,15 @@ const isMediaStream = (source: TAudioSource) => {
   }
 };
 
+type TAudioAnalyzerMode =
+  | typeof APPLICATION_MODE.AUDIO
+  | typeof APPLICATION_MODE.AUDIO_SCOPE;
+
 const ControlledAnalyzer = ({
   mode,
   audioSource,
 }: {
-  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
+  mode: TAudioAnalyzerMode;
   audioSource: TAudioSource;
 }) => {
   const { audio, analyzer } = useMemo(() => {
@@ -129,7 +133,7 @@ const ControlledAnalyzer = ({
 const AudioAnalyzer = ({
   mode,
 }: {
-  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
+  mode: TAudioAnalyzerMode;
 }) => {
   const { source } = useAudio();
 

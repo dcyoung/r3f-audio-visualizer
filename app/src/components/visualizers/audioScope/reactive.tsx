@@ -1,8 +1,5 @@
 import { createConfigStore } from "@/lib/storeHelpers";
 
-import { type TVisualProps } from "../models";
-import BaseScopeVisual from "./base";
-
 export interface IScopeSettings {
   nParticles: number;
   pointScale: number;
@@ -23,8 +20,3 @@ export const { useParams, useActions, usePresets } =
       minSaturation: 0.65,
     },
   });
-
-export default ({ textureMapper }: TVisualProps) => {
-  const params = useParams();
-  return <BaseScopeVisual textureMapper={textureMapper} {...params} />;
-};

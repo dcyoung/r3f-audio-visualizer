@@ -182,7 +182,6 @@ const useAppState = create<IAppState>((set) => ({
             ...state.appearance,
             // Reset paletteTrackEnergy whenever the mode changes
             paletteTrackEnergy: newMode === APPLICATION_MODE.AUDIO,
-            // Set default appearance settings for audio scope mode
             ...(newMode === APPLICATION_MODE.AUDIO_SCOPE
               ? {
                   palette: "rainbow",

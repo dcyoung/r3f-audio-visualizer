@@ -1,4 +1,4 @@
-import Scope from "./audioScope";
+import Scope from "./audioScopeTSL";
 import Cube from "./cube";
 import DiffusedRing from "./diffusedRing";
 import Dna from "./dna";

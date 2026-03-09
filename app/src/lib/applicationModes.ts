@@ -23,6 +23,9 @@ export const isAudioMode = (mode: TApplicationMode) => {
   }
 };
 
+export const isAudioScopeMode = (mode: TApplicationMode) =>
+  mode === APPLICATION_MODE.AUDIO_SCOPE;
+
 export const getPlatformSupportedApplicationModes = () => {
   return [
     APPLICATION_MODE.WAVE_FORM,

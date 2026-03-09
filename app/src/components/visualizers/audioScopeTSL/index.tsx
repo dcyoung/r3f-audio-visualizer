@@ -1,9 +1,9 @@
 import { lazy, Suspense, useMemo } from "react";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
+import ScopeControls from "@/components/visualizers/audioScope/controls";
 import { Shell } from "lucide-react";
 
 import { type TVisualProps } from "../models";
-import ScopeControls from "./controls";
 
 const ReactiveComponent = (props: TVisualProps) => {
   const VisualComponent = useMemo(

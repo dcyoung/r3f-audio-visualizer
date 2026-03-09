@@ -5,7 +5,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { APPLICATION_MODE, isCameraMode } from "@/lib/applicationModes";
+import {
+  APPLICATION_MODE,
+  isAudioScopeMode,
+  isCameraMode,
+} from "@/lib/applicationModes";
 import {
   useAppearance,
   useAppStateActions,
@@ -186,7 +190,7 @@ const BehaviorSection = () => {
 
 export const SettingsPanel = () => {
   const mode = useMode();
-  const isScope = mode === APPLICATION_MODE.AUDIO_SCOPE;
+  const isScope = isAudioScopeMode(mode);
 
   return (
     <Accordion type="multiple" defaultValue={["input-mode"]} className="w-full">

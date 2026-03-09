@@ -12,7 +12,6 @@ FROM oven/bun:1.2-alpine AS server
 
 WORKDIR /app
 
-COPY --from=base /app/node_modules /app/node_modules
 COPY --from=base /app/dist /app/dist
 COPY --from=base /app/package.json /app/package.json
 
@@ -20,4 +19,4 @@ ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["bun", "run", "dist/app.js"]
+CMD ["bun", "--smol", "run", "dist/app.js"]

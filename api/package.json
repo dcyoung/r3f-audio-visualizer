@@ -6,10 +6,11 @@
   "main": "src/app.ts",
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc",
+    "build": "bun build src/app.ts --outdir dist --target bun",
     "start": "bun run dist/app.js",
     "dev": "bun run --env-file=../.env src/app.ts",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -18,10 +19,7 @@
   "engines": {
     "node": ">=22"
   },
-  "dependencies": {
-    "effect": "4.0.0-beta.28",
-    "@effect/platform-node": "4.0.0-beta.28"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^10.0.0",
     "@types/bun": "latest",

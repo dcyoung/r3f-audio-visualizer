@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Settings } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Sheet, SheetContent } from "../ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "../ui/sheet";
 import { MobileDrawer } from "./mobile-drawer";
 import { SettingsPanel } from "./settingsPanel";
 
@@ -28,10 +28,11 @@ export const SettingsPanelTrigger = () => {
       ) : (
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent
-            insertHidden={true}
             side="right"
-            className="no-scrollbar bg-background/70 w-full max-w-full overflow-scroll p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
+            className="no-scrollbar bg-background w-full max-w-full overflow-scroll p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
           >
+            <SheetTitle className="sr-only">Nav Menu</SheetTitle>
+            <SheetDescription className="sr-only">Nav Menu</SheetDescription>
             <SettingsPanel />
           </SheetContent>
         </Sheet>
@@ -67,11 +68,13 @@ const VisualSelector = () => {
   }, [mode]);
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <DockItem className="pointer-events-auto">
-          <activeVisual.icon />
-        </DockItem>
-      </PopoverTrigger>
+      <PopoverTrigger
+        render={(props) => (
+          <DockItem {...props} className="pointer-events-auto">
+            <activeVisual.icon />
+          </DockItem>
+        )}
+      />
       <PopoverContent
         side="top"
         className="pointer-events-auto mb-2 grid h-fit w-fit place-content-center border-white/10 bg-white/10 p-3"

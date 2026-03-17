@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useRef } from "react";
-import { BoxGeometry, EdgesGeometry, Vector3, type LineSegments } from "three";
-import { useFrame } from "@react-three/fiber";
 import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
+import { useFrame } from "@react-three/fiber";
+import { BoxGeometry, EdgesGeometry, Vector3, type LineSegments } from "three";
 
 import FluidBody from "../fluidSimulation/FluidBody";
 import type { SimulationInstance } from "../fluidSimulation/simulation";
@@ -73,10 +73,7 @@ const BaseFluidBox = ({
   color?: string;
   showWireframe?: boolean;
 }) => {
-  const fillRegion = useMemo(
-    () => ({ min: FILL_MIN, max: FILL_MAX }),
-    [],
-  );
+  const fillRegion = useMemo(() => ({ min: FILL_MIN, max: FILL_MAX }), []);
   const elapsedRef = useRef(0);
   const boundsRef = useRef({
     min: new Vector3(BASE_MIN, BASE_MIN, BASE_MIN),
@@ -93,15 +90,51 @@ const BaseFluidBox = ({
           : wallAmplitude;
 
       // Sample the signal at 6 spread positions to drive 6 walls
-      const xMinD = coordinateMapper.map(COORDINATE_TYPE.CARTESIAN_1D, 0.0, 0, 0, t);
-      const xMaxD = coordinateMapper.map(COORDINATE_TYPE.CARTESIAN_1D, 0.2, 0, 0, t);
-      const yMinD = coordinateMapper.map(COORDINATE_TYPE.CARTESIAN_1D, 0.4, 0, 0, t);
-      const yMaxD = coordinateMapper.map(COORDINATE_TYPE.CARTESIAN_1D, 0.6, 0, 0, t);
-      const zMinD = coordinateMapper.map(COORDINATE_TYPE.CARTESIAN_1D, 0.8, 0, 0, t);
-      const zMaxD = coordinateMapper.map(COORDINATE_TYPE.CARTESIAN_1D, 1.0, 0, 0, t);
+      const xMinD = coordinateMapper.map(
+        COORDINATE_TYPE.CARTESIAN_1D,
+        0.0,
+        0,
+        0,
+        t,
+      );
+      const xMaxD = coordinateMapper.map(
+        COORDINATE_TYPE.CARTESIAN_1D,
+        0.2,
+        0,
+        0,
+        t,
+      );
+      const yMinD = coordinateMapper.map(
+        COORDINATE_TYPE.CARTESIAN_1D,
+        0.4,
+        0,
+        0,
+        t,
+      );
+      const yMaxD = coordinateMapper.map(
+        COORDINATE_TYPE.CARTESIAN_1D,
+        0.6,
+        0,
+        0,
+        t,
+      );
+      const zMinD = coordinateMapper.map(
+        COORDINATE_TYPE.CARTESIAN_1D,
+        0.8,
+        0,
+        0,
+        t,
+      );
+      const zMaxD = coordinateMapper.map(
+        COORDINATE_TYPE.CARTESIAN_1D,
+        1.0,
+        0,
+        0,
+        t,
+      );
 
-      const bMin = sim.uniforms.boundaryMin.value;
-      const bMax = sim.uniforms.boundaryMax.value;
+      const bMin = (sim.uniforms.boundaryMin as { value: Vector3 }).value;
+      const bMax = (sim.uniforms.boundaryMax as { value: Vector3 }).value;
 
       bMin.set(
         BASE_MIN + Math.max(0, xMinD * amp),

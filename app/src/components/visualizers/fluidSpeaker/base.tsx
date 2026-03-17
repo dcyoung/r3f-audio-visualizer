@@ -1,16 +1,16 @@
 import { useCallback, useMemo, useRef } from "react";
 import {
-  CylinderGeometry,
-  DoubleSide,
-  EdgesGeometry,
-  type Mesh as ThreeMesh,
-  Vector3,
-} from "three";
-import { useFrame } from "@react-three/fiber";
-import {
   COORDINATE_TYPE,
   type ICoordinateMapper,
 } from "@/lib/mappers/coordinateMappers/common";
+import { useFrame } from "@react-three/fiber";
+import {
+  CylinderGeometry,
+  DoubleSide,
+  EdgesGeometry,
+  Vector3,
+  type Mesh as ThreeMesh,
+} from "three";
 
 import FluidBody from "../fluidSimulation/FluidBody";
 import type { SimulationInstance } from "../fluidSimulation/simulation";
@@ -111,12 +111,20 @@ const BaseFluidSpeaker = ({
   // Fill: radial in XY centered at 0.5, vertical in Z from floor
   const fillMin = useMemo(
     () =>
-      new Vector3(0.5 - normRadius * 0.8, 0.5 - normRadius * 0.8, floorZ + 0.02),
+      new Vector3(
+        0.5 - normRadius * 0.8,
+        0.5 - normRadius * 0.8,
+        floorZ + 0.02,
+      ),
     [normRadius, floorZ],
   );
   const fillMax = useMemo(
     () =>
-      new Vector3(0.5 + normRadius * 0.8, 0.5 + normRadius * 0.8, floorZ + (ceilZ - floorZ) * 0.5),
+      new Vector3(
+        0.5 + normRadius * 0.8,
+        0.5 + normRadius * 0.8,
+        floorZ + (ceilZ - floorZ) * 0.5,
+      ),
     [normRadius, floorZ, ceilZ],
   );
   const fillRegion = useMemo(
@@ -134,19 +142,23 @@ const BaseFluidSpeaker = ({
           : speakerAmplitude;
 
       const floorDisp = coordinateMapper.map(
-        COORDINATE_TYPE.CARTESIAN_1D, 0.5, 0, 0, t,
+        COORDINATE_TYPE.CARTESIAN_1D,
+        0.5,
+        0,
+        0,
+        t,
       );
       displacementRef.current = floorDisp * amp;
 
       // Z is vertical: move floor boundary up/down
       const dynamicFloor = floorZ + floorDisp * amp;
       // Boundary: XY radial (encoded in x,y), Z floor/ceiling (encoded in z)
-      sim.uniforms.boundaryMin.value.set(
+      (sim.uniforms.boundaryMin as { value: Vector3 }).value.set(
         0.5 - normRadius,
         0.5 - normRadius,
         Math.max(2 / gs, dynamicFloor),
       );
-      sim.uniforms.boundaryMax.value.set(
+      (sim.uniforms.boundaryMax as { value: Vector3 }).value.set(
         0.5 + normRadius,
         0.5 + normRadius,
         ceilZ,
@@ -154,7 +166,11 @@ const BaseFluidSpeaker = ({
 
       // Upward force along Z
       const forceZ = floorDisp * amp * 50;
-      sim.uniforms.externalForce.value.set(0, 0, forceZ);
+      (sim.uniforms.externalForce as { value: Vector3 }).value.set(
+        0,
+        0,
+        forceZ,
+      );
     },
     [coordinateMapper, speakerAmplitude, floorZ, ceilZ, normRadius, gs],
   );

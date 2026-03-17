@@ -8,7 +8,6 @@ import {
 import {
   EnergyMeasureOptions,
   OctaveBandModeMap,
-  type EnergyMeasure,
   type OctaveBandMode,
 } from "@/lib/analyzers/fft";
 import { useAnalyzerFFT, useAppStateActions } from "@/lib/appState";
@@ -35,6 +34,7 @@ const FFTAnalyzerControls = () => {
       />
       <SelectRow label="Octave Bands">
         <Select
+          defaultValue={String(octaveBandMode)}
           onValueChange={(v) =>
             setAnalyzerFFT({
               octaveBandMode: Number(v) as OctaveBandMode,
@@ -42,10 +42,7 @@ const FFTAnalyzerControls = () => {
           }
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue
-              placeholder={OctaveBandModeMap[octaveBandMode]}
-              defaultValue={octaveBandMode}
-            />
+            <SelectValue placeholder={OctaveBandModeMap[octaveBandMode]} />
           </SelectTrigger>
           <SelectContent className="max-h-36">
             {Object.entries(OctaveBandModeMap).map((v) => (
@@ -62,17 +59,15 @@ const FFTAnalyzerControls = () => {
       </SelectRow>
       <SelectRow label="Energy">
         <Select
+          defaultValue={energyMeasure}
           onValueChange={(v) => {
             setAnalyzerFFT({
-              energyMeasure: v as EnergyMeasure,
+              energyMeasure: v ?? energyMeasure,
             });
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue
-              placeholder={energyMeasure}
-              defaultValue={energyMeasure}
-            />
+            <SelectValue placeholder={energyMeasure} />
           </SelectTrigger>
           <SelectContent className="max-h-36">
             {EnergyMeasureOptions.map((v) => (

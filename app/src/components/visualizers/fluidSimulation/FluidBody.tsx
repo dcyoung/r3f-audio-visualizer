@@ -1,7 +1,7 @@
 import { type Vector3 } from "three";
 
-import type { BoundaryMode } from "./types";
 import type { SimulationInstance } from "./simulation";
+import type { BoundaryMode } from "./types";
 import { useFluidSimulation } from "./useFluidSimulation";
 
 export interface FluidBodyProps {

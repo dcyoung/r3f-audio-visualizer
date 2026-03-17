@@ -1,9 +1,4 @@
-import {
-  DataTexture,
-  FloatType,
-  NearestFilter,
-  RGBAFormat,
-} from "three";
+import { DataTexture, FloatType, NearestFilter, RGBAFormat } from "three";
 
 export type TTextureMapperParams = {
   size: number;
@@ -69,9 +64,7 @@ export class TextureMapper {
   }
 
   public generateSupportedTextureAndData() {
-    const textureData = new Float32Array(
-      this.samplesX.length * this.CHANNELS,
-    );
+    const textureData = new Float32Array(this.samplesX.length * this.CHANNELS);
     const tex = new DataTexture(
       textureData,
       this.samplesX.length,

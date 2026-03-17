@@ -55,12 +55,7 @@ function createHilbertFilter(
  * Uses the numerically stable half-angle formula:
  *   2 * atan2(|‖v‖u − ‖u‖v|, |‖v‖u + ‖u‖v|)
  */
-function getAngle(
-  vRe: number,
-  vIm: number,
-  uRe: number,
-  uIm: number,
-): number {
+function getAngle(vRe: number, vIm: number, uRe: number, uIm: number): number {
   const lenV = Math.sqrt(vRe * vRe + vIm * vIm);
   const lenU = Math.sqrt(uRe * uRe + uIm * uIm);
   const lvuRe = lenV * uRe;

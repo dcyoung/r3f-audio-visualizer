@@ -1,4 +1,8 @@
-import { PresetBar, SliderField, SwitchRow } from "@/components/controls/common";
+import {
+  PresetBar,
+  SliderField,
+  SwitchRow,
+} from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
@@ -18,7 +22,7 @@ export default () => {
   return (
     <div className="space-y-4">
       <PresetBar
-        activePreset={activePreset as string | undefined}
+        activePreset={activePreset}
         presetOptions={presetOptions}
         onSelect={setPreset}
       />

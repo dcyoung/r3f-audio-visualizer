@@ -197,7 +197,7 @@ export const SettingsPanel = () => {
   const isFluid = FLUID_VISUAL_IDS.has(visual.id);
 
   return (
-    <Accordion type="multiple" defaultValue={["input-mode"]} className="w-full">
+    <Accordion multiple defaultValue={["input-mode"]} className="w-full">
       <InputModeSection />
       <VisualizerSection />
       {!isScope && !isFluid && <AppearanceSection />}

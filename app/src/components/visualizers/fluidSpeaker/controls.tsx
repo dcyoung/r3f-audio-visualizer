@@ -1,4 +1,8 @@
-import { PresetBar, SliderField, SwitchRow } from "@/components/controls/common";
+import {
+  PresetBar,
+  SliderField,
+  SwitchRow,
+} from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 

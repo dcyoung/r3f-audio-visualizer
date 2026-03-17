@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   COORDINATE_TYPE,
   TWO_PI,
@@ -39,22 +39,25 @@ const MorphingSphereShell = ({
   const meshRef = useRef<ThreeMesh>(null);
   const directionsRef = useRef<Float32Array | null>(null);
 
-  const geometry = useMemo(() => {
+  const { geometry, dirs } = useMemo(() => {
     const geo = new SphereGeometry(1, 32, 24);
     const pos = geo.attributes.position as BufferAttribute;
-    const dirs = new Float32Array(pos.count * 3);
+    const d = new Float32Array(pos.count * 3);
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const y = pos.getY(i);
       const z = pos.getZ(i);
       const len = Math.sqrt(x * x + y * y + z * z) || 1;
-      dirs[i * 3] = x / len;
-      dirs[i * 3 + 1] = y / len;
-      dirs[i * 3 + 2] = z / len;
+      d[i * 3] = x / len;
+      d[i * 3 + 1] = y / len;
+      d[i * 3 + 2] = z / len;
     }
-    directionsRef.current = dirs;
-    return geo;
+    return { geometry: geo, dirs: d };
   }, []);
+
+  useEffect(() => {
+    directionsRef.current = dirs;
+  }, [dirs]);
 
   useFrame(({ elapsed }) => {
     const mesh = meshRef.current;
@@ -90,11 +93,11 @@ const MorphingSphereShell = ({
   });
 
   return (
-    <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial
+    <mesh ref={meshRef} geometry={geometry} renderOrder={0}>
+      <meshPhysicalMaterial
         color="#6699bb"
-        transparent
-        opacity={0.35}
+        transmission={0.85}
+        thickness={0.15}
         roughness={0.3}
         metalness={0.1}
         side={DoubleSide}
@@ -177,7 +180,7 @@ const BaseFluidBall = ({
         attribute.needsUpdate = true;
       }
 
-      sim.uniforms.externalForce.value.set(0, 0, 0);
+      (sim.uniforms.externalForce as { value: Vector3 }).value.set(0, 0, 0);
     },
     [coordinateMapper, sphereRadius, morphScale],
   );

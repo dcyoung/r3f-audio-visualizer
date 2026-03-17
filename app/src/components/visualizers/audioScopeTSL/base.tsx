@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { type TextureMapper } from "@/lib/mappers/textureMappers/textureMapper";
 import { useFrame, useThree } from "@react-three/fiber";
-import {
-  instancedBufferAttribute,
-  uniform as tslUniform,
-} from "three/tsl";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { Line2 } from "three/addons/lines/webgpu/Line2.js";
+import { instancedBufferAttribute, uniform as tslUniform } from "three/tsl";
+import type { InterleavedBufferAttribute } from "three/webgpu";
 import {
   AdditiveBlending,
   Color,
   InstancedBufferAttribute,
-  InterleavedBufferAttribute,
   Line2NodeMaterial,
   PointsNodeMaterial,
   type Mesh,
   type Sprite,
 } from "three/webgpu";
-import { Line2 } from "three/addons/lines/webgpu/Line2.js";
-import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
 import { type IScopeSettings } from "../audioScope/reactive";
 
@@ -63,23 +60,20 @@ function useScopeData(
   );
   const size = useThree((state) => state.size);
   const tmpColor = useMemo(() => new Color(), []);
-  const positionsRef = useRef(new Float32Array(nParticles * 3));
-  const colorsRef = useRef(new Float32Array(nParticles * 3));
-  const alphasRef = useRef(new Float32Array(nParticles));
-
-  if (positionsRef.current.length !== nParticles * 3) {
-    positionsRef.current = new Float32Array(nParticles * 3);
-    colorsRef.current = new Float32Array(nParticles * 3);
-    alphasRef.current = new Float32Array(nParticles);
-  }
+  const buffers = useMemo(
+    () => ({
+      positions: new Float32Array(nParticles * 3),
+      colors: new Float32Array(nParticles * 3),
+      alphas: new Float32Array(nParticles),
+    }),
+    [nParticles],
+  );
 
   return {
     textureData,
     compute: () => {
       textureMapper.updateTextureData(textureData);
-      const positions = positionsRef.current;
-      const colors = colorsRef.current;
-      const alphas = alphasRef.current;
+      const { positions, colors, alphas } = buffers;
       const N = Math.min(nParticles, textureMapper.samplesX.length);
       const { width, height } = size;
       const side = Math.min(width, height);
@@ -87,6 +81,8 @@ function useScopeData(
       const scaleY = side / height;
       const portrait = width < height;
 
+      /* Intentionally mutate memoized buffers in place each frame for performance */
+      /* eslint-disable react-hooks/immutability */
       for (let i = 0; i < N; i++) {
         const j = i * 4;
         const rawX = textureData[j];
@@ -118,8 +114,9 @@ function useScopeData(
         colors[pi + 1] = tmpColor.g;
         colors[pi + 2] = tmpColor.b;
 
-        alphas[i] = (1.0 - settings.decay) + settings.decay * (i / N);
+        alphas[i] = 1.0 - settings.decay + settings.decay * (i / N);
       }
+      /* eslint-enable react-hooks/immutability */
 
       return { positions, colors, alphas, N };
     },
@@ -139,10 +136,34 @@ const PointsMode = ({
   const posAttrRef = useRef<InstancedBufferAttribute | null>(null);
   const colorAttrRef = useRef<InstancedBufferAttribute | null>(null);
   const sizeUniformRef = useRef(tslUniform(3.0 * pointScale));
-  const settingsRef = useRef({ pointScale, baseHue, decay, desaturation, minSaturation });
-  settingsRef.current = { pointScale, baseHue, decay, desaturation, minSaturation };
+  const settingsRef = useRef({
+    pointScale,
+    baseHue,
+    decay,
+    desaturation,
+    minSaturation,
+  });
 
-  const { compute } = useScopeData(textureMapper, nParticles, settingsRef.current);
+  const settings = useMemo(
+    () => ({
+      baseHue,
+      decay,
+      desaturation,
+      minSaturation,
+    }),
+    [baseHue, decay, desaturation, minSaturation],
+  );
+  const { compute } = useScopeData(textureMapper, nParticles, settings);
+
+  useEffect(() => {
+    settingsRef.current = {
+      pointScale,
+      baseHue,
+      decay,
+      desaturation,
+      minSaturation,
+    };
+  }, [pointScale, baseHue, decay, desaturation, minSaturation]);
 
   useEffect(() => {
     const sprite = spriteRef.current;
@@ -204,8 +225,7 @@ const PointsMode = ({
     colorAttr.needsUpdate = true;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <sprite ref={spriteRef as any} frustumCulled={false} />;
+  return <sprite ref={spriteRef as RefObject<Sprite>} frustumCulled={false} />;
 };
 
 /**
@@ -241,10 +261,34 @@ const LinesMode = ({
 }: { textureMapper: TextureMapper } & IScopeSettings) => {
   const meshRef = useRef<Mesh>(null);
   const lineRef = useRef<Line2 | null>(null);
-  const settingsRef = useRef({ pointScale, baseHue, decay, desaturation, minSaturation });
-  settingsRef.current = { pointScale, baseHue, decay, desaturation, minSaturation };
+  const settingsRef = useRef({
+    pointScale,
+    baseHue,
+    decay,
+    desaturation,
+    minSaturation,
+  });
 
-  const { compute } = useScopeData(textureMapper, nParticles, settingsRef.current);
+  const settings = useMemo(
+    () => ({
+      baseHue,
+      decay,
+      desaturation,
+      minSaturation,
+    }),
+    [baseHue, decay, desaturation, minSaturation],
+  );
+  const { compute } = useScopeData(textureMapper, nParticles, settings);
+
+  useEffect(() => {
+    settingsRef.current = {
+      pointScale,
+      baseHue,
+      decay,
+      desaturation,
+      minSaturation,
+    };
+  }, [pointScale, baseHue, decay, desaturation, minSaturation]);
 
   useEffect(() => {
     const container = meshRef.current;
@@ -256,7 +300,7 @@ const LinesMode = ({
     geom.setPositions(initPos);
     geom.setColors(initCol);
 
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
     const mat = new Line2NodeMaterial({
       linewidth: 2,
       vertexColors: true,
@@ -265,7 +309,7 @@ const LinesMode = ({
       blending: AdditiveBlending as any,
       alphaToCoverage: false,
     } as any);
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
     const line = new Line2(geom, mat);
     line.frustumCulled = false;
@@ -292,29 +336,38 @@ const LinesMode = ({
 
     const { positions, colors } = compute();
 
-    const posAttr = geom.getAttribute("instanceStart") as InterleavedBufferAttribute | null;
-    const colAttr = geom.getAttribute("instanceColorStart") as InterleavedBufferAttribute | null;
+    const posAttr = geom.getAttribute(
+      "instanceStart",
+    ) as InterleavedBufferAttribute | null;
+    const colAttr = geom.getAttribute(
+      "instanceColorStart",
+    ) as InterleavedBufferAttribute | null;
     if (!posAttr?.data?.array || !colAttr?.data?.array) return;
 
-    writePolylinePairs(positions, posAttr.data.array as Float32Array, nParticles, 3);
-    writePolylinePairs(colors, colAttr.data.array as Float32Array, nParticles, 3);
+    writePolylinePairs(
+      positions,
+      posAttr.data.array as Float32Array,
+      nParticles,
+      3,
+    );
+    writePolylinePairs(
+      colors,
+      colAttr.data.array as Float32Array,
+      nParticles,
+      3,
+    );
 
     posAttr.data.needsUpdate = true;
     colAttr.data.needsUpdate = true;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <mesh ref={meshRef as any} frustumCulled={false} />;
+  return <mesh ref={meshRef as RefObject<Mesh>} frustumCulled={false} />;
 };
 
 const BaseScopeTSLVisual = (
   props: { textureMapper: TextureMapper } & IScopeSettings,
 ) => {
-  return props.useLines ? (
-    <LinesMode {...props} />
-  ) : (
-    <PointsMode {...props} />
-  );
+  return props.useLines ? <LinesMode {...props} /> : <PointsMode {...props} />;
 };
 
 export default BaseScopeTSLVisual;

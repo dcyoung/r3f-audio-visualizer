@@ -61,7 +61,7 @@ export interface FluidSimulationResources {
   particleBuffer: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   kernels: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   workgroupBuffers: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     p2g1: any;

@@ -64,6 +64,7 @@ const ModeSelector = () => {
 
   return (
     <Select
+      value={mode}
       onValueChange={(v) => {
         setMode(v as (typeof availableModes)[number]);
       }}
@@ -71,7 +72,6 @@ const ModeSelector = () => {
       <SelectTrigger>
         <SelectValue
           placeholder={<ModeSelectEntry mode={mode} />}
-          defaultValue={mode}
           className="w-full"
         />
       </SelectTrigger>

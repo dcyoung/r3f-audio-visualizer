@@ -61,7 +61,15 @@ export const SliderField = ({
       min={min}
       max={max}
       step={step}
-      onValueChange={(e) => onChange(e[0])}
+      onValueChange={(e) => {
+        const next: number =
+          typeof e === "number"
+            ? e
+            : Array.isArray(e)
+              ? Number(e[0] ?? value)
+              : value;
+        onChange(next);
+      }}
     />
   </div>
 );

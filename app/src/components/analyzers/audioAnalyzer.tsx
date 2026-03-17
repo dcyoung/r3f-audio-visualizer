@@ -130,11 +130,7 @@ const ControlledAnalyzer = ({
   );
 };
 
-const AudioAnalyzer = ({
-  mode,
-}: {
-  mode: TAudioAnalyzerMode;
-}) => {
+const AudioAnalyzer = ({ mode }: { mode: TAudioAnalyzerMode }) => {
   const { source } = useAudio();
 
   return <ControlledAnalyzer mode={mode} audioSource={source} />;

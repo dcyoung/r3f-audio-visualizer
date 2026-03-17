@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Vector3 } from "three";
 import {
   acos,
@@ -28,9 +28,9 @@ import {
   vec3,
   vec4,
 } from "three/tsl";
+import type { Mesh } from "three/webgpu";
 import {
   IndirectStorageBufferAttribute,
-  Mesh,
   StorageBufferAttribute,
   type WebGPURenderer,
 } from "three/webgpu";
@@ -126,7 +126,7 @@ function initParticleArray(
 }
 
 const encodeFixedPoint = (f32: any): any =>
-  int((f32 as any).mul(FIXED_POINT_MULTIPLIER));
+  int(f32.mul(FIXED_POINT_MULTIPLIER));
 
 const decodeFixedPoint = (i32: any): any =>
   float(i32).div(FIXED_POINT_MULTIPLIER);
@@ -135,7 +135,7 @@ function computeWeights(cellDiff: any): any {
   const w0 = float(0.5)
     .mul(float(0.5).sub(cellDiff))
     .mul(float(0.5).sub(cellDiff));
-  const w1 = float(0.75).sub((cellDiff as any).mul(cellDiff));
+  const w1 = float(0.75).sub(cellDiff.mul(cellDiff));
   const w2 = float(0.5)
     .mul(float(0.5).add(cellDiff))
     .mul(float(0.5).add(cellDiff));
@@ -566,10 +566,7 @@ export function createFluidSimulation(
       },
     );
 
-    particleBuffer
-      .element(instanceIndex)
-      .get("C")
-      .assign((B as any).mul(4));
+    particleBuffer.element(instanceIndex).get("C").assign(B.mul(4));
 
     // Scale velocity from grid space to normalized [0,1] space
     particleVelocity.divAssign(gridSizeUniform);
@@ -646,10 +643,7 @@ export function createFluidSimulation(
       const TWO_PI_VAL = float(Math.PI * 2);
       const thetaIdxF = clamp(
         floor(
-          (theta as any)
-            .add(PI_VAL)
-            .div(TWO_PI_VAL)
-            .mul(float(SPHERE_MAP_THETA_RES)),
+          theta.add(PI_VAL).div(TWO_PI_VAL).mul(float(SPHERE_MAP_THETA_RES)),
         ),
         float(0),
         float(SPHERE_MAP_THETA_RES - 1),
@@ -663,9 +657,7 @@ export function createFluidSimulation(
         .mul(int(SPHERE_MAP_PHI_RES))
         .add(int(phiIdxF));
 
-      const innerRadius = (radiusMapStorage as any)
-        .element(mapIdx)
-        .toVar("innerRadius");
+      const innerRadius = radiusMapStorage.element(mapIdx).toVar("innerRadius");
       const shellThickness = float(0.16);
       const outerRadius = innerRadius.add(shellThickness);
 
@@ -734,12 +726,12 @@ export function createFluidSimulation(
   };
 
   const step = (renderer: WebGPURenderer) => {
-    renderer.compute(workgroupKernel);
-    renderer.compute(clearGridKernel);
-    renderer.compute(p2g1Kernel, p2g1Wg);
-    renderer.compute(p2g2Kernel, p2g2Wg);
-    renderer.compute(updateGridKernel);
-    renderer.compute(g2pKernel, g2pWg);
+    void renderer.compute(workgroupKernel);
+    void renderer.compute(clearGridKernel);
+    void renderer.compute(p2g1Kernel, p2g1Wg);
+    void renderer.compute(p2g2Kernel, p2g2Wg);
+    void renderer.compute(updateGridKernel);
+    void renderer.compute(g2pKernel, g2pWg);
   };
 
   return {

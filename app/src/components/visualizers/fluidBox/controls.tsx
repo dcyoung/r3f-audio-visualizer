@@ -1,10 +1,19 @@
-import { PresetBar, SliderField, SwitchRow } from "@/components/controls/common";
+import {
+  PresetBar,
+  SliderField,
+  SwitchRow,
+} from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { particleCount, stiffness, dynamicViscosity, wallAmplitude, showWireframe } =
-    useParams();
+  const {
+    particleCount,
+    stiffness,
+    dynamicViscosity,
+    wallAmplitude,
+    showWireframe,
+  } = useParams();
   const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
 

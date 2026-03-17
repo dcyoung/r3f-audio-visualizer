@@ -103,10 +103,11 @@ export function useFluidSimulation(options: UseFluidSimulationOptions) {
   useEffect(() => {
     const sim = simRef.current;
     if (!sim) return;
-    sim.uniforms.stiffness.value = stiffness;
-    sim.uniforms.restDensity.value = restDensity;
-    sim.uniforms.dynamicViscosity.value = dynamicViscosity;
-    sim.uniforms.gravity.value.copy(gravity);
+    (sim.uniforms.stiffness as { value: number }).value = stiffness;
+    (sim.uniforms.restDensity as { value: number }).value = restDensity;
+    (sim.uniforms.dynamicViscosity as { value: number }).value =
+      dynamicViscosity;
+    (sim.uniforms.gravity as { value: Vector3 }).value.copy(gravity);
   }, [stiffness, restDensity, dynamicViscosity, gravity]);
 
   useFrame(({ gl }) => {
@@ -114,11 +115,12 @@ export function useFluidSimulation(options: UseFluidSimulationOptions) {
     if (!sim) return;
 
     const dt = MathUtils.clamp(1 / 60, 0.00001, 1 / 30);
-    sim.uniforms.dt.value = dt;
+    (sim.uniforms.dt as { value: number }).value = dt;
 
     onBeforeStepRef.current?.(sim, dt);
 
-    sim.step(gl as unknown as WebGPURenderer);
+    const typedSim = sim as { step: (r: WebGPURenderer) => void };
+    typedSim.step(gl as unknown as WebGPURenderer);
   });
 
   return { simRef, meshRef };

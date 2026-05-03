@@ -79,6 +79,7 @@ const useSphericalLimits = () => {
     case "movingBoxes":
     case "dna":
     case "grid":
+    case "neuron":
       return {
         rMin: 15,
         rMax: 22,

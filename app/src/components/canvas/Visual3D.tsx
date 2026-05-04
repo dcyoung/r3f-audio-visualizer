@@ -14,6 +14,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber/webgpu";
 import * as THREE from "three/webgpu";
 
 import { AutoOrbitCameraControls } from "./AutoOrbitCamera";
+import { DebugStats } from "./DebugStats";
 import { PaletteTracker } from "./paletteTracker";
 
 const FLUID_VISUAL_IDS = new Set(["fluidBox", "fluidSpeaker", "fluidBall"]);
@@ -117,6 +118,7 @@ const Visual3DCanvas = () => {
       <CameraPositioner />
       <CameraControls />
       <PaletteTracker />
+      <DebugStats />
     </Canvas>
   );
 };

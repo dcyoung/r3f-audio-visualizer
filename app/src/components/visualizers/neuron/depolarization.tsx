@@ -12,7 +12,7 @@ import {
 
 import { type DendriteSegment } from "./base";
 import { kEffluxDrive, naInfluxDrive } from "./hhModel";
-import { type NeuronSimSampler } from "./useNeuronSimulation";
+import { type NeuronSimSampler } from "./useNeuronWaveformSampler";
 
 const TWO_PI = Math.PI * 2;
 const FRAME_STEPS = 72;

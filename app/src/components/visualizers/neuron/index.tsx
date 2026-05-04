@@ -16,11 +16,23 @@ const ReactiveComponent = (props: TVisualProps) => {
   );
 };
 
+const ControlsComponent = () => {
+  const Controls = useMemo(
+    () => lazy(async () => await import("./controls")),
+    [],
+  );
+  return (
+    <Suspense fallback={null}>
+      <Controls />
+    </Suspense>
+  );
+};
+
 export default {
   id: "neuron",
   icon: Network,
   ReactiveComponent,
-  ControlsComponent: null,
+  ControlsComponent,
   supportedApplicationModes: [
     APPLICATION_MODE.WAVE_FORM,
     APPLICATION_MODE.NOISE,

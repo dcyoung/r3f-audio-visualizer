@@ -21,6 +21,7 @@ type DepolarizationSettings = {
   wavePeriodSec: number;
   travelFraction: number;
   bandWidth: number;
+  preInrushLeadSec: number;
   sleeveInnerGap: number;
   sleeveThickness: number;
   inrushDurationSec: number;
@@ -28,14 +29,15 @@ type DepolarizationSettings = {
 };
 
 const DEFAULT_SETTINGS: DepolarizationSettings = {
-  particleCount: 12000,
+  particleCount: 100_000,
   particleSize: 0.075,
   wavePeriodSec: 4.4,
   travelFraction: 0.78,
-  bandWidth: 1.8,
-  sleeveInnerGap: 0.42,
-  sleeveThickness: 0.95,
-  inrushDurationSec: 0.72,
+  bandWidth: 2.25,
+  preInrushLeadSec: 0.62,
+  sleeveInnerGap: 0.34,
+  sleeveThickness: 0.78,
+  inrushDurationSec: 1.25,
   color: "#9dfcff",
 };
 
@@ -58,6 +60,9 @@ type ParticleField = {
   localT: Float32Array;
   angles: Float32Array;
   radialOffsets: Float32Array;
+  axialJitter: Float32Array;
+  radialJitter: Float32Array;
+  phaseJitter: Float32Array;
   gates: Float32Array;
   speedJitter: Float32Array;
   intensity: Float32Array;
@@ -115,6 +120,9 @@ const buildParticleField = (
   const localT = new Float32Array(settings.particleCount);
   const angles = new Float32Array(settings.particleCount);
   const radialOffsets = new Float32Array(settings.particleCount);
+  const axialJitter = new Float32Array(settings.particleCount);
+  const radialJitter = new Float32Array(settings.particleCount);
+  const phaseJitter = new Float32Array(settings.particleCount);
   const gates = new Float32Array(settings.particleCount);
   const speedJitter = new Float32Array(settings.particleCount);
   const intensity = new Float32Array(settings.particleCount);
@@ -136,6 +144,9 @@ const buildParticleField = (
     radialOffsets[i] =
       settings.sleeveInnerGap +
       settings.sleeveThickness * (0.16 + 0.84 * random(28057 + i * 43));
+    axialJitter[i] = random(31249 + i * 41) * 2 - 1;
+    radialJitter[i] = 0.78 + 0.44 * random(33289 + i * 37);
+    phaseJitter[i] = random(35027 + i * 29) * TWO_PI;
     gates[i] = 0.08 + 0.56 * random(36061 + i * 47);
     speedJitter[i] = 0.76 + 0.48 * random(44071 + i * 53);
     intensity[i] = 0.55 + 0.45 * random(52081 + i * 59);
@@ -149,6 +160,9 @@ const buildParticleField = (
     localT,
     angles,
     radialOffsets,
+    axialJitter,
+    radialJitter,
+    phaseJitter,
     gates,
     speedJitter,
     intensity,
@@ -162,6 +176,7 @@ export const DepolarizationParticles = ({
   wavePeriodSec = DEFAULT_SETTINGS.wavePeriodSec,
   travelFraction = DEFAULT_SETTINGS.travelFraction,
   bandWidth = DEFAULT_SETTINGS.bandWidth,
+  preInrushLeadSec = DEFAULT_SETTINGS.preInrushLeadSec,
   sleeveInnerGap = DEFAULT_SETTINGS.sleeveInnerGap,
   sleeveThickness = DEFAULT_SETTINGS.sleeveThickness,
   inrushDurationSec = DEFAULT_SETTINGS.inrushDurationSec,
@@ -181,6 +196,7 @@ export const DepolarizationParticles = ({
       wavePeriodSec,
       travelFraction,
       bandWidth,
+      preInrushLeadSec,
       sleeveInnerGap,
       sleeveThickness,
       inrushDurationSec,
@@ -192,6 +208,7 @@ export const DepolarizationParticles = ({
       wavePeriodSec,
       travelFraction,
       bandWidth,
+      preInrushLeadSec,
       sleeveInnerGap,
       sleeveThickness,
       inrushDurationSec,
@@ -257,6 +274,7 @@ export const DepolarizationParticles = ({
     const center = new Vector3();
     const normal = new Vector3();
     const binormal = new Vector3();
+    const tangent = new Vector3();
     const radialDirection = new Vector3();
 
     sizeNodeRef.current.value = particleSize;
@@ -265,10 +283,14 @@ export const DepolarizationParticles = ({
       const sample = field.samples[field.segmentIndices[i]];
       const t = field.localT[i];
       const distance = sample.startDistance + sample.length * t;
-      const bandOffset = Math.abs(distance - waveDistance);
+      const organicDistance =
+        distance +
+        field.axialJitter[i] * bandWidth * 0.32 +
+        Math.sin(elapsed * 1.65 + field.phaseJitter[i]) * bandWidth * 0.08;
+      const bandOffset = Math.abs(organicDistance - waveDistance);
       const bandAlpha = Math.exp(-Math.pow(bandOffset / (bandWidth * 0.42), 2));
       const gateAlpha = smoothstep(field.gates[i], 1, bandAlpha);
-      const arrivalAge = (waveDistance - distance) / waveSpeed;
+      const arrivalAge = (waveDistance - organicDistance) / waveSpeed;
       const inrushProgress = MathUtils.clamp(
         (arrivalAge * field.speedJitter[i]) / inrushDurationSec,
         0,
@@ -276,7 +298,7 @@ export const DepolarizationParticles = ({
       );
       const visible =
         cycleTime <= travelSec &&
-        arrivalAge >= -0.08 &&
+        arrivalAge >= -preInrushLeadSec &&
         arrivalAge <= inrushDurationSec / field.speedJitter[i] &&
         gateAlpha > 0.001;
       const posIndex = i * 3;
@@ -296,22 +318,23 @@ export const DepolarizationParticles = ({
       const frameT = t * FRAME_STEPS;
       const frameIndex = Math.min(FRAME_STEPS - 1, Math.floor(frameT));
       const frameMix = frameT - frameIndex;
-      const easedInrush =
-        inrushProgress * inrushProgress * (3 - 2 * inrushProgress);
+      const easedInrush = Math.pow(inrushProgress, 0.42);
       const radiusAtT = MathUtils.lerp(
         sample.segment.radiusStart,
         sample.segment.radiusEnd,
         t,
       );
       const radialDistance = MathUtils.lerp(
-        radiusAtT + field.radialOffsets[i],
-        radiusAtT * 0.16,
+        radiusAtT + field.radialOffsets[i] * field.radialJitter[i],
+        -radiusAtT * (0.18 + 0.3 * field.radialJitter[i]),
         easedInrush,
       );
       const angle =
         field.angles[i] + elapsed * (0.45 + field.speedJitter[i] * 0.18);
 
       sample.segment.curve.getPointAt(t, center);
+      sample.segment.curve.getTangentAt(t, tangent);
+      center.addScaledVector(tangent, field.axialJitter[i] * bandWidth * 0.04);
       normal
         .copy(sample.frames.normals[frameIndex])
         .lerp(sample.frames.normals[frameIndex + 1], frameMix)
@@ -327,8 +350,14 @@ export const DepolarizationParticles = ({
         .normalize();
       center.addScaledVector(radialDirection, radialDistance);
 
-      const fadeOut = 1 - smoothstep(0.72, 1, inrushProgress);
-      const alpha = gateAlpha * fadeOut * field.intensity[i] * 0.95;
+      const spawnRamp = smoothstep(-preInrushLeadSec, 0.18, arrivalAge);
+      const inrushGlow = smoothstep(0, 0.86, inrushProgress);
+      const intensityRamp = MathUtils.lerp(
+        0.2,
+        1,
+        Math.max(spawnRamp, inrushGlow),
+      );
+      const alpha = gateAlpha * intensityRamp * field.intensity[i] * 0.95;
       positions[posIndex] = center.x;
       positions[posIndex + 1] = center.y;
       positions[posIndex + 2] = center.z;

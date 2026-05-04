@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import App from "@/App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NuqsAdapter } from "nuqs/adapters/react";
 import { createRoot } from "react-dom/client";
 
 import "@/style/globals.css";
@@ -17,7 +18,9 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <SoundcloudContextProvider>
-          <App />
+          <NuqsAdapter>
+            <App />
+          </NuqsAdapter>
         </SoundcloudContextProvider>
       </ThemeProvider>
     </QueryClientProvider>

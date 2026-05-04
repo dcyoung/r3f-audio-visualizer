@@ -7,6 +7,7 @@ import {
   APPLICATION_MODE,
   type TApplicationMode,
 } from "@/lib/applicationModes";
+import { UrlStateSync } from "@/lib/urlState";
 
 import { useAppStateActions, useMode } from "./lib/appState";
 
@@ -44,6 +45,7 @@ const App = () => {
 
   return (
     <main className="relative h-[100dvh] w-[100dvw] bg-black">
+      <UrlStateSync />
       <div
         className="absolute h-[100dvh] w-[100dvw]"
         onMouseDown={noteCanvasInteraction}

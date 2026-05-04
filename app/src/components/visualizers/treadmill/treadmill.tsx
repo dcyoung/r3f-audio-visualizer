@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import { easeInOut, EASING_FUNCTION } from "@/lib/easing";
 import { COORDINATE_TYPE } from "@/lib/mappers/coordinateMappers/common";
@@ -56,18 +56,25 @@ export const Treadmill = ({
 
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
-  useEffect(() => {
-    if (!stoneRef.current) {
+  useLayoutEffect(() => {
+    const stones = stoneRef.current;
+    const hadInstanceColor = Boolean(stones?.instanceColor);
+
+    if (!stones) {
       return;
     }
     for (let instanceIdx = 0; instanceIdx < nStones; instanceIdx++) {
-      stoneRef.current.setColorAt(
-        instanceIdx,
-        lut.getColor(instanceIdx / (nStones - 1)),
-      );
+      stones.setColorAt(instanceIdx, lut.getColor(instanceIdx / (nStones - 1)));
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    stoneRef.current.instanceColor!.needsUpdate = true;
+    stones.instanceColor!.needsUpdate = true;
+
+    if (!hadInstanceColor) {
+      const material = Array.isArray(stones.material)
+        ? stones.material[0]
+        : stones.material;
+      material.needsUpdate = true;
+    }
   }, [stoneRef, lut, nStones]);
 
   useFrame(({ elapsed }) => {

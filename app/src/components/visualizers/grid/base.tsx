@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
@@ -32,7 +32,10 @@ const BaseGrid = ({
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    const hadInstanceColor = Boolean(mesh?.instanceColor);
+
     if (!lut || !meshRef.current) {
       return;
     }
@@ -50,12 +53,20 @@ const BaseGrid = ({
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     meshRef.current.instanceColor!.needsUpdate = true;
+
+    if (!hadInstanceColor) {
+      const material = Array.isArray(meshRef.current.material)
+        ? meshRef.current.material[0]
+        : meshRef.current.material;
+      material.needsUpdate = true;
+    }
   });
 
   useFrame(({ elapsed }) => {
     if (!meshRef.current) {
       return;
     }
+
     const elapsedTimeSec = elapsed;
     const gridSizeX = nGridRows * cubeSpacingScalar * cubeSideLength;
     const gridSizeY = nGridCols * cubeSpacingScalar * cubeSideLength;

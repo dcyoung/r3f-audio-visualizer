@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { ScalarMovingAvgEventDetector } from "@/lib/analyzers/scalarEventDetector";
 import { usePalette } from "@/lib/appState";
 import { clip, easeInOut, lerp } from "@/lib/easing";
@@ -56,18 +56,28 @@ const BaseBoxes = ({
   }, [nBoxes, nRows, nCols]);
 
   //   Recolor;
-  useEffect(() => {
-    if (!meshRef.current) {
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    const hadInstanceColor = Boolean(mesh?.instanceColor);
+
+    if (!mesh) {
       return;
     }
     for (let instanceIdx = 0; instanceIdx < nBoxes; instanceIdx++) {
-      meshRef.current.setColorAt(
+      mesh.setColorAt(
         instanceIdx,
         lut.getColor(instanceIdx / (nBoxes - 1)),
       );
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    meshRef.current.instanceColor!.needsUpdate = true;
+    mesh.instanceColor!.needsUpdate = true;
+
+    if (!hadInstanceColor) {
+      const material = Array.isArray(mesh.material)
+        ? mesh.material[0]
+        : mesh.material;
+      material.needsUpdate = true;
+    }
   }, [lut, nBoxes]);
 
   useFrame(() => {

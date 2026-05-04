@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
@@ -33,15 +33,25 @@ const BaseSphere = ({
   const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
   const lut = ColorPalette.getPalette(palette).buildLut();
-  useEffect(() => {
-    if (!meshRef.current) {
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    const hadInstanceColor = Boolean(mesh?.instanceColor);
+
+    if (!mesh) {
       return;
     }
     for (let i = 0; i < nPoints; i++) {
-      meshRef.current.setColorAt(i, lut.getColor(i / nPoints));
+      mesh.setColorAt(i, lut.getColor(i / nPoints));
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    meshRef.current.instanceColor!.needsUpdate = true;
+    mesh.instanceColor!.needsUpdate = true;
+
+    if (!hadInstanceColor) {
+      const material = Array.isArray(mesh.material)
+        ? mesh.material[0]
+        : mesh.material;
+      material.needsUpdate = true;
+    }
   }, [lut, meshRef, nPoints]);
 
   useFrame(({ elapsed }) => {

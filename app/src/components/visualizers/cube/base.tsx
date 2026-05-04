@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
@@ -36,8 +36,11 @@ const BaseCube = ({
   const lut = ColorPalette.getPalette(palette).buildLut();
 
   // Recolor
-  useEffect(() => {
-    if (!meshRef.current) {
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    const hadInstanceColor = Boolean(mesh?.instanceColor);
+
+    if (!mesh) {
       return;
     }
     let instanceIdx, normCubeX, normCubeY, normCubeZ, normRadialOffset;
@@ -66,15 +69,19 @@ const BaseCube = ({
             // interior
             normRadialOffset = 0;
           }
-          meshRef.current.setColorAt(
-            instanceIdx,
-            lut.getColor(normRadialOffset),
-          );
+          mesh.setColorAt(instanceIdx, lut.getColor(normRadialOffset));
         }
       }
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    meshRef.current.instanceColor!.needsUpdate = true;
+    mesh.instanceColor!.needsUpdate = true;
+
+    if (!hadInstanceColor) {
+      const material = Array.isArray(mesh.material)
+        ? mesh.material[0]
+        : mesh.material;
+      material.needsUpdate = true;
+    }
   });
 
   useFrame(({ elapsed }) => {

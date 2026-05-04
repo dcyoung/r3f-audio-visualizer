@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useMemo, useRef } from "react";
+import { forwardRef, useLayoutEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import {
   COORDINATE_TYPE,
@@ -160,8 +160,11 @@ export const BaseDoubleHelix = forwardRef<
     const tmpQuat = useMemo(() => new Quaternion(), []);
     const upVec = useMemo(() => new Vector3(0, 0, 1), []);
 
-    useEffect(() => {
-      if (!refBaseMesh.current) {
+    useLayoutEffect(() => {
+      const baseMesh = refBaseMesh.current;
+      const hadInstanceColor = Boolean(baseMesh?.instanceColor);
+
+      if (!baseMesh) {
         return;
       }
       for (let bpIdx = 0; bpIdx < nBasePairs; bpIdx++) {
@@ -175,18 +178,25 @@ export const BaseDoubleHelix = forwardRef<
         // Base A
         tmpMatrix.setPosition(tmpVecA);
         tmpMatrix.lookAt(tmpVecA, tmpVecB, upVec);
-        refBaseMesh.current.setMatrixAt(bpIdx * 2, tmpMatrix);
-        refBaseMesh.current.setColorAt(bpIdx * 2, lut.getColor(tagA / 3));
+        baseMesh.setMatrixAt(bpIdx * 2, tmpMatrix);
+        baseMesh.setColorAt(bpIdx * 2, lut.getColor(tagA / 3));
 
         // Base B
         tmpMatrix.setPosition(tmpVecB);
         tmpMatrix.lookAt(tmpVecB, tmpVecA, upVec);
-        refBaseMesh.current.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
-        refBaseMesh.current.setColorAt(bpIdx * 2 + 1, lut.getColor(tagB / 3));
+        baseMesh.setMatrixAt(bpIdx * 2 + 1, tmpMatrix);
+        baseMesh.setColorAt(bpIdx * 2 + 1, lut.getColor(tagB / 3));
       }
-      refBaseMesh.current.instanceMatrix.needsUpdate = true;
+      baseMesh.instanceMatrix.needsUpdate = true;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      refBaseMesh.current.instanceColor!.needsUpdate = true;
+      baseMesh.instanceColor!.needsUpdate = true;
+
+      if (!hadInstanceColor) {
+        const material = Array.isArray(baseMesh.material)
+          ? baseMesh.material[0]
+          : baseMesh.material;
+        material.needsUpdate = true;
+      }
     }, [
       curveHelixA,
       curveHelixB,

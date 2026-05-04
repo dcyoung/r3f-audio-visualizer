@@ -20,7 +20,13 @@
     "target": "ESNext",
     "useDefineForClassFields": true
   },
-  "exclude": ["node_modules", "dist", "scratch", "vite.config.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "scratch",
+    "vite.config.ts",
+    "**/*.test.ts"
+  ],
   "include": ["src", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.cjs"],
   "references": [
     {

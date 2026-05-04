@@ -11,6 +11,8 @@ import {
 } from "three/webgpu";
 
 import { type DendriteSegment } from "./base";
+import { kEffluxDrive, naInfluxDrive } from "./hhModel";
+import { type NeuronSimSampler } from "./useNeuronSimulation";
 
 const TWO_PI = Math.PI * 2;
 const FRAME_STEPS = 72;
@@ -26,6 +28,10 @@ type DepolarizationSettings = {
   sleeveThickness: number;
   inrushDurationSec: number;
   color: string;
+  effluxEnabled: boolean;
+  effluxColor: string;
+  effluxLagDistance: number;
+  effluxParticleFraction: number;
 };
 
 const DEFAULT_SETTINGS: DepolarizationSettings = {
@@ -39,7 +45,14 @@ const DEFAULT_SETTINGS: DepolarizationSettings = {
   sleeveThickness: 0.78,
   inrushDurationSec: 1.25,
   color: "#9dfcff",
+  effluxEnabled: false,
+  effluxColor: "#ff9ec8",
+  effluxLagDistance: 1.35,
+  effluxParticleFraction: 0.35,
 };
+
+/** Matches default `bandWidth` for tuning efflux lag in callers. */
+export const DEFAULT_DEPOLARIZATION_BAND_WIDTH = DEFAULT_SETTINGS.bandWidth;
 
 type SegmentFrames = ReturnType<
   DendriteSegment["curve"]["computeFrenetFrames"]
@@ -66,6 +79,7 @@ type ParticleField = {
   gates: Float32Array;
   speedJitter: Float32Array;
   intensity: Float32Array;
+  isEfflux: Uint8Array;
 };
 
 const random = (seed: number) => MathUtils.seededRandom(seed);
@@ -126,8 +140,23 @@ const buildParticleField = (
   const gates = new Float32Array(settings.particleCount);
   const speedJitter = new Float32Array(settings.particleCount);
   const intensity = new Float32Array(settings.particleCount);
+  const isEfflux = new Uint8Array(settings.particleCount);
+
+  const effluxCount =
+    settings.effluxEnabled && settings.effluxParticleFraction > 0
+      ? Math.min(
+          settings.particleCount,
+          Math.floor(
+            settings.particleCount * settings.effluxParticleFraction,
+          ),
+        )
+      : 0;
 
   for (let i = 0; i < settings.particleCount; i += 1) {
+    const eff = i < effluxCount ? 1 : 0;
+    isEfflux[i] = eff;
+    const es = eff * 901_333;
+
     const distancePick = random(9301 + i * 17) * totalLength;
     let segmentIndex = 0;
 
@@ -139,17 +168,17 @@ const buildParticleField = (
     }
 
     segmentIndices[i] = segmentIndex;
-    localT[i] = random(14033 + i * 23);
-    angles[i] = random(20939 + i * 31) * TWO_PI;
+    localT[i] = random(14033 + i * 23 + es);
+    angles[i] = random(20939 + i * 31 + es) * TWO_PI;
     radialOffsets[i] =
       settings.sleeveInnerGap +
-      settings.sleeveThickness * (0.16 + 0.84 * random(28057 + i * 43));
-    axialJitter[i] = random(31249 + i * 41) * 2 - 1;
-    radialJitter[i] = 0.78 + 0.44 * random(33289 + i * 37);
-    phaseJitter[i] = random(35027 + i * 29) * TWO_PI;
-    gates[i] = 0.08 + 0.56 * random(36061 + i * 47);
-    speedJitter[i] = 0.76 + 0.48 * random(44071 + i * 53);
-    intensity[i] = 0.55 + 0.45 * random(52081 + i * 59);
+      settings.sleeveThickness * (0.16 + 0.84 * random(28057 + i * 43 + es));
+    axialJitter[i] = random(31249 + i * 41 + es) * 2 - 1;
+    radialJitter[i] = 0.78 + 0.44 * random(33289 + i * 37 + es);
+    phaseJitter[i] = random(35027 + i * 29 + es) * TWO_PI;
+    gates[i] = 0.08 + 0.56 * random(36061 + i * 47 + es);
+    speedJitter[i] = 0.76 + 0.48 * random(44071 + i * 53 + es);
+    intensity[i] = 0.55 + 0.45 * random(52081 + i * 59 + es);
   }
 
   return {
@@ -166,6 +195,7 @@ const buildParticleField = (
     gates,
     speedJitter,
     intensity,
+    isEfflux,
   };
 };
 
@@ -181,14 +211,23 @@ export const DepolarizationParticles = ({
   sleeveThickness = DEFAULT_SETTINGS.sleeveThickness,
   inrushDurationSec = DEFAULT_SETTINGS.inrushDurationSec,
   color = DEFAULT_SETTINGS.color,
+  effluxEnabled = DEFAULT_SETTINGS.effluxEnabled,
+  effluxColor = DEFAULT_SETTINGS.effluxColor,
+  effluxLagDistance = DEFAULT_SETTINGS.effluxLagDistance,
+  effluxParticleFraction = DEFAULT_SETTINGS.effluxParticleFraction,
+  samplerRef,
 }: {
   segments: DendriteSegment[];
+  samplerRef?: RefObject<NeuronSimSampler | null>;
 } & Partial<DepolarizationSettings>) => {
   const spriteRef = useRef<Sprite>(null);
   const posAttrRef = useRef<InstancedBufferAttribute | null>(null);
   const colorAttrRef = useRef<InstancedBufferAttribute | null>(null);
   const sizeNodeRef = useRef(tslUniform(particleSize));
+  /** Smoothed sim axial band center to avoid frame-to-frame shimmer. */
+  const bandSmoothRef = useRef<number | null>(null);
   const glowColor = useMemo(() => new Color(color), [color]);
+  const effluxGlowColor = useMemo(() => new Color(effluxColor), [effluxColor]);
   const settings = useMemo(
     () => ({
       particleCount,
@@ -201,6 +240,10 @@ export const DepolarizationParticles = ({
       sleeveThickness,
       inrushDurationSec,
       color,
+      effluxEnabled,
+      effluxColor,
+      effluxLagDistance,
+      effluxParticleFraction,
     }),
     [
       particleCount,
@@ -213,6 +256,10 @@ export const DepolarizationParticles = ({
       sleeveThickness,
       inrushDurationSec,
       color,
+      effluxEnabled,
+      effluxColor,
+      effluxLagDistance,
+      effluxParticleFraction,
     ],
   );
   const field = useMemo(
@@ -255,7 +302,7 @@ export const DepolarizationParticles = ({
     };
   }, [particleCount]);
 
-  useFrame(({ elapsed }) => {
+  useFrame(({ elapsed, delta }) => {
     const posAttr = posAttrRef.current;
     const colorAttr = colorAttrRef.current;
     if (!posAttr || !colorAttr || field.samples.length === 0) {
@@ -264,12 +311,53 @@ export const DepolarizationParticles = ({
 
     const positions = posAttr.array as Float32Array;
     const colors = colorAttr.array as Float32Array;
+    const sim = samplerRef?.current ?? null;
+    const drives = sim?.getSmoothedDrives() ?? {
+      na: 0,
+      k: 0,
+      dVmDt: 0,
+      naSlow: 0,
+      kSlow: 0,
+      vmSlow: 0,
+      dVmSlow: 0,
+    };
+
     const travelSec = wavePeriodSec * travelFraction;
     const cycleTime = elapsed % wavePeriodSec;
     const waveProgress = MathUtils.clamp(cycleTime / travelSec, 0, 1);
-    const waveDistance =
+    const waveDistanceLegacy =
       -bandWidth * 0.5 + waveProgress * (field.maxDistance + bandWidth);
-    const waveSpeed = (field.maxDistance + bandWidth) / travelSec;
+    const waveSpeedLegacy = (field.maxDistance + bandWidth) / travelSec;
+
+    let waveDistanceSim = 0;
+    if (sim) {
+      const vNorm = MathUtils.clamp((drives.vmSlow + 26) / 92, 0, 1);
+      const span = field.maxDistance + bandWidth;
+      const na = drives.na * 0.35 + drives.naSlow * 0.65;
+      const k = drives.k * 0.35 + drives.kSlow * 0.65;
+      // HH-driven axial hint (no legacy sweep). Cap how far distal the global
+      // center can sit so a spike does not park the Gaussian past most of the tree.
+      const axial = MathUtils.clamp(
+        0.34 + 0.44 * vNorm + 0.15 * na - 0.1 * k,
+        0.18,
+        0.62,
+      );
+      const wobble = 0.032 * Math.sin(elapsed * 0.52);
+      const rawBand = MathUtils.clamp(
+        -bandWidth * 0.5 + span * (axial + wobble),
+        -bandWidth * 0.35,
+        -bandWidth * 0.5 + span * 0.62,
+      );
+      const dt = Math.min(delta, 0.1);
+      const bandA = 1 - Math.exp(-dt * 3.8);
+      const prevB = bandSmoothRef.current;
+      bandSmoothRef.current =
+        prevB === null ? rawBand : prevB + bandA * (rawBand - prevB);
+      waveDistanceSim = bandSmoothRef.current;
+    }
+
+    const waveSpeedSim = (field.maxDistance + bandWidth) / 3.2;
+    const effluxLag = effluxEnabled ? effluxLagDistance : 0;
     const hiddenZ = -1000;
     const center = new Vector3();
     const normal = new Vector3();
@@ -282,25 +370,71 @@ export const DepolarizationParticles = ({
     for (let i = 0; i < particleCount; i += 1) {
       const sample = field.samples[field.segmentIndices[i]];
       const t = field.localT[i];
+      const isEff = field.isEfflux[i] === 1;
+      const waveDistance = sim ? waveDistanceSim : waveDistanceLegacy;
+      const waveSpeed = sim ? waveSpeedSim : waveSpeedLegacy;
+      const bandCenter = isEff ? waveDistance - effluxLag : waveDistance;
+      const tint = isEff ? effluxGlowColor : glowColor;
       const distance = sample.startDistance + sample.length * t;
       const organicDistance =
         distance +
         field.axialJitter[i] * bandWidth * 0.32 +
         Math.sin(elapsed * 1.65 + field.phaseJitter[i]) * bandWidth * 0.08;
-      const bandOffset = Math.abs(organicDistance - waveDistance);
-      const bandAlpha = Math.exp(-Math.pow(bandOffset / (bandWidth * 0.42), 2));
-      const gateAlpha = smoothstep(field.gates[i], 1, bandAlpha);
-      const arrivalAge = (waveDistance - organicDistance) / waveSpeed;
-      const inrushProgress = MathUtils.clamp(
-        (arrivalAge * field.speedJitter[i]) / inrushDurationSec,
-        0,
-        1,
-      );
-      const visible =
-        cycleTime <= travelSec &&
-        arrivalAge >= -preInrushLeadSec &&
-        arrivalAge <= inrushDurationSec / field.speedJitter[i] &&
-        gateAlpha > 0.001;
+
+      let gateAlpha: number;
+      let arrivalAge: number;
+      let effInrushSec: number;
+      let visible: boolean;
+      let inrushProgress: number;
+      let ionWeightMul = 1;
+
+      if (sim) {
+        const tau = Math.max(0, organicDistance * sim.conductionMsPerWorldUnit);
+        const hist = isEff ? sim.sampleEfflux(tau) : sim.sample(tau);
+        const localDrive = isEff
+          ? kEffluxDrive(hist.IK)
+          : naInfluxDrive(hist.INa);
+        // Full-axon envelope: no narrow Gaussian vs bandCenter. Propagation along the
+        // fiber is read from sample(tau) / localDrive; distance no longer masks that.
+        gateAlpha = 1;
+        ionWeightMul = MathUtils.clamp(0.28 + 0.72 * localDrive, 0.22, 1);
+        const naR = drives.na * 0.4 + drives.naSlow * 0.6;
+        const kR = drives.k * 0.4 + drives.kSlow * 0.6;
+        const rateBoost =
+          0.38 +
+          0.62 *
+            (isEff
+              ? Math.max(localDrive, kR * 0.55)
+              : Math.max(localDrive, naR * 0.55));
+        effInrushSec =
+          inrushDurationSec / MathUtils.clamp(rateBoost, 0.45, 1.85);
+        arrivalAge = (bandCenter - organicDistance) / waveSpeed;
+        const inrushProgressSim = MathUtils.clamp(
+          (arrivalAge * field.speedJitter[i]) / effInrushSec,
+          0,
+          1,
+        );
+        visible = true;
+        inrushProgress = inrushProgressSim;
+      } else {
+        const bandOffset = Math.abs(organicDistance - bandCenter);
+        const bandEnvelope = Math.exp(
+          -Math.pow(bandOffset / (bandWidth * 0.42), 2),
+        );
+        gateAlpha = smoothstep(field.gates[i], 1, bandEnvelope);
+        arrivalAge = (bandCenter - organicDistance) / waveSpeed;
+        effInrushSec = inrushDurationSec;
+        inrushProgress = MathUtils.clamp(
+          (arrivalAge * field.speedJitter[i]) / effInrushSec,
+          0,
+          1,
+        );
+        visible =
+          cycleTime <= travelSec &&
+          arrivalAge >= -preInrushLeadSec &&
+          arrivalAge <= effInrushSec / field.speedJitter[i] &&
+          gateAlpha > 0.001;
+      }
       const posIndex = i * 3;
       const colorIndex = i * 4;
 
@@ -308,9 +442,9 @@ export const DepolarizationParticles = ({
         positions[posIndex] = 0;
         positions[posIndex + 1] = 0;
         positions[posIndex + 2] = hiddenZ;
-        colors[colorIndex] = glowColor.r;
-        colors[colorIndex + 1] = glowColor.g;
-        colors[colorIndex + 2] = glowColor.b;
+        colors[colorIndex] = tint.r;
+        colors[colorIndex + 1] = tint.g;
+        colors[colorIndex + 2] = tint.b;
         colors[colorIndex + 3] = 0;
         continue;
       }
@@ -318,19 +452,25 @@ export const DepolarizationParticles = ({
       const frameT = t * FRAME_STEPS;
       const frameIndex = Math.min(FRAME_STEPS - 1, Math.floor(frameT));
       const frameMix = frameT - frameIndex;
-      const easedInrush = Math.pow(inrushProgress, 0.42);
+      const baseExp = isEff ? 0.36 : 0.42;
+      const expTweak = sim
+        ? MathUtils.clamp(0.06 * drives.dVmSlow, 0, 0.07)
+        : 0;
+      const easedInrush = Math.pow(inrushProgress, baseExp - expTweak);
       const radiusAtT = MathUtils.lerp(
         sample.segment.radiusStart,
         sample.segment.radiusEnd,
         t,
       );
-      const radialDistance = MathUtils.lerp(
-        radiusAtT + field.radialOffsets[i] * field.radialJitter[i],
-        -radiusAtT * (0.18 + 0.3 * field.radialJitter[i]),
-        easedInrush,
-      );
+      const outerR = radiusAtT + field.radialOffsets[i] * field.radialJitter[i];
+      const innerR = -radiusAtT * (0.18 + 0.3 * field.radialJitter[i]);
+      const radialDistance = isEff
+        ? MathUtils.lerp(innerR, outerR, easedInrush)
+        : MathUtils.lerp(outerR, innerR, easedInrush);
+      const spinMul = sim ? 1 + 0.2 * drives.dVmSlow : 1;
       const angle =
-        field.angles[i] + elapsed * (0.45 + field.speedJitter[i] * 0.18);
+        field.angles[i] +
+        elapsed * (0.45 + field.speedJitter[i] * 0.18) * spinMul;
 
       sample.segment.curve.getPointAt(t, center);
       sample.segment.curve.getTangentAt(t, tangent);
@@ -357,13 +497,14 @@ export const DepolarizationParticles = ({
         1,
         Math.max(spawnRamp, inrushGlow),
       );
-      const alpha = gateAlpha * intensityRamp * field.intensity[i] * 0.95;
+      const alpha =
+        gateAlpha * intensityRamp * field.intensity[i] * 0.95 * ionWeightMul;
       positions[posIndex] = center.x;
       positions[posIndex + 1] = center.y;
       positions[posIndex + 2] = center.z;
-      colors[colorIndex] = glowColor.r;
-      colors[colorIndex + 1] = glowColor.g;
-      colors[colorIndex + 2] = glowColor.b;
+      colors[colorIndex] = tint.r;
+      colors[colorIndex + 1] = tint.g;
+      colors[colorIndex + 2] = tint.b;
       colors[colorIndex + 3] = alpha;
     }
 

@@ -2,11 +2,26 @@ import { useMemo } from "react";
 import { type TVisualProps } from "@/components/visualizers/models";
 
 import { buildNeuronSegments, NeuronModel } from "./base";
-import { DepolarizationParticles } from "./depolarization";
+import {
+  DEFAULT_DEPOLARIZATION_BAND_WIDTH,
+  DepolarizationParticles,
+} from "./depolarization";
+import {
+  DEFAULT_SIM_TIME_SCALE,
+  useNeuronSimulation,
+} from "./useNeuronSimulation";
 
 const NeuronVisual = (props: TVisualProps) => {
   void props;
   const segments = useMemo(() => buildNeuronSegments(), []);
+  /** Higher = more sim-ms delay per world unit along the axon (slower apparent spread). */
+  const conductionMsPerWorldUnit = 28;
+  const { samplerRef } = useNeuronSimulation({
+    stimulusKeyHold: true,
+    simTimeScale: DEFAULT_SIM_TIME_SCALE,
+    conductionMsPerWorldUnit,
+    effluxLagMs: DEFAULT_DEPOLARIZATION_BAND_WIDTH * conductionMsPerWorldUnit * 0.55,
+  });
 
   return (
     <>
@@ -28,7 +43,13 @@ const NeuronVisual = (props: TVisualProps) => {
         />
       </mesh>
       <NeuronModel segments={segments}>
-        <DepolarizationParticles segments={segments} />
+        <DepolarizationParticles
+          segments={segments}
+          samplerRef={samplerRef}
+          effluxEnabled
+          effluxLagDistance={DEFAULT_DEPOLARIZATION_BAND_WIDTH * 0.55}
+          effluxParticleFraction={0.35}
+        />
       </NeuronModel>
     </>
   );

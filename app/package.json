@@ -10,6 +10,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "test": "bun test",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --check \"**/*.{js,cjs,mjs,ts,tsx,md,json}\"",

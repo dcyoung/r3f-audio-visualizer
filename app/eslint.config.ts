@@ -75,7 +75,7 @@ const reactConfig = defineConfig(
 
 export default defineConfig(
   {
-    ignores: ["dist/**"],
+    ignores: ["dist/**", "**/*.test.ts"],
   },
   baseConfig,
   reactConfig,

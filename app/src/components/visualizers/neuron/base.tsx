@@ -26,7 +26,7 @@ export type DendriteSegment = {
   radiusEnd: number;
 };
 
-type NeuronConfig = {
+export type NeuronConfig = {
   seed: number;
   somaRadius: number;
   primaryCount: number;
@@ -92,8 +92,14 @@ const createDendriteCurve = (
       .clone()
       .addScaledVector(forward, length * 0.24)
       .addScaledVector(normal, length * 0.1 * (random(seed + 4) - 0.5)),
-    start.clone().addScaledVector(forward, length * 0.52).add(firstBend),
-    start.clone().addScaledVector(forward, length * 0.8).add(secondBend),
+    start
+      .clone()
+      .addScaledVector(forward, length * 0.52)
+      .add(firstBend),
+    start
+      .clone()
+      .addScaledVector(forward, length * 0.8)
+      .add(secondBend),
     start
       .clone()
       .addScaledVector(forward, length)
@@ -247,7 +253,9 @@ const createOrganicSomaGeometry = (
   const geometry = new SphereGeometry(radius, 96, 48);
   const position = geometry.attributes.position;
   const vertex = new Vector3();
-  const primarySegments = segments.filter((segment) => segment.parentId === null);
+  const primarySegments = segments.filter(
+    (segment) => segment.parentId === null,
+  );
 
   for (let i = 0; i < position.count; i += 1) {
     vertex.fromBufferAttribute(position, i).normalize();
@@ -326,17 +334,26 @@ const createTaperedTubeGeometry = (
   return geometry;
 };
 
-export const NeuronModel = (props: Omit<ThreeElements["group"], "children">) => {
+type NeuronModelProps = ThreeElements["group"] & {
+  segments?: DendriteSegment[];
+};
+
+export const NeuronModel = ({
+  children,
+  segments,
+  ...props
+}: NeuronModelProps) => {
   const groupRef = useRef<Group>(null);
-  const segments = useMemo(() => buildNeuronSegments(), []);
+  const generatedSegments = useMemo(() => buildNeuronSegments(), []);
+  const modelSegments = segments ?? generatedSegments;
   const somaGeometry = useMemo(
     () =>
       createOrganicSomaGeometry(
         DEFAULT_CONFIG.somaRadius,
         DEFAULT_CONFIG.seed,
-        segments,
+        modelSegments,
       ),
-    [segments],
+    [modelSegments],
   );
   const somaMaterial = useMemo(
     () =>
@@ -358,7 +375,7 @@ export const NeuronModel = (props: Omit<ThreeElements["group"], "children">) => 
   );
   const dendriteGeometries = useMemo(
     () =>
-      segments.map((segment) => ({
+      modelSegments.map((segment) => ({
         id: segment.id,
         geometry: createTaperedTubeGeometry(
           segment.curve,
@@ -368,7 +385,7 @@ export const NeuronModel = (props: Omit<ThreeElements["group"], "children">) => 
           DEFAULT_CONFIG.radialSegments,
         ),
       })),
-    [segments],
+    [modelSegments],
   );
 
   useFrame(({ elapsed }) => {
@@ -387,6 +404,7 @@ export const NeuronModel = (props: Omit<ThreeElements["group"], "children">) => 
       {dendriteGeometries.map(({ id, geometry }) => (
         <mesh key={id} geometry={geometry} material={dendriteMaterial} />
       ))}
+      {children}
     </group>
   );
 };

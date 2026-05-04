@@ -1,9 +1,12 @@
+import { useMemo } from "react";
 import { type TVisualProps } from "@/components/visualizers/models";
 
-import { NeuronModel } from "./base";
+import { buildNeuronSegments, NeuronModel } from "./base";
+import { DepolarizationParticles } from "./depolarization";
 
 const NeuronVisual = (props: TVisualProps) => {
   void props;
+  const segments = useMemo(() => buildNeuronSegments(), []);
 
   return (
     <>
@@ -14,11 +17,7 @@ const NeuronVisual = (props: TVisualProps) => {
         decay={2}
         color="#8da2ff"
       />
-      <directionalLight
-        position={[0, 2, -5]}
-        intensity={3.2}
-        color="#b8c5ff"
-      />
+      <directionalLight position={[0, 2, -5]} intensity={3.2} color="#b8c5ff" />
       <mesh position={[0, 0, -4.8]} scale={[8, 8, 1]} renderOrder={-1}>
         <circleGeometry args={[1, 64]} />
         <meshBasicMaterial
@@ -28,7 +27,9 @@ const NeuronVisual = (props: TVisualProps) => {
           depthWrite={false}
         />
       </mesh>
-      <NeuronModel />
+      <NeuronModel segments={segments}>
+        <DepolarizationParticles segments={segments} />
+      </NeuronModel>
     </>
   );
 };

@@ -14,6 +14,10 @@ export type NeuronSimSampler = {
   /** Not used for waveform sampling; kept for API compatibility. */
   readonly dtMs: number;
   readonly effluxLagMs: number;
+  /** Global phase (ms) used by `sample` / `sampleEfflux`; matches GPU uniforms. */
+  getPhaseMs(): number;
+  /** Resolved AP parameters (defaults + options) for GPU parity with sampling. */
+  getApproxParams(): ApproxApParams;
   sample(delayMs: number): TStepData;
   sampleEfflux(delayMs: number): TStepData;
   getSmoothedDrives(): {
@@ -68,6 +72,8 @@ export function useNeuronWaveformSampler(options?: {
       conductionMsPerWorldUnit: c,
       effluxLagMs: e,
       dtMs: 1,
+      getPhaseMs: () => phaseMsRef.current,
+      getApproxParams: () => paramsRef.current,
       sample: (delayMs: number) =>
         evaluateApproximateAp(
           phaseMsRef.current - delayMs,

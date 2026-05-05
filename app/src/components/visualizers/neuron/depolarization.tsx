@@ -1,21 +1,36 @@
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, Vector3 } from "three";
 import { instancedBufferAttribute, uniform as tslUniform } from "three/tsl";
 import {
   AdditiveBlending,
+  ClampToEdgeWrapping,
   Color,
+  DataTexture,
+  FloatType,
   InstancedBufferAttribute,
+  NearestFilter,
   PointsNodeMaterial,
+  RGBAFormat,
   type Sprite,
 } from "three/webgpu";
 
 import { type DendriteSegment } from "./base";
-import { kEffluxDrive, naInfluxDrive } from "./hhModel";
+import { DEFAULT_APPROX_AP_PARAMS } from "./canonicalActionPotential";
+import { DEFAULT_DEPOLARIZATION_BAND_WIDTH } from "./depolarizationShared";
+import {
+  AP_DRIVE_LUT_SIZE,
+  fillApDriveLut,
+} from "./depolarizationApDrive";
+import {
+  buildDepolarizationNodes,
+  NEURON_PARTICLE_FRAME_STEPS,
+  type NeuronDepolarizationUniforms,
+} from "./depolarizationNodes";
 import { type NeuronSimSampler } from "./useNeuronWaveformSampler";
 
+const F = NEURON_PARTICLE_FRAME_STEPS;
 const TWO_PI = Math.PI * 2;
-const FRAME_STEPS = 72;
 
 type DepolarizationSettings = {
   particleCount: number;
@@ -39,7 +54,7 @@ const DEFAULT_SETTINGS: DepolarizationSettings = {
   particleSize: 0.075,
   wavePeriodSec: 4.4,
   travelFraction: 0.78,
-  bandWidth: 2.25,
+  bandWidth: DEFAULT_DEPOLARIZATION_BAND_WIDTH,
   preInrushLeadSec: 0.62,
   sleeveInnerGap: 0.34,
   sleeveThickness: 0.78,
@@ -51,45 +66,18 @@ const DEFAULT_SETTINGS: DepolarizationSettings = {
   effluxParticleFraction: 0.35,
 };
 
-/** Matches default `bandWidth` for tuning efflux lag in callers. */
-export const DEFAULT_DEPOLARIZATION_BAND_WIDTH = DEFAULT_SETTINGS.bandWidth;
+export { DEFAULT_DEPOLARIZATION_BAND_WIDTH } from "./depolarizationShared";
 
-type SegmentFrames = ReturnType<
-  DendriteSegment["curve"]["computeFrenetFrames"]
->;
-
-type SegmentSample = {
+type SegmentGpuSample = {
   segment: DendriteSegment;
-  frames: SegmentFrames;
+  frames: ReturnType<DendriteSegment["curve"]["computeFrenetFrames"]>;
   length: number;
   startDistance: number;
 };
 
-type ParticleField = {
-  samples: SegmentSample[];
-  totalLength: number;
-  maxDistance: number;
-  segmentIndices: Uint16Array;
-  localT: Float32Array;
-  angles: Float32Array;
-  radialOffsets: Float32Array;
-  axialJitter: Float32Array;
-  radialJitter: Float32Array;
-  phaseJitter: Float32Array;
-  gates: Float32Array;
-  speedJitter: Float32Array;
-  intensity: Float32Array;
-  isEfflux: Uint8Array;
-};
-
 const random = (seed: number) => MathUtils.seededRandom(seed);
 
-const smoothstep = (edge0: number, edge1: number, value: number) => {
-  const x = MathUtils.clamp((value - edge0) / (edge1 - edge0), 0, 1);
-  return x * x * (3 - 2 * x);
-};
-
-const buildSegmentSamples = (segments: DendriteSegment[]) => {
+const buildSegmentGpuSamples = (segments: DendriteSegment[]): SegmentGpuSample[] => {
   const distancesById = new Map<
     string,
     { length: number; startDistance: number }
@@ -108,18 +96,28 @@ const buildSegmentSamples = (segments: DendriteSegment[]) => {
 
     return {
       segment,
-      frames: segment.curve.computeFrenetFrames(FRAME_STEPS, false),
+      frames: segment.curve.computeFrenetFrames(F, false),
       length,
       startDistance,
     };
   });
 };
 
-const buildParticleField = (
+type GpuParticlePack = {
+  maxDistance: number;
+  aIdxT: Float32Array;
+  aJit: Float32Array;
+  aSpd: Float32Array;
+  framesTex: DataTexture;
+  scalarsTex: DataTexture;
+  dispose: () => void;
+};
+
+const bakeGpuTexturesAndAttrs = (
   segments: DendriteSegment[],
   settings: DepolarizationSettings,
-): ParticleField => {
-  const samples = buildSegmentSamples(segments);
+): GpuParticlePack => {
+  const samples = buildSegmentGpuSamples(segments);
   const cumulativeLengths = new Float32Array(samples.length);
   let totalLength = 0;
   let maxDistance = 0;
@@ -130,17 +128,60 @@ const buildParticleField = (
     maxDistance = Math.max(maxDistance, sample.startDistance + sample.length);
   });
 
-  const segmentIndices = new Uint16Array(settings.particleCount);
-  const localT = new Float32Array(settings.particleCount);
-  const angles = new Float32Array(settings.particleCount);
-  const radialOffsets = new Float32Array(settings.particleCount);
-  const axialJitter = new Float32Array(settings.particleCount);
-  const radialJitter = new Float32Array(settings.particleCount);
-  const phaseJitter = new Float32Array(settings.particleCount);
-  const gates = new Float32Array(settings.particleCount);
-  const speedJitter = new Float32Array(settings.particleCount);
-  const intensity = new Float32Array(settings.particleCount);
-  const isEfflux = new Uint8Array(settings.particleCount);
+  const nSeg = samples.length;
+  const framesW = (F + 1) * 4;
+  const framesH = nSeg;
+  const framesData = new Float32Array(framesW * framesH * 4);
+  const scalarsData = new Float32Array(nSeg * 4);
+
+  samples.forEach((sample, si) => {
+    const { segment, frames, length, startDistance } = sample;
+    const curve = segment.curve;
+    scalarsData[si * 4 + 0] = startDistance;
+    scalarsData[si * 4 + 1] = length;
+    scalarsData[si * 4 + 2] = segment.radiusStart;
+    scalarsData[si * 4 + 3] = segment.radiusEnd;
+
+    for (let i = 0; i <= F; i += 1) {
+      const t = i / F;
+      const p = curve.getPointAt(t, new Vector3());
+      const tg = frames.tangents[i].clone();
+      const nm = frames.normals[i].clone();
+      const bn = frames.binormals[i].clone();
+      const write = (ch: number, v: Vector3) => {
+        const x = i * 4 + ch;
+        const o = (si * framesW + x) * 4;
+        framesData[o] = v.x;
+        framesData[o + 1] = v.y;
+        framesData[o + 2] = v.z;
+        framesData[o + 3] = 0;
+      };
+      write(0, p);
+      write(1, tg);
+      write(2, nm);
+      write(3, bn);
+    }
+  });
+
+  const framesTex = new DataTexture(framesData, framesW, framesH, RGBAFormat, FloatType);
+  framesTex.minFilter = NearestFilter;
+  framesTex.magFilter = NearestFilter;
+  framesTex.wrapS = ClampToEdgeWrapping;
+  framesTex.wrapT = ClampToEdgeWrapping;
+  framesTex.flipY = false;
+  framesTex.needsUpdate = true;
+
+  const scalarsTex = new DataTexture(scalarsData, 1, nSeg, RGBAFormat, FloatType);
+  scalarsTex.minFilter = NearestFilter;
+  scalarsTex.magFilter = NearestFilter;
+  scalarsTex.wrapS = ClampToEdgeWrapping;
+  scalarsTex.wrapT = ClampToEdgeWrapping;
+  scalarsTex.flipY = false;
+  scalarsTex.needsUpdate = true;
+
+  const aIdxT = new Float32Array(settings.particleCount * 4);
+  const aJit = new Float32Array(settings.particleCount * 4);
+  const aSpd = new Float32Array(settings.particleCount * 4);
 
   const effluxCount =
     settings.effluxEnabled && settings.effluxParticleFraction > 0
@@ -154,12 +195,10 @@ const buildParticleField = (
 
   for (let i = 0; i < settings.particleCount; i += 1) {
     const eff = i < effluxCount ? 1 : 0;
-    isEfflux[i] = eff;
     const es = eff * 901_333;
 
     const distancePick = random(9301 + i * 17) * totalLength;
     let segmentIndex = 0;
-
     while (
       segmentIndex < cumulativeLengths.length - 1 &&
       distancePick > cumulativeLengths[segmentIndex]
@@ -167,39 +206,89 @@ const buildParticleField = (
       segmentIndex += 1;
     }
 
-    segmentIndices[i] = segmentIndex;
-    localT[i] = random(14033 + i * 23 + es);
-    angles[i] = random(20939 + i * 31 + es) * TWO_PI;
-    radialOffsets[i] =
+    const o = i * 4;
+    aIdxT[o] = segmentIndex;
+    aIdxT[o + 1] = random(14033 + i * 23 + es);
+    aIdxT[o + 2] = random(20939 + i * 31 + es) * TWO_PI;
+    aIdxT[o + 3] =
       settings.sleeveInnerGap +
       settings.sleeveThickness * (0.16 + 0.84 * random(28057 + i * 43 + es));
-    axialJitter[i] = random(31249 + i * 41 + es) * 2 - 1;
-    radialJitter[i] = 0.78 + 0.44 * random(33289 + i * 37 + es);
-    phaseJitter[i] = random(35027 + i * 29 + es) * TWO_PI;
-    gates[i] = 0.08 + 0.56 * random(36061 + i * 47 + es);
-    speedJitter[i] = 0.76 + 0.48 * random(44071 + i * 53 + es);
-    intensity[i] = 0.55 + 0.45 * random(52081 + i * 59 + es);
+
+    aJit[o] = random(31249 + i * 41 + es) * 2 - 1;
+    aJit[o + 1] = 0.78 + 0.44 * random(33289 + i * 37 + es);
+    aJit[o + 2] = random(35027 + i * 29 + es) * TWO_PI;
+    aJit[o + 3] = 0.08 + 0.56 * random(36061 + i * 47 + es);
+
+    aSpd[o] = 0.76 + 0.48 * random(44071 + i * 53 + es);
+    aSpd[o + 1] = 0.55 + 0.45 * random(52081 + i * 59 + es);
+    aSpd[o + 2] = eff;
+    aSpd[o + 3] = 0;
   }
 
   return {
-    samples,
-    totalLength,
     maxDistance,
-    segmentIndices,
-    localT,
-    angles,
-    radialOffsets,
-    axialJitter,
-    radialJitter,
-    phaseJitter,
-    gates,
-    speedJitter,
-    intensity,
-    isEfflux,
+    aIdxT,
+    aJit,
+    aSpd,
+    framesTex,
+    scalarsTex,
+    dispose: () => {
+      framesTex.dispose();
+      scalarsTex.dispose();
+    },
   };
 };
 
-export const DepolarizationParticles = ({
+function createDepolarizationUniforms(
+  gpu: GpuParticlePack,
+  glowColor: Color,
+  effluxGlowColor: Color,
+  initialParticleSize: number,
+): NeuronDepolarizationUniforms {
+  const ap = DEFAULT_APPROX_AP_PARAMS;
+  const bandW = DEFAULT_SETTINGS.bandWidth;
+  const span = gpu.maxDistance + bandW;
+  return {
+    uTime: tslUniform(0),
+    uPhaseMs: tslUniform(0),
+    uBandCenter: tslUniform(
+      gpu.maxDistance > 0 ? gpu.maxDistance * 0.35 : 2,
+    ),
+    uDriveNa: tslUniform(0),
+    uDriveK: tslUniform(0),
+    uDriveNaSlow: tslUniform(0),
+    uDriveKSlow: tslUniform(0),
+    uDriveVmSlow: tslUniform(0),
+    uDriveDvSlow: tslUniform(0),
+    uMaxDistance: tslUniform(gpu.maxDistance),
+    uBandWidth: tslUniform(bandW),
+    uWaveSpeedSim: tslUniform(span > 0 ? span / 3.2 : 2),
+    uPreInrushLeadSec: tslUniform(DEFAULT_SETTINGS.preInrushLeadSec),
+    uInrushDurationSec: tslUniform(DEFAULT_SETTINGS.inrushDurationSec),
+    uEffluxLagDistance: tslUniform(0),
+    uEffluxLagMs: tslUniform(0),
+    uConductionMsPerWorldUnit: tslUniform(14),
+    uVRest: tslUniform(ap.vRest),
+    uVmAmp: tslUniform(ap.vmAmp),
+    uTauVmFast: tslUniform(ap.tauVmFast),
+    uTauVmSlow: tslUniform(ap.tauVmSlow),
+    uTauNa: tslUniform(ap.tauNa),
+    uAmpNa: tslUniform(ap.ampNa),
+    uTauK: tslUniform(ap.tauK),
+    uAmpK: tslUniform(ap.ampK),
+    uKDelayMs: tslUniform(ap.kDelayMs),
+    uWaveformDurationMs: tslUniform(ap.waveformDurationMs),
+    uRepeatPeriodMs: tslUniform(ap.repeatPeriodMs),
+    uApDriveLutSize: tslUniform(AP_DRIVE_LUT_SIZE - 1),
+    uInfluxColor: tslUniform(new Vector3(glowColor.r, glowColor.g, glowColor.b)),
+    uEffluxColor: tslUniform(
+      new Vector3(effluxGlowColor.r, effluxGlowColor.g, effluxGlowColor.b),
+    ),
+    uParticleSize: tslUniform(initialParticleSize),
+  };
+}
+
+export const DepolarizationParticlesGpu = ({
   segments,
   particleCount = DEFAULT_SETTINGS.particleCount,
   particleSize = DEFAULT_SETTINGS.particleSize,
@@ -218,16 +307,19 @@ export const DepolarizationParticles = ({
   samplerRef,
 }: {
   segments: DendriteSegment[];
-  samplerRef?: RefObject<NeuronSimSampler | null>;
+  samplerRef: RefObject<NeuronSimSampler | null>;
 } & Partial<DepolarizationSettings>) => {
   const spriteRef = useRef<Sprite>(null);
-  const posAttrRef = useRef<InstancedBufferAttribute | null>(null);
-  const colorAttrRef = useRef<InstancedBufferAttribute | null>(null);
-  const sizeNodeRef = useRef(tslUniform(particleSize));
-  /** Smoothed sim axial band center to avoid frame-to-frame shimmer. */
   const bandSmoothRef = useRef<number | null>(null);
   const glowColor = useMemo(() => new Color(color), [color]);
   const effluxGlowColor = useMemo(() => new Color(effluxColor), [effluxColor]);
+
+  /** AP drive LUT — created in `useLayoutEffect` with the points material so Strict Mode cannot dispose it while `attach` is still waiting on `rAF`. */
+  const apDriveLutRef = useRef<{
+    data: Float32Array;
+    texture: DataTexture;
+  } | null>(null);
+
   const settings = useMemo(
     () => ({
       particleCount,
@@ -262,255 +354,208 @@ export const DepolarizationParticles = ({
       effluxParticleFraction,
     ],
   );
-  const field = useMemo(
-    () => buildParticleField(segments, settings),
+
+  const gpuPack = useMemo(
+    () => bakeGpuTexturesAndAttrs(segments, settings),
     [segments, settings],
   );
 
   useEffect(() => {
-    const sprite = spriteRef.current;
-    if (!sprite) {
-      return;
-    }
+    return () => {
+      gpuPack.dispose();
+    };
+  }, [gpuPack]);
 
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 4);
-    const posAttr = new InstancedBufferAttribute(positions, 3);
-    const colorAttr = new InstancedBufferAttribute(colors, 4);
-    posAttrRef.current = posAttr;
-    colorAttrRef.current = colorAttr;
+  const uniformsRef = useRef<NeuronDepolarizationUniforms | null>(null);
 
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const material = new PointsNodeMaterial({
-      transparent: true,
-      depthWrite: false,
-      blending: AdditiveBlending as any,
-      sizeNode: sizeNodeRef.current as any,
-    });
-    (material as any).positionNode = instancedBufferAttribute(posAttr);
-    (material as any).colorNode = instancedBufferAttribute(colorAttr, "vec4");
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+  /** WebGPU: instanced `Sprite` + `PointsNodeMaterial`; baked atlases + `textureLoad`; split TSL `Fn`s for position/color. */
+  useLayoutEffect(() => {
+    let cancelled = false;
+    let rafId = 0;
+    let material: PointsNodeMaterial | null = null;
+    let attempts = 0;
+    const maxRafAttempts = 64;
+    let spriteMaterialHost: Sprite | null = null;
 
-    sprite.material = material;
-    sprite.count = particleCount;
-    sprite.frustumCulled = false;
+    const ensureApDriveLut = () => {
+      if (apDriveLutRef.current !== null) {
+        return;
+      }
+      const data = new Float32Array(AP_DRIVE_LUT_SIZE * 4);
+      fillApDriveLut(data, DEFAULT_APPROX_AP_PARAMS, AP_DRIVE_LUT_SIZE);
+      const texture = new DataTexture(data, AP_DRIVE_LUT_SIZE, 1, RGBAFormat, FloatType);
+      texture.minFilter = NearestFilter;
+      texture.magFilter = NearestFilter;
+      texture.wrapS = ClampToEdgeWrapping;
+      texture.wrapT = ClampToEdgeWrapping;
+      texture.flipY = false;
+      texture.needsUpdate = true;
+      apDriveLutRef.current = { data, texture };
+    };
+
+    const attach = () => {
+      if (cancelled) {
+        return;
+      }
+      ensureApDriveLut();
+      const sprite = spriteRef.current;
+      if (!sprite) {
+        attempts += 1;
+        if (attempts < maxRafAttempts) {
+          rafId = requestAnimationFrame(attach);
+        }
+        return;
+      }
+
+      const uniforms = createDepolarizationUniforms(
+        gpuPack,
+        glowColor,
+        effluxGlowColor,
+        particleSize,
+      );
+      uniformsRef.current = uniforms;
+
+      const aIdxTAttr = new InstancedBufferAttribute(gpuPack.aIdxT, 4);
+      const aJitAttr = new InstancedBufferAttribute(gpuPack.aJit, 4);
+      const aSpdAttr = new InstancedBufferAttribute(gpuPack.aSpd, 4);
+
+      const aIdxTNode = instancedBufferAttribute(aIdxTAttr, "vec4");
+      const aJitNode = instancedBufferAttribute(aJitAttr, "vec4");
+      const aSpdNode = instancedBufferAttribute(aSpdAttr, "vec4");
+
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment -- TSL node types */
+      const apLut = apDriveLutRef.current;
+      if (apLut === null) {
+        return;
+      }
+      const { positionNode, colorNode } = buildDepolarizationNodes(
+        aIdxTNode,
+        aJitNode,
+        aSpdNode,
+        uniforms,
+        gpuPack.framesTex,
+        gpuPack.scalarsTex,
+        apLut.texture,
+      );
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment */
+
+      /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      material = new PointsNodeMaterial({
+        transparent: true,
+        depthWrite: false,
+        blending: AdditiveBlending as any,
+        sizeNode: uniforms.uParticleSize,
+      });
+      (material as any).positionNode = positionNode;
+      (material as any).colorNode = colorNode;
+      /* Match CPU: no custom opacityNode — NodeMaterial multiplies color.a by opacityNode; wiring opacityNode=color.a squares alpha (much dimmer). */
+      material.needsUpdate = true;
+      /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
+      spriteMaterialHost = sprite;
+      sprite.material = material;
+      sprite.count = particleCount;
+      sprite.frustumCulled = false;
+      sprite.renderOrder = 8;
+    };
+
+    attach();
 
     return () => {
-      material.dispose();
-      posAttrRef.current = null;
-      colorAttrRef.current = null;
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      if (spriteMaterialHost) {
+        spriteMaterialHost.material = null as never;
+      }
+      material?.dispose();
+      uniformsRef.current = null;
+      apDriveLutRef.current?.texture.dispose();
+      apDriveLutRef.current = null;
     };
-  }, [particleCount]);
+  }, [gpuPack, particleCount, glowColor, effluxGlowColor, particleSize]);
 
   useFrame(({ elapsed, delta }) => {
-    const posAttr = posAttrRef.current;
-    const colorAttr = colorAttrRef.current;
-    if (!posAttr || !colorAttr || field.samples.length === 0) {
+    const sim = samplerRef.current;
+    const uniforms = uniformsRef.current;
+    if (!sim || !uniforms || segments.length === 0) {
       return;
     }
 
-    const positions = posAttr.array as Float32Array;
-    const colors = colorAttr.array as Float32Array;
-    const sim = samplerRef?.current ?? null;
-    const drives = sim?.getSmoothedDrives() ?? {
-      na: 0,
-      k: 0,
-      dVmDt: 0,
-      naSlow: 0,
-      kSlow: 0,
-      vmSlow: 0,
-      dVmSlow: 0,
-    };
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- TSL uniform nodes */
+    const drives = sim.getSmoothedDrives();
+    const span = gpuPack.maxDistance + bandWidth;
+    const vNorm = MathUtils.clamp((drives.vmSlow + 26) / 92, 0, 1);
+    const na = drives.na * 0.35 + drives.naSlow * 0.65;
+    const k = drives.k * 0.35 + drives.kSlow * 0.65;
+    const axial = MathUtils.clamp(
+      0.34 + 0.44 * vNorm + 0.15 * na - 0.1 * k,
+      0.18,
+      0.62,
+    );
+    const wobble = 0.032 * Math.sin(elapsed * 0.52);
+    const rawBand = MathUtils.clamp(
+      -bandWidth * 0.5 + span * (axial + wobble),
+      -bandWidth * 0.35,
+      -bandWidth * 0.5 + span * 0.62,
+    );
+    const dt = Math.min(delta, 0.1);
+    const bandA = 1 - Math.exp(-dt * 3.8);
+    const prevB = bandSmoothRef.current;
+    bandSmoothRef.current =
+      prevB === null ? rawBand : prevB + bandA * (rawBand - prevB);
+    const waveDistanceSim = bandSmoothRef.current;
 
-    const travelSec = wavePeriodSec * travelFraction;
-    const cycleTime = elapsed % wavePeriodSec;
-    const waveProgress = MathUtils.clamp(cycleTime / travelSec, 0, 1);
-    const waveDistanceLegacy =
-      -bandWidth * 0.5 + waveProgress * (field.maxDistance + bandWidth);
-    const waveSpeedLegacy = (field.maxDistance + bandWidth) / travelSec;
-
-    let waveDistanceSim = 0;
-    if (sim) {
-      const vNorm = MathUtils.clamp((drives.vmSlow + 26) / 92, 0, 1);
-      const span = field.maxDistance + bandWidth;
-      const na = drives.na * 0.35 + drives.naSlow * 0.65;
-      const k = drives.k * 0.35 + drives.kSlow * 0.65;
-      // HH-driven axial hint (no legacy sweep). Cap how far distal the global
-      // center can sit so a spike does not park the Gaussian past most of the tree.
-      const axial = MathUtils.clamp(
-        0.34 + 0.44 * vNorm + 0.15 * na - 0.1 * k,
-        0.18,
-        0.62,
-      );
-      const wobble = 0.032 * Math.sin(elapsed * 0.52);
-      const rawBand = MathUtils.clamp(
-        -bandWidth * 0.5 + span * (axial + wobble),
-        -bandWidth * 0.35,
-        -bandWidth * 0.5 + span * 0.62,
-      );
-      const dt = Math.min(delta, 0.1);
-      const bandA = 1 - Math.exp(-dt * 3.8);
-      const prevB = bandSmoothRef.current;
-      bandSmoothRef.current =
-        prevB === null ? rawBand : prevB + bandA * (rawBand - prevB);
-      waveDistanceSim = bandSmoothRef.current;
+    const p = sim.getApproxParams();
+    const apLut = apDriveLutRef.current;
+    if (apLut) {
+      fillApDriveLut(apLut.data, p, AP_DRIVE_LUT_SIZE);
+      apLut.texture.needsUpdate = true;
     }
+    const waveSpeedSim = (gpuPack.maxDistance + bandWidth) / 3.2;
 
-    const waveSpeedSim = (field.maxDistance + bandWidth) / 3.2;
-    const effluxLag = effluxEnabled ? effluxLagDistance : 0;
-    const hiddenZ = -1000;
-    const center = new Vector3();
-    const normal = new Vector3();
-    const binormal = new Vector3();
-    const tangent = new Vector3();
-    const radialDirection = new Vector3();
-
-    sizeNodeRef.current.value = particleSize;
-
-    for (let i = 0; i < particleCount; i += 1) {
-      const sample = field.samples[field.segmentIndices[i]];
-      const t = field.localT[i];
-      const isEff = field.isEfflux[i] === 1;
-      const waveDistance = sim ? waveDistanceSim : waveDistanceLegacy;
-      const waveSpeed = sim ? waveSpeedSim : waveSpeedLegacy;
-      const bandCenter = isEff ? waveDistance - effluxLag : waveDistance;
-      const tint = isEff ? effluxGlowColor : glowColor;
-      const distance = sample.startDistance + sample.length * t;
-      const organicDistance =
-        distance +
-        field.axialJitter[i] * bandWidth * 0.32 +
-        Math.sin(elapsed * 1.65 + field.phaseJitter[i]) * bandWidth * 0.08;
-
-      let gateAlpha: number;
-      let arrivalAge: number;
-      let effInrushSec: number;
-      let visible: boolean;
-      let inrushProgress: number;
-      let ionWeightMul = 1;
-
-      if (sim) {
-        const tau = Math.max(0, organicDistance * sim.conductionMsPerWorldUnit);
-        const hist = isEff ? sim.sampleEfflux(tau) : sim.sample(tau);
-        const localDrive = isEff
-          ? kEffluxDrive(hist.IK)
-          : naInfluxDrive(hist.INa);
-        // Full-axon envelope: no narrow Gaussian vs bandCenter. Propagation along the
-        // fiber is read from sample(tau) / localDrive; distance no longer masks that.
-        gateAlpha = 1;
-        ionWeightMul = MathUtils.clamp(0.28 + 0.72 * localDrive, 0.22, 1);
-        const naR = drives.na * 0.4 + drives.naSlow * 0.6;
-        const kR = drives.k * 0.4 + drives.kSlow * 0.6;
-        const rateBoost =
-          0.38 +
-          0.62 *
-            (isEff
-              ? Math.max(localDrive, kR * 0.55)
-              : Math.max(localDrive, naR * 0.55));
-        effInrushSec =
-          inrushDurationSec / MathUtils.clamp(rateBoost, 0.45, 1.85);
-        arrivalAge = (bandCenter - organicDistance) / waveSpeed;
-        const inrushProgressSim = MathUtils.clamp(
-          (arrivalAge * field.speedJitter[i]) / effInrushSec,
-          0,
-          1,
-        );
-        visible = true;
-        inrushProgress = inrushProgressSim;
-      } else {
-        const bandOffset = Math.abs(organicDistance - bandCenter);
-        const bandEnvelope = Math.exp(
-          -Math.pow(bandOffset / (bandWidth * 0.42), 2),
-        );
-        gateAlpha = smoothstep(field.gates[i], 1, bandEnvelope);
-        arrivalAge = (bandCenter - organicDistance) / waveSpeed;
-        effInrushSec = inrushDurationSec;
-        inrushProgress = MathUtils.clamp(
-          (arrivalAge * field.speedJitter[i]) / effInrushSec,
-          0,
-          1,
-        );
-        visible =
-          cycleTime <= travelSec &&
-          arrivalAge >= -preInrushLeadSec &&
-          arrivalAge <= effInrushSec / field.speedJitter[i] &&
-          gateAlpha > 0.001;
-      }
-      const posIndex = i * 3;
-      const colorIndex = i * 4;
-
-      if (!visible) {
-        positions[posIndex] = 0;
-        positions[posIndex + 1] = 0;
-        positions[posIndex + 2] = hiddenZ;
-        colors[colorIndex] = tint.r;
-        colors[colorIndex + 1] = tint.g;
-        colors[colorIndex + 2] = tint.b;
-        colors[colorIndex + 3] = 0;
-        continue;
-      }
-
-      const frameT = t * FRAME_STEPS;
-      const frameIndex = Math.min(FRAME_STEPS - 1, Math.floor(frameT));
-      const frameMix = frameT - frameIndex;
-      const baseExp = isEff ? 0.36 : 0.42;
-      const expTweak = sim
-        ? MathUtils.clamp(0.06 * drives.dVmSlow, 0, 0.07)
-        : 0;
-      const easedInrush = Math.pow(inrushProgress, baseExp - expTweak);
-      const radiusAtT = MathUtils.lerp(
-        sample.segment.radiusStart,
-        sample.segment.radiusEnd,
-        t,
-      );
-      const outerR = radiusAtT + field.radialOffsets[i] * field.radialJitter[i];
-      const innerR = -radiusAtT * (0.18 + 0.3 * field.radialJitter[i]);
-      const radialDistance = isEff
-        ? MathUtils.lerp(innerR, outerR, easedInrush)
-        : MathUtils.lerp(outerR, innerR, easedInrush);
-      const spinMul = sim ? 1 + 0.2 * drives.dVmSlow : 1;
-      const angle =
-        field.angles[i] +
-        elapsed * (0.45 + field.speedJitter[i] * 0.18) * spinMul;
-
-      sample.segment.curve.getPointAt(t, center);
-      sample.segment.curve.getTangentAt(t, tangent);
-      center.addScaledVector(tangent, field.axialJitter[i] * bandWidth * 0.04);
-      normal
-        .copy(sample.frames.normals[frameIndex])
-        .lerp(sample.frames.normals[frameIndex + 1], frameMix)
-        .normalize();
-      binormal
-        .copy(sample.frames.binormals[frameIndex])
-        .lerp(sample.frames.binormals[frameIndex + 1], frameMix)
-        .normalize();
-      radialDirection
-        .copy(normal)
-        .multiplyScalar(Math.cos(angle))
-        .addScaledVector(binormal, Math.sin(angle))
-        .normalize();
-      center.addScaledVector(radialDirection, radialDistance);
-
-      const spawnRamp = smoothstep(-preInrushLeadSec, 0.18, arrivalAge);
-      const inrushGlow = smoothstep(0, 0.86, inrushProgress);
-      const intensityRamp = MathUtils.lerp(
-        0.2,
-        1,
-        Math.max(spawnRamp, inrushGlow),
-      );
-      const alpha =
-        gateAlpha * intensityRamp * field.intensity[i] * 0.95 * ionWeightMul;
-      positions[posIndex] = center.x;
-      positions[posIndex + 1] = center.y;
-      positions[posIndex + 2] = center.z;
-      colors[colorIndex] = tint.r;
-      colors[colorIndex + 1] = tint.g;
-      colors[colorIndex + 2] = tint.b;
-      colors[colorIndex + 3] = alpha;
-    }
-
-    posAttr.needsUpdate = true;
-    colorAttr.needsUpdate = true;
+    uniforms.uTime.value = elapsed;
+    uniforms.uPhaseMs.value = sim.getPhaseMs();
+    uniforms.uBandCenter.value = waveDistanceSim;
+    uniforms.uDriveNa.value = drives.na;
+    uniforms.uDriveK.value = drives.k;
+    uniforms.uDriveNaSlow.value = drives.naSlow;
+    uniforms.uDriveKSlow.value = drives.kSlow;
+    uniforms.uDriveVmSlow.value = drives.vmSlow;
+    uniforms.uDriveDvSlow.value = drives.dVmSlow;
+    uniforms.uMaxDistance.value = gpuPack.maxDistance;
+    uniforms.uBandWidth.value = bandWidth;
+    uniforms.uWaveSpeedSim.value = waveSpeedSim;
+    uniforms.uPreInrushLeadSec.value = preInrushLeadSec;
+    uniforms.uInrushDurationSec.value = inrushDurationSec;
+    uniforms.uEffluxLagDistance.value = effluxEnabled ? effluxLagDistance : 0;
+    uniforms.uEffluxLagMs.value = sim.effluxLagMs;
+    uniforms.uConductionMsPerWorldUnit.value = sim.conductionMsPerWorldUnit;
+    uniforms.uVRest.value = p.vRest;
+    uniforms.uVmAmp.value = p.vmAmp;
+    uniforms.uTauVmFast.value = p.tauVmFast;
+    uniforms.uTauVmSlow.value = p.tauVmSlow;
+    uniforms.uTauNa.value = p.tauNa;
+    uniforms.uAmpNa.value = p.ampNa;
+    uniforms.uTauK.value = p.tauK;
+    uniforms.uAmpK.value = p.ampK;
+    uniforms.uKDelayMs.value = p.kDelayMs;
+    uniforms.uWaveformDurationMs.value = p.waveformDurationMs;
+    uniforms.uRepeatPeriodMs.value = p.repeatPeriodMs;
+    uniforms.uInfluxColor.value.set(glowColor.r, glowColor.g, glowColor.b);
+    uniforms.uEffluxColor.value.set(
+      effluxGlowColor.r,
+      effluxGlowColor.g,
+      effluxGlowColor.b,
+    );
+    uniforms.uParticleSize.value = particleSize;
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   });
 
-  return <sprite ref={spriteRef as RefObject<Sprite>} frustumCulled={false} />;
+  return (
+    <sprite
+      ref={spriteRef as RefObject<Sprite>}
+      count={particleCount}
+      frustumCulled={false}
+    />
+  );
 };

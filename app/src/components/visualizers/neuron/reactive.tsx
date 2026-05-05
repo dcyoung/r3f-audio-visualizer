@@ -7,14 +7,19 @@ import { buildNeuronSegments, NeuronModel } from "./base";
 import { DEFAULT_APPROX_AP_PARAMS } from "./canonicalActionPotential";
 import {
   DEFAULT_DEPOLARIZATION_BAND_WIDTH,
-  DepolarizationParticles,
+  DepolarizationParticlesGpu,
 } from "./depolarization";
+import { DepolarizationParticlesCpu } from "./depolarizationCpu";
 import {
   DEFAULT_PHASE_MS_PER_WALL_MS,
   useNeuronWaveformSampler,
 } from "./useNeuronWaveformSampler";
 
 export type NeuronVisualConfig = {
+  /**
+   * GPU: TSL shader + baked atlases (default). CPU: JS waveforms + instanced buffer updates for A/B.
+   */
+  depolarizationUseGpu: boolean;
   /**
    * 0 = very slow propagation (high ms / world unit), 100 = fast (low ms / unit).
    * Mapped ~240 → 12 ms/unit across the slider.
@@ -32,23 +37,16 @@ export type NeuronVisualConfig = {
 };
 
 const defaultConfig: NeuronVisualConfig = {
-  propagationSpeed: 82,
+  depolarizationUseGpu: true,
+  propagationSpeed: 25,
   waveCycleFraction: 0.24,
   spikeSpacingSec: 3.5,
   effluxSeparation: 55,
 };
 
-const gentlePreset: NeuronVisualConfig = {
-  propagationSpeed: 44,
-  waveCycleFraction: 0.31,
-  spikeSpacingSec: 4.5,
-  effluxSeparation: 48,
-};
-
 export const { useParams, useActions, usePresets } =
   createConfigStore<NeuronVisualConfig>({
     default: defaultConfig,
-    gentle: gentlePreset,
   });
 
 const deriveWaveformTiming = (params: NeuronVisualConfig) => {
@@ -116,23 +114,24 @@ const NeuronVisual = (props: TVisualProps) => {
         color="#8da2ff"
       />
       <directionalLight position={[0, 2, -5]} intensity={3.2} color="#b8c5ff" />
-      <mesh position={[0, 0, -4.8]} scale={[8, 8, 1]} renderOrder={-1}>
-        <circleGeometry args={[1, 64]} />
-        <meshBasicMaterial
-          color="#4f6cff"
-          transparent={true}
-          opacity={0.22}
-          depthWrite={false}
-        />
-      </mesh>
       <NeuronModel segments={segments}>
-        <DepolarizationParticles
-          segments={segments}
-          samplerRef={samplerRef}
-          effluxEnabled
-          effluxLagDistance={effluxLagDistance}
-          effluxParticleFraction={0.35}
-        />
+        {params.depolarizationUseGpu ? (
+          <DepolarizationParticlesGpu
+            segments={segments}
+            samplerRef={samplerRef}
+            effluxEnabled
+            effluxLagDistance={effluxLagDistance}
+            effluxParticleFraction={0.35}
+          />
+        ) : (
+          <DepolarizationParticlesCpu
+            segments={segments}
+            samplerRef={samplerRef}
+            effluxEnabled
+            effluxLagDistance={effluxLagDistance}
+            effluxParticleFraction={0.35}
+          />
+        )}
       </NeuronModel>
     </>
   );

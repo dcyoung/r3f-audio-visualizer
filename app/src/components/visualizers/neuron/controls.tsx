@@ -1,4 +1,4 @@
-import { PresetBar, SliderField } from "@/components/controls/common";
+import { PresetBar, SliderField, SwitchRow } from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
@@ -16,6 +16,11 @@ export default function NeuronControls() {
       />
       {!activePreset && (
         <div className="space-y-3">
+          <SwitchRow
+            label="GPU depolarization"
+            checked={params.depolarizationUseGpu}
+            onCheckedChange={(v) => setParams({ depolarizationUseGpu: v })}
+          />
           <SliderField
             label="Propagation speed"
             value={params.propagationSpeed}

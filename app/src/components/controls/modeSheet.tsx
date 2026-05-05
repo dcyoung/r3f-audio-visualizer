@@ -18,6 +18,7 @@ import { AudioWaveform, Brain, Music, Shell, Waves, Wind } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
+import { useSettingsPortalContainer } from "./settingsPortalContainer";
 
 const MODE_DISPLAY_NAMES: Record<TApplicationMode, string> = {
   [APPLICATION_MODE.WAVE_FORM]: "Waveform",
@@ -60,6 +61,7 @@ const ModeSelectEntry = ({ mode }: { mode: TApplicationMode }) => {
 const ModeSelector = () => {
   const mode = useMode();
   const { setMode } = useAppStateActions();
+  const settingsPortalContainerRef = useSettingsPortalContainer();
 
   const availableModes = useMemo(() => {
     return getPlatformSupportedApplicationModes();
@@ -78,7 +80,7 @@ const ModeSelector = () => {
           className="w-full"
         />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent container={settingsPortalContainerRef ?? undefined}>
         {availableModes.map((v) => (
           <SelectItem
             value={v}

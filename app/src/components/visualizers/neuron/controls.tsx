@@ -1,11 +1,23 @@
-import { PresetBar, SliderField, SwitchRow } from "@/components/controls/common";
+import { PresetBar, SliderField } from "@/components/controls/common";
+import { MathUtils } from "three";
 
+import { NEURON_PARTICLE_COUNT_TIERS } from "./depolarizationShared";
 import { useActions, useParams, usePresets } from "./reactive";
+
+const formatParticleTier = (n: number) =>
+  n >= 1_000_000 ? "1M" : `${n / 1000}k`;
 
 export default function NeuronControls() {
   const params = useParams();
   const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
+
+  const maxTier = NEURON_PARTICLE_COUNT_TIERS.length - 1;
+  const tierIdx = MathUtils.clamp(
+    Math.round(params.particleCountTierIndex),
+    0,
+    maxTier,
+  );
 
   return (
     <div className="space-y-4">
@@ -16,10 +28,27 @@ export default function NeuronControls() {
       />
       {!activePreset && (
         <div className="space-y-3">
-          <SwitchRow
-            label="GPU depolarization"
-            checked={params.depolarizationUseGpu}
-            onCheckedChange={(v) => setParams({ depolarizationUseGpu: v })}
+          <SliderField
+            label="Particle count"
+            value={tierIdx}
+            displayValue={formatParticleTier(NEURON_PARTICLE_COUNT_TIERS[tierIdx])}
+            min={0}
+            max={maxTier}
+            step={1}
+            onChange={(v) =>
+              setParams({
+                particleCountTierIndex: Math.round(MathUtils.clamp(v, 0, maxTier)),
+              })
+            }
+          />
+          <SliderField
+            label="Per-particle intensity"
+            value={params.particleIntensityScale}
+            displayValue={`${(params.particleIntensityScale * 100).toFixed(0)}%`}
+            min={0.05}
+            max={1}
+            step={0.05}
+            onChange={(v) => setParams({ particleIntensityScale: v })}
           />
           <SliderField
             label="Propagation speed"

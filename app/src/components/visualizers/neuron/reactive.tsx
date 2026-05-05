@@ -9,17 +9,17 @@ import {
   DEFAULT_DEPOLARIZATION_BAND_WIDTH,
   DepolarizationParticlesGpu,
 } from "./depolarization";
-import { DepolarizationParticlesCpu } from "./depolarizationCpu";
+import {
+  DEFAULT_NEURON_PARTICLE_INTENSITY_SCALE,
+  DEFAULT_NEURON_PARTICLE_TIER_INDEX,
+  NEURON_PARTICLE_COUNT_TIERS,
+} from "./depolarizationShared";
 import {
   DEFAULT_PHASE_MS_PER_WALL_MS,
   useNeuronWaveformSampler,
 } from "./useNeuronWaveformSampler";
 
 export type NeuronVisualConfig = {
-  /**
-   * GPU: TSL shader + baked atlases (default). CPU: JS waveforms + instanced buffer updates for A/B.
-   */
-  depolarizationUseGpu: boolean;
   /**
    * 0 = very slow propagation (high ms / world unit), 100 = fast (low ms / unit).
    * Mapped ~240 → 12 ms/unit across the slider.
@@ -34,14 +34,23 @@ export type NeuronVisualConfig = {
   spikeSpacingSec: number;
   /** 0 = efflux close behind influx, 100 = more separation along the fiber. */
   effluxSeparation: number;
+  /**
+   * Index into `NEURON_PARTICLE_COUNT_TIERS` (0 = 100k … 4 = 1M).
+   */
+  particleCountTierIndex: number;
+  /**
+   * Scales each particle’s alpha (use lower values with 750k/1M counts; additive blend stacks).
+   */
+  particleIntensityScale: number;
 };
 
 const defaultConfig: NeuronVisualConfig = {
-  depolarizationUseGpu: true,
   propagationSpeed: 25,
   waveCycleFraction: 0.24,
   spikeSpacingSec: 3.5,
   effluxSeparation: 55,
+  particleCountTierIndex: DEFAULT_NEURON_PARTICLE_TIER_INDEX,
+  particleIntensityScale: DEFAULT_NEURON_PARTICLE_INTENSITY_SCALE,
 };
 
 export const { useParams, useActions, usePresets } =
@@ -104,6 +113,13 @@ const NeuronVisual = (props: TVisualProps) => {
 
   const { samplerRef } = useNeuronWaveformSampler(samplerOptions);
 
+  const tierIndex = MathUtils.clamp(
+    Math.round(params.particleCountTierIndex),
+    0,
+    NEURON_PARTICLE_COUNT_TIERS.length - 1,
+  );
+  const particleCount = NEURON_PARTICLE_COUNT_TIERS[tierIndex];
+
   return (
     <>
       <pointLight
@@ -115,23 +131,15 @@ const NeuronVisual = (props: TVisualProps) => {
       />
       <directionalLight position={[0, 2, -5]} intensity={3.2} color="#b8c5ff" />
       <NeuronModel segments={segments}>
-        {params.depolarizationUseGpu ? (
-          <DepolarizationParticlesGpu
-            segments={segments}
-            samplerRef={samplerRef}
-            effluxEnabled
-            effluxLagDistance={effluxLagDistance}
-            effluxParticleFraction={0.35}
-          />
-        ) : (
-          <DepolarizationParticlesCpu
-            segments={segments}
-            samplerRef={samplerRef}
-            effluxEnabled
-            effluxLagDistance={effluxLagDistance}
-            effluxParticleFraction={0.35}
-          />
-        )}
+        <DepolarizationParticlesGpu
+          segments={segments}
+          samplerRef={samplerRef}
+          effluxEnabled
+          effluxLagDistance={effluxLagDistance}
+          effluxParticleFraction={0.35}
+          particleCount={particleCount}
+          particleIntensityScale={params.particleIntensityScale}
+        />
       </NeuronModel>
     </>
   );

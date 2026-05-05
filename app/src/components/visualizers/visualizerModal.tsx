@@ -24,6 +24,7 @@ const useVisualParams = () => {
         return coordinateMapperData;
       case APPLICATION_MODE.AUDIO_SCOPE:
       case APPLICATION_MODE.PARTICLE_NOISE:
+      case APPLICATION_MODE.NEURON:
         return DummyMapper;
       default:
         return mode satisfies never;

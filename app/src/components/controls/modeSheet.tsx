@@ -14,7 +14,7 @@ import {
 } from "@/lib/applicationModes";
 import { useAppStateActions, useMode } from "@/lib/appState";
 import { COORDINATE_MAPPER_REGISTRY } from "@/lib/mappers/coordinateMappers/registry";
-import { AudioWaveform, Music, Shell, Waves, Wind } from "lucide-react";
+import { AudioWaveform, Brain, Music, Shell, Waves, Wind } from "lucide-react";
 
 import { AudioModeControls } from "./mode/audio";
 import { AudioScopeModeControls } from "./mode/audioScope";
@@ -25,6 +25,7 @@ const MODE_DISPLAY_NAMES: Record<TApplicationMode, string> = {
   [APPLICATION_MODE.AUDIO]: "Audio",
   [APPLICATION_MODE.AUDIO_SCOPE]: "AudioScope",
   [APPLICATION_MODE.PARTICLE_NOISE]: "Particle Noise",
+  [APPLICATION_MODE.NEURON]: "Neuron",
 };
 
 const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
@@ -39,6 +40,8 @@ const ModeIcon = ({ mode }: { mode: TApplicationMode }) => {
       return <Shell className="h-4 w-4" />;
     case APPLICATION_MODE.PARTICLE_NOISE:
       return <Wind className="h-4 w-4" />;
+    case APPLICATION_MODE.NEURON:
+      return <Brain className="h-4 w-4" />;
     default:
       return mode satisfies never;
   }

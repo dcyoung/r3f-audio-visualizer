@@ -19,6 +19,7 @@ const getAnalyzerComponent = (mode: TApplicationMode) => {
     case APPLICATION_MODE.WAVE_FORM:
     case APPLICATION_MODE.NOISE:
     case APPLICATION_MODE.PARTICLE_NOISE:
+    case APPLICATION_MODE.NEURON:
       return null;
     default:
       return mode satisfies never;
@@ -33,6 +34,7 @@ const getCanvasComponent = (mode: TApplicationMode) => {
     case APPLICATION_MODE.NOISE:
     case APPLICATION_MODE.AUDIO:
     case APPLICATION_MODE.PARTICLE_NOISE:
+    case APPLICATION_MODE.NEURON:
       return <Visual3DCanvas />;
     default:
       return mode satisfies never;

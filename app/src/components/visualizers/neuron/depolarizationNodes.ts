@@ -60,6 +60,8 @@ export type NeuronDepolarizationUniforms = {
   uInfluxColor: any;
   uEffluxColor: any;
   uParticleSize: any;
+  /** Multiplies final alpha (tones down additive stack when particle count is high). */
+  uParticleIntensityScale: any;
 };
 
 /**
@@ -263,7 +265,8 @@ export function buildDepolarizationNodes(
       .mul(float(intensityRamp))
       .mul(float(intensity))
       .mul(float(0.95))
-      .mul(float(ionWeightMul));
+      .mul(float(ionWeightMul))
+      .mul(float(u.uParticleIntensityScale));
 
     const hidden = float(-1000);
     return select(
@@ -385,7 +388,8 @@ export function buildDepolarizationNodes(
       .mul(float(intensityRamp))
       .mul(float(intensity))
       .mul(float(0.95))
-      .mul(float(ionWeightMul));
+      .mul(float(ionWeightMul))
+      .mul(float(u.uParticleIntensityScale));
 
     const tint = select(
       isEfflux.greaterThan(float(0.5)),

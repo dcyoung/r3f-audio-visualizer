@@ -17,7 +17,12 @@ import {
 
 import { type DendriteSegment } from "./base";
 import { DEFAULT_APPROX_AP_PARAMS } from "./canonicalActionPotential";
-import { DEFAULT_DEPOLARIZATION_BAND_WIDTH } from "./depolarizationShared";
+import {
+  DEFAULT_DEPOLARIZATION_BAND_WIDTH,
+  DEFAULT_NEURON_PARTICLE_INTENSITY_SCALE,
+  DEFAULT_NEURON_PARTICLE_TIER_INDEX,
+  NEURON_PARTICLE_COUNT_TIERS,
+} from "./depolarizationShared";
 import {
   AP_DRIVE_LUT_SIZE,
   fillApDriveLut,
@@ -50,7 +55,8 @@ type DepolarizationSettings = {
 };
 
 const DEFAULT_SETTINGS: DepolarizationSettings = {
-  particleCount: 100_000,
+  particleCount:
+    NEURON_PARTICLE_COUNT_TIERS[DEFAULT_NEURON_PARTICLE_TIER_INDEX],
   particleSize: 0.075,
   wavePeriodSec: 4.4,
   travelFraction: 0.78,
@@ -244,6 +250,7 @@ function createDepolarizationUniforms(
   glowColor: Color,
   effluxGlowColor: Color,
   initialParticleSize: number,
+  initialIntensityScale: number,
 ): NeuronDepolarizationUniforms {
   const ap = DEFAULT_APPROX_AP_PARAMS;
   const bandW = DEFAULT_SETTINGS.bandWidth;
@@ -285,6 +292,7 @@ function createDepolarizationUniforms(
       new Vector3(effluxGlowColor.r, effluxGlowColor.g, effluxGlowColor.b),
     ),
     uParticleSize: tslUniform(initialParticleSize),
+    uParticleIntensityScale: tslUniform(initialIntensityScale),
   };
 }
 
@@ -305,9 +313,12 @@ export const DepolarizationParticlesGpu = ({
   effluxLagDistance = DEFAULT_SETTINGS.effluxLagDistance,
   effluxParticleFraction = DEFAULT_SETTINGS.effluxParticleFraction,
   samplerRef,
+  particleIntensityScale = DEFAULT_NEURON_PARTICLE_INTENSITY_SCALE,
 }: {
   segments: DendriteSegment[];
   samplerRef: RefObject<NeuronSimSampler | null>;
+  /** Global per-particle alpha scale (lower when using high counts with additive blending). */
+  particleIntensityScale?: number;
 } & Partial<DepolarizationSettings>) => {
   const spriteRef = useRef<Sprite>(null);
   const bandSmoothRef = useRef<number | null>(null);
@@ -412,6 +423,8 @@ export const DepolarizationParticlesGpu = ({
         glowColor,
         effluxGlowColor,
         particleSize,
+        /* Initial value; `useFrame` applies live `particleIntensityScale` without rebuilding materials. */
+        1,
       );
       uniformsRef.current = uniforms;
 
@@ -548,6 +561,7 @@ export const DepolarizationParticlesGpu = ({
       effluxGlowColor.b,
     );
     uniforms.uParticleSize.value = particleSize;
+    uniforms.uParticleIntensityScale.value = particleIntensityScale;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   });
 

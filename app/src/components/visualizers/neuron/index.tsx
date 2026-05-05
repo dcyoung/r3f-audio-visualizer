@@ -33,9 +33,5 @@ export default {
   icon: Network,
   ReactiveComponent,
   ControlsComponent,
-  supportedApplicationModes: [
-    APPLICATION_MODE.WAVE_FORM,
-    APPLICATION_MODE.NOISE,
-    APPLICATION_MODE.AUDIO,
-  ],
+  supportedApplicationModes: [APPLICATION_MODE.NEURON],
 } as const;

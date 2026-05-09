@@ -30,6 +30,7 @@ import { SwitchRow } from "./common";
 import { ModeSheetContent } from "./modeSheet";
 
 const FLUID_VISUAL_IDS = new Set(["fluidBox", "fluidSpeaker", "fluidBall"]);
+const HIDE_APPEARANCE_VISUAL_IDS = new Set(["waveHistory"]);
 
 const PaletteBand = ({
   palette,
@@ -195,12 +196,13 @@ export const SettingsPanel = () => {
   const visual = useVisual();
   const isScope = isAudioScopeMode(mode);
   const isFluid = FLUID_VISUAL_IDS.has(visual.id);
+  const hideAppearance = HIDE_APPEARANCE_VISUAL_IDS.has(visual.id);
 
   return (
     <Accordion multiple defaultValue={["input-mode"]} className="w-full">
       <InputModeSection />
       <VisualizerSection />
-      {!isScope && !isFluid && <AppearanceSection />}
+      {!isScope && !isFluid && !hideAppearance && <AppearanceSection />}
       {!isScope && <BehaviorSection />}
     </Accordion>
   );

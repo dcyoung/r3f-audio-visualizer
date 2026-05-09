@@ -12,6 +12,7 @@ import Ribbons from "./ribbons";
 import Sphere from "./sphere";
 import Swarm from "./swarm";
 import Treadmill from "./treadmill";
+import WaveHistory from "./waveHistory";
 
 export const VISUAL_REGISTRY = {
   [Scope.id]: Scope,
@@ -28,6 +29,7 @@ export const VISUAL_REGISTRY = {
   [FluidBox.id]: FluidBox,
   [FluidSpeaker.id]: FluidSpeaker,
   [FluidBall.id]: FluidBall,
+  [WaveHistory.id]: WaveHistory,
 } as const;
 
 export type TVisual = (typeof VISUAL_REGISTRY)[keyof typeof VISUAL_REGISTRY];

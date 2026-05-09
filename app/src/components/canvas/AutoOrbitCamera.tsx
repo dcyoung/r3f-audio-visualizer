@@ -91,6 +91,18 @@ const useSphericalLimits = () => {
         phiMax: Math.PI / 2,
         phiSpeed: 0.25,
       };
+    case "waveHistory":
+      return {
+        rMin: 10,
+        rMax: 14,
+        rSpeed: 0.08,
+        thetaMin: -Math.PI / 6,
+        thetaMax: Math.PI / 6,
+        thetaSpeed: 0.02,
+        phiMin: Math.PI / 3,
+        phiMax: Math.PI / 2,
+        phiSpeed: 0.2,
+      };
     case "swarm":
       return {
         rMin: 10,

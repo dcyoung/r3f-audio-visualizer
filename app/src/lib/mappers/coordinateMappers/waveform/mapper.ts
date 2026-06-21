@@ -6,7 +6,16 @@ import {
   TWO_PI,
   type CoordinateType,
   type ICoordinateMapper,
+  type SphericalMappingMode,
 } from "@/lib/mappers/coordinateMappers/common";
+import {
+  azimuthNorm,
+  blendEquirectSeam,
+  colatitudeNorm,
+  equirectNorm,
+  projectDirectionToCubemapFace,
+  SPHERICAL_MAPPING_MODE,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
 
 /**
  * Maps input coordinates to output values based on a time varying waveform.
@@ -69,6 +78,58 @@ export class CoordinateMapper_Waveform extends CoordinateMapperBase {
     return (
       this.amplitude * Math.sin(this.b * normRadialOffset + elapsedTimeSec)
     );
+  }
+
+  public map_spherical(
+    mode: SphericalMappingMode,
+    xDir: number,
+    yDir: number,
+    zDir: number,
+    elapsedTimeSec = 0.0,
+  ): number {
+    switch (mode) {
+      case SPHERICAL_MAPPING_MODE.LATITUDE:
+        return (
+          this.amplitude *
+          Math.sin(this.b * colatitudeNorm(zDir) + elapsedTimeSec)
+        );
+      case SPHERICAL_MAPPING_MODE.DIRECTION_3D:
+        return (
+          this.amplitude *
+          Math.sin(this.b * colatitudeNorm(zDir) + elapsedTimeSec)
+        );
+      case SPHERICAL_MAPPING_MODE.LONGITUDE:
+        return (
+          this.amplitude *
+          Math.sin(this.b * azimuthNorm(xDir, yDir) + elapsedTimeSec)
+        );
+      case SPHERICAL_MAPPING_MODE.CUBEMAP: {
+        const face = projectDirectionToCubemapFace(xDir, yDir, zDir);
+        return this.map_3DFaces(
+          face.xNorm,
+          face.yNorm,
+          face.zNorm,
+          elapsedTimeSec,
+        );
+      }
+      case SPHERICAL_MAPPING_MODE.EQUIRECT_2D: {
+        const { thetaNorm, phiNorm } = equirectNorm(xDir, yDir, zDir);
+        return blendEquirectSeam(
+          (theta, phi) => {
+            const normRadialOffset =
+              Math.hypot(theta - 0.5, phi - 0.5) / HALF_DIAGONAL_UNIT_SQUARE;
+            return (
+              this.amplitude *
+              Math.sin(this.b * normRadialOffset + elapsedTimeSec)
+            );
+          },
+          thetaNorm,
+          phiNorm,
+        );
+      }
+      default:
+        return mode satisfies never;
+    }
   }
 }
 
@@ -161,6 +222,26 @@ export class CoordinateMapper_WaveformSuperposition implements ICoordinateMapper
         xNorm,
         yNorm,
         zNorm,
+        elapsedTimeSec,
+      );
+    }
+    return superposition;
+  }
+
+  public map_spherical(
+    mode: SphericalMappingMode,
+    xDir: number,
+    yDir: number,
+    zDir: number,
+    elapsedTimeSec = 0.0,
+  ): number {
+    let superposition = 0;
+    for (const mapper of this.mappers) {
+      superposition += mapper.map_spherical(
+        mode,
+        xDir,
+        yDir,
+        zDir,
         elapsedTimeSec,
       );
     }

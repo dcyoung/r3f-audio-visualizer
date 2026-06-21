@@ -1,7 +1,16 @@
 import {
   CoordinateMapperBase,
   cubeFaceCenterRadialOffset,
+  type SphericalMappingMode,
 } from "@/lib/mappers/coordinateMappers/common";
+import {
+  azimuthNorm,
+  blendEquirectSeam,
+  colatitudeNorm,
+  equirectNorm,
+  projectDirectionToCubemapFace,
+  SPHERICAL_MAPPING_MODE,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
 import {
   createNoise2D,
   createNoise3D,
@@ -145,5 +154,70 @@ export class CoordinateMapper_Noise extends CoordinateMapperBase {
       1.0,
     );
     return this.map_1D(normRadialOffset, elapsedTimeSec);
+  }
+
+  public map_spherical(
+    mode: SphericalMappingMode,
+    xDir: number,
+    yDir: number,
+    zDir: number,
+    elapsedTimeSec = 0.0,
+  ): number {
+    switch (mode) {
+      case SPHERICAL_MAPPING_MODE.DIRECTION_3D:
+        return this.map_direction3d(xDir, yDir, zDir, elapsedTimeSec);
+      case SPHERICAL_MAPPING_MODE.LONGITUDE:
+        return this.map_1D(azimuthNorm(xDir, yDir), elapsedTimeSec);
+      case SPHERICAL_MAPPING_MODE.LATITUDE:
+        return this.map_1D(colatitudeNorm(zDir), elapsedTimeSec);
+      case SPHERICAL_MAPPING_MODE.CUBEMAP: {
+        const face = projectDirectionToCubemapFace(xDir, yDir, zDir);
+        return this.map_3DFaces(
+          face.xNorm,
+          face.yNorm,
+          face.zNorm,
+          elapsedTimeSec,
+        );
+      }
+      case SPHERICAL_MAPPING_MODE.EQUIRECT_2D: {
+        const { thetaNorm, phiNorm } = equirectNorm(xDir, yDir, zDir);
+        return blendEquirectSeam(
+          (theta, phi) => this.map_2D(theta, phi, elapsedTimeSec),
+          thetaNorm,
+          phiNorm,
+        );
+      }
+      default:
+        return mode satisfies never;
+    }
+  }
+
+  private map_direction3d(
+    xDir: number,
+    yDir: number,
+    zDir: number,
+    elapsedTimeSec = 0.0,
+  ): number {
+    let noise = 0;
+    let maxAmp = 0;
+    let amp = this.amplitude;
+    let spatialScale = this._params.spatialScale;
+    const timeScale = this._params.timeScale;
+
+    for (let i = 0; i < this._params.nIterations; i++) {
+      noise +=
+        amp *
+        this.noise4D(
+          xDir * spatialScale,
+          yDir * spatialScale,
+          zDir * spatialScale,
+          elapsedTimeSec * timeScale,
+        );
+      maxAmp += amp;
+      amp *= this._params.persistence;
+      spatialScale *= 2;
+    }
+
+    return this._params.nIterations > 1 ? noise / maxAmp : noise;
   }
 }

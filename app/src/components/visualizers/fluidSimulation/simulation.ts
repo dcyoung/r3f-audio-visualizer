@@ -19,6 +19,9 @@ import {
   Loop,
   mat3,
   max,
+  min,
+  mix,
+  mod,
   pow,
   Return,
   storage,
@@ -638,26 +641,44 @@ export function createFluidSimulation(
       const theta = (atan as any)(toParticle.y, toParticle.x); // [-PI, PI]
       const phi = acos(clamp(toParticle.z.div(safeDist), -1.0, 1.0)); // [0, PI]
 
-      // Map to buffer indices (compute as float, then convert to int)
       const PI_VAL = float(Math.PI);
       const TWO_PI_VAL = float(Math.PI * 2);
-      const thetaIdxF = clamp(
-        floor(
-          theta.add(PI_VAL).div(TWO_PI_VAL).mul(float(SPHERE_MAP_THETA_RES)),
-        ),
-        float(0),
-        float(SPHERE_MAP_THETA_RES - 1),
-      );
-      const phiIdxF = clamp(
-        floor((phi as any).div(PI_VAL).mul(float(SPHERE_MAP_PHI_RES))),
-        float(0),
-        float(SPHERE_MAP_PHI_RES - 1),
-      );
-      const mapIdx = (int(thetaIdxF) as any)
-        .mul(int(SPHERE_MAP_PHI_RES))
-        .add(int(phiIdxF));
+      const thetaNorm = theta.add(PI_VAL).div(TWO_PI_VAL);
+      const phiNorm = (phi as any).div(PI_VAL);
 
-      const innerRadius = radiusMapStorage.element(mapIdx).toVar("innerRadius");
+      const thetaCont = thetaNorm.mul(float(SPHERE_MAP_THETA_RES));
+      const phiCont = phiNorm.mul(float(SPHERE_MAP_PHI_RES));
+
+      const thetaIdx0 = floor(thetaCont);
+      const phiIdx0 = clamp(
+        floor(phiCont),
+        float(0),
+        float(SPHERE_MAP_PHI_RES - 2),
+      );
+
+      const thetaFrac = thetaCont.sub(thetaIdx0);
+      const phiFrac = phiCont.sub(floor(phiCont));
+
+      const thetaIdx1 = mod(thetaIdx0.add(1.0), float(SPHERE_MAP_THETA_RES));
+      const phiIdx1 = min(phiIdx0.add(1.0), float(SPHERE_MAP_PHI_RES - 1));
+
+      const sampleRadius = (tIdx: any, pIdx: any) => {
+        const idx = (int(tIdx) as any)
+          .mul(int(SPHERE_MAP_PHI_RES))
+          .add(int(pIdx));
+        return radiusMapStorage.element(idx);
+      };
+
+      const r00 = sampleRadius(thetaIdx0, phiIdx0);
+      const r10 = sampleRadius(thetaIdx1, phiIdx0);
+      const r01 = sampleRadius(thetaIdx0, phiIdx1);
+      const r11 = sampleRadius(thetaIdx1, phiIdx1);
+
+      const innerRadius = mix(
+        mix(r00, r10, thetaFrac),
+        mix(r01, r11, thetaFrac),
+        phiFrac,
+      ).toVar("innerRadius");
       const shellThickness = float(0.16);
       const outerRadius = innerRadius.add(shellThickness);
 

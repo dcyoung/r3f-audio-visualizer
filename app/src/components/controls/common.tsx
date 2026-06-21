@@ -6,8 +6,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import type { SphericalMappingMode } from "@/lib/mappers/coordinateMappers/common";
+import { SPHERICAL_MAPPING_MODE_OPTIONS } from "@/lib/mappers/coordinateMappers/sphericalUtils";
 import { cn } from "@/lib/utils";
 
 export const ValueLabel = ({
@@ -141,6 +150,27 @@ export const SelectRow = ({
     <span className="text-muted-foreground shrink-0 text-xs">{label}</span>
     {children}
   </div>
+);
+
+export const SphericalMappingModeSelect = ({
+  value,
+  onValueChange,
+}: {
+  value: SphericalMappingMode;
+  onValueChange: (value: SphericalMappingMode) => void;
+}) => (
+  <Select value={value} onValueChange={onValueChange}>
+    <SelectTrigger className="w-[180px]">
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
+      {SPHERICAL_MAPPING_MODE_OPTIONS.map(([mode, label]) => (
+        <SelectItem key={mode} value={mode}>
+          {label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 );
 
 export const ToolbarItem = ({

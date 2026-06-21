@@ -74,8 +74,8 @@ export interface FluidSimulationResources {
 }
 
 /** Resolution of the radius map for morphing_sphere boundary mode */
-export const SPHERE_MAP_THETA_RES = 32;
-export const SPHERE_MAP_PHI_RES = 16;
+export const SPHERE_MAP_THETA_RES = 64;
+export const SPHERE_MAP_PHI_RES = 32;
 
 /**
  * Boundary mode determines how particles are confined.

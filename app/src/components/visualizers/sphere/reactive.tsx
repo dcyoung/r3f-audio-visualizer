@@ -4,6 +4,7 @@ import {
   type TOmitVisualProps,
   type TVisualProps,
 } from "@/components/visualizers/models";
+import { DEFAULT_SPHERICAL_MAPPING_MODE } from "@/lib/mappers/coordinateMappers/sphericalUtils";
 import { createConfigStore } from "@/lib/storeHelpers";
 import { Vector3 } from "three";
 
@@ -19,6 +20,7 @@ export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
       radius: 2,
       nPoints: 800,
       cubeSideLength: 0.05,
+      mappingMode: DEFAULT_SPHERICAL_MAPPING_MODE,
     },
   },
 );

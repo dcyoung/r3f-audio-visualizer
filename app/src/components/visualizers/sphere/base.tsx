@@ -1,10 +1,13 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { usePalette } from "@/lib/appState";
 import {
-  COORDINATE_TYPE,
-  TWO_PI,
   type ICoordinateMapper,
+  type SphericalMappingMode,
 } from "@/lib/mappers/coordinateMappers/common";
+import {
+  DEFAULT_SPHERICAL_MAPPING_MODE,
+  sampleSpherical,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
 import { ColorPalette } from "@/lib/palettes";
 import { useFrame } from "@react-three/fiber";
 import {
@@ -14,20 +17,18 @@ import {
   type InstancedMesh,
 } from "three";
 
-// const MAPPING_MODE_POLAR_2D = "polar_2d";
-// const MAPPING_MODE_POLAR_PHI = "polar_phi";
-// const MAPPING_MODE_POLAR_THETA = "polar_theta";
-
 const BaseSphere = ({
   coordinateMapper,
   radius = 2,
   nPoints = 800,
   cubeSideLength = 0.05,
+  mappingMode = DEFAULT_SPHERICAL_MAPPING_MODE,
 }: {
   coordinateMapper: ICoordinateMapper;
   radius?: number;
   nPoints?: number;
   cubeSideLength?: number;
+  mappingMode?: SphericalMappingMode;
 }) => {
   const palette = usePalette();
   const meshRef = useRef<InstancedMesh>(null);
@@ -65,7 +66,7 @@ const BaseSphere = ({
       // range 0:PI
       phi = Math.acos(1 - (2 * k) / nPoints) % Math.PI;
       // range 0:2PI
-      theta = (Math.PI * (1 + Math.sqrt(5)) * k) % TWO_PI;
+      theta = (Math.PI * (1 + Math.sqrt(5)) * k) % (2 * Math.PI);
       x = Math.cos(theta) * Math.sin(phi);
       y = Math.sin(theta) * Math.sin(phi);
       z = Math.cos(phi);
@@ -74,11 +75,10 @@ const BaseSphere = ({
         radius +
         0.25 *
           radius *
-          coordinateMapper.map(
-            COORDINATE_TYPE.POLAR,
-            theta / TWO_PI, // normalize
-            phi / Math.PI, // normalize
-            0,
+          sampleSpherical(
+            coordinateMapper,
+            mappingMode,
+            { x, y, z },
             elapsedTimeSec,
           );
 

@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
-  COORDINATE_TYPE,
-  TWO_PI,
   type ICoordinateMapper,
+  type SphericalMappingMode,
 } from "@/lib/mappers/coordinateMappers/common";
+import {
+  DEFAULT_SPHERICAL_MAPPING_MODE,
+  sampleSpherical,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
 import { useFrame } from "@react-three/fiber";
 import {
   DoubleSide,
@@ -31,10 +34,12 @@ const MorphingSphereShell = ({
   coordinateMapper,
   baseRadius,
   morphScale,
+  mappingMode,
 }: {
   coordinateMapper: ICoordinateMapper;
   baseRadius: number;
   morphScale: number;
+  mappingMode: SphericalMappingMode;
 }) => {
   const meshRef = useRef<ThreeMesh>(null);
   const directionsRef = useRef<Float32Array | null>(null);
@@ -71,18 +76,14 @@ const MorphingSphereShell = ({
       const dy = dirs[i * 3 + 1];
       const dz = dirs[i * 3 + 2];
 
-      const theta = Math.atan2(dy, dx);
-      const phi = Math.acos(Math.max(-1, Math.min(1, dz)));
-
       const r =
         baseRadius +
         morphScale *
           baseRadius *
-          coordinateMapper.map(
-            COORDINATE_TYPE.POLAR,
-            (theta + Math.PI) / TWO_PI,
-            phi / Math.PI,
-            0,
+          sampleSpherical(
+            coordinateMapper,
+            mappingMode,
+            { x: dx, y: dy, z: dz },
             t,
           );
 
@@ -116,6 +117,7 @@ const BaseFluidBall = ({
   morphScale = 0.25,
   color = "#2266FF",
   showMorphMesh = false,
+  mappingMode = DEFAULT_SPHERICAL_MAPPING_MODE,
 }: {
   coordinateMapper: ICoordinateMapper;
   particleCount?: number;
@@ -126,6 +128,7 @@ const BaseFluidBall = ({
   morphScale?: number;
   color?: string;
   showMorphMesh?: boolean;
+  mappingMode?: SphericalMappingMode;
 }) => {
   const elapsedRef = useRef(0);
   const gs = GRID_SIZE;
@@ -162,14 +165,14 @@ const BaseFluidBall = ({
             const theta = (ti / SPHERE_MAP_THETA_RES) * 2 * Math.PI - Math.PI;
             const phi = (pi / SPHERE_MAP_PHI_RES) * Math.PI;
 
-            const thetaNorm = (theta + Math.PI) / (2 * Math.PI);
-            const phiNorm = phi / Math.PI;
+            const x = Math.cos(theta) * Math.sin(phi);
+            const y = Math.sin(theta) * Math.sin(phi);
+            const z = Math.cos(phi);
 
-            const mapVal = coordinateMapper.map(
-              COORDINATE_TYPE.POLAR,
-              thetaNorm,
-              phiNorm,
-              0,
+            const mapVal = sampleSpherical(
+              coordinateMapper,
+              mappingMode,
+              { x, y, z },
               t,
             );
 
@@ -182,7 +185,7 @@ const BaseFluidBall = ({
 
       (sim.uniforms.externalForce as { value: Vector3 }).value.set(0, 0, 0);
     },
-    [coordinateMapper, sphereRadius, morphScale],
+    [coordinateMapper, sphereRadius, morphScale, mappingMode],
   );
 
   return (
@@ -204,6 +207,7 @@ const BaseFluidBall = ({
           coordinateMapper={coordinateMapper}
           baseRadius={sphereRadius}
           morphScale={morphScale}
+          mappingMode={mappingMode}
         />
       )}
     </>

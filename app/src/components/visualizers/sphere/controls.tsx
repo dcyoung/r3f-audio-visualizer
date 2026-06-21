@@ -1,9 +1,14 @@
-import { PresetBar, SliderField } from "@/components/controls/common";
+import {
+  PresetBar,
+  SelectRow,
+  SliderField,
+  SphericalMappingModeSelect,
+} from "@/components/controls/common";
 
 import { useActions, useParams, usePresets } from "./reactive";
 
 export default () => {
-  const { radius, nPoints } = useParams();
+  const { radius, nPoints, mappingMode } = useParams();
   const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
 
@@ -16,6 +21,12 @@ export default () => {
       />
       {!activePreset && (
         <div className="space-y-3">
+          <SelectRow label="Mapping Mode">
+            <SphericalMappingModeSelect
+              value={mappingMode}
+              onValueChange={(v) => setParams({ mappingMode: v })}
+            />
+          </SelectRow>
           <SliderField
             label="Point Count"
             value={nPoints}

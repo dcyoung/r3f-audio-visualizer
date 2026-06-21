@@ -1,3 +1,8 @@
+import {
+  DEFAULT_SPHERICAL_MAPPING_MODE,
+  type SphericalMappingMode,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
+
 export const TWO_PI = 2 * Math.PI;
 /**
  * "Hypotenuse" for the quadrant of a unit square.
@@ -67,9 +72,6 @@ export const cubeFaceCenterRadialOffset = (
   return interiorValue;
 };
 
-/**
- * Describes a coordinate type.
- */
 export const COORDINATE_TYPE = {
   CARTESIAN_1D: "Cartesian_1D",
   CARTESIAN_2D: "Cartesian_2D",
@@ -77,6 +79,14 @@ export const COORDINATE_TYPE = {
   CARTESIAN_CUBE_FACES: "Cartesian_CubeFaces",
   POLAR: "Polar",
 } as const;
+
+export type { SphericalMappingMode };
+export {
+  DEFAULT_SPHERICAL_MAPPING_MODE,
+  SPHERICAL_MAPPING_MODE,
+  SPHERICAL_MAPPING_MODE_LABELS,
+  SPHERICAL_MAPPING_MODE_OPTIONS,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
 
 type ObjectValues<T> = T[keyof T];
 export type CoordinateType = ObjectValues<typeof COORDINATE_TYPE>;
@@ -106,6 +116,13 @@ export interface ICoordinateMapper {
     zNorm?: number,
     elapsedTimeSec?: number,
   ) => number;
+  map_spherical: (
+    mode: SphericalMappingMode,
+    xDir: number,
+    yDir: number,
+    zDir: number,
+    elapsedTimeSec?: number,
+  ) => number;
 }
 
 /**
@@ -133,8 +150,15 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
       case COORDINATE_TYPE.CARTESIAN_1D:
         return this.map_1D(xNorm, elapsedTimeSec);
       case COORDINATE_TYPE.CARTESIAN_2D:
-      case COORDINATE_TYPE.POLAR:
         return this.map_2D(xNorm, yNorm, elapsedTimeSec);
+      case COORDINATE_TYPE.POLAR:
+        return this.map_spherical(
+          DEFAULT_SPHERICAL_MAPPING_MODE,
+          xNorm,
+          yNorm,
+          zNorm,
+          elapsedTimeSec,
+        );
       case COORDINATE_TYPE.CARTESIAN_3D:
         return this.map_3D(xNorm, yNorm, zNorm, elapsedTimeSec);
       case COORDINATE_TYPE.CARTESIAN_CUBE_FACES:
@@ -160,6 +184,13 @@ export abstract class CoordinateMapperBase implements ICoordinateMapper {
     xNorm: number,
     yNorm: number,
     zNorm: number,
+    elapsedTimeSec?: number,
+  ): number;
+  abstract map_spherical(
+    mode: SphericalMappingMode,
+    xDir: number,
+    yDir: number,
+    zDir: number,
     elapsedTimeSec?: number,
   ): number;
 }

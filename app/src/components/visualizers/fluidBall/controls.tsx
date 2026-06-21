@@ -1,6 +1,8 @@
 import {
   PresetBar,
+  SelectRow,
   SliderField,
+  SphericalMappingModeSelect,
   SwitchRow,
 } from "@/components/controls/common";
 
@@ -14,6 +16,7 @@ export default () => {
     sphereRadius,
     morphScale,
     showMorphMesh,
+    mappingMode,
   } = useParams();
   const { setParams, setPreset } = useActions();
   const { active: activePreset, options: presetOptions } = usePresets();
@@ -27,6 +30,12 @@ export default () => {
       />
       {!activePreset && (
         <div className="space-y-3">
+          <SelectRow label="Mapping Mode">
+            <SphericalMappingModeSelect
+              value={mappingMode}
+              onValueChange={(v) => setParams({ mappingMode: v })}
+            />
+          </SelectRow>
           <SliderField
             label="Particles"
             value={particleCount}

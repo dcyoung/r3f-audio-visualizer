@@ -1,9 +1,17 @@
 import {
   CoordinateMapperBase,
   cubeFaceCenterRadialOffset,
-  HALF_DIAGONAL_UNIT_CUBE,
   HALF_DIAGONAL_UNIT_SQUARE,
+  type SphericalMappingMode,
 } from "@/lib/mappers/coordinateMappers/common";
+import {
+  azimuthNorm,
+  blendEquirectSeam,
+  colatitudeNorm,
+  equirectNorm,
+  projectDirectionToCubemapFace,
+  SPHERICAL_MAPPING_MODE,
+} from "@/lib/mappers/coordinateMappers/sphericalUtils";
 
 export type TCoordinateMapper_DataParams = {
   amplitude: number;
@@ -59,6 +67,18 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
     return valueBelow + (rawIdx % 1) * (valueAbove - valueBelow);
   }
 
+  private interpolateValuePeriodic(normalizedCoord: number): number {
+    if (this.data === undefined || !this.data || this.data.length === 0) {
+      return 0;
+    }
+    const wrapped = ((normalizedCoord % 1) + 1) % 1;
+    const rawIdx = wrapped * this.data.length;
+    const idx0 = Math.floor(rawIdx) % this.data.length;
+    const idx1 = (idx0 + 1) % this.data.length;
+    const frac = rawIdx - Math.floor(rawIdx);
+    return this.data[idx0] + frac * (this.data[idx1] - this.data[idx0]);
+  }
+
   public map_1D(xNorm: number, _ = 0.0): number {
     return this.amplitude * this.interpolateValueForNormalizedCoord(xNorm);
   }
@@ -94,5 +114,51 @@ export class CoordinateMapper_Data extends CoordinateMapperBase {
       1.0,
     );
     return this.map_1D(normRadialOffset, elapsedTimeSec);
+  }
+
+  public map_spherical(
+    mode: SphericalMappingMode,
+    xDir: number,
+    yDir: number,
+    zDir: number,
+    elapsedTimeSec = 0.0,
+  ): number {
+    switch (mode) {
+      case SPHERICAL_MAPPING_MODE.LONGITUDE:
+        return (
+          this.amplitude *
+          this.interpolateValuePeriodic(azimuthNorm(xDir, yDir))
+        );
+      case SPHERICAL_MAPPING_MODE.DIRECTION_3D:
+        return this.map_1D((xDir + 1) / 2, elapsedTimeSec);
+      case SPHERICAL_MAPPING_MODE.LATITUDE:
+        return this.map_1D(colatitudeNorm(zDir), elapsedTimeSec);
+      case SPHERICAL_MAPPING_MODE.CUBEMAP: {
+        const face = projectDirectionToCubemapFace(xDir, yDir, zDir);
+        return this.map_3DFaces(
+          face.xNorm,
+          face.yNorm,
+          face.zNorm,
+          elapsedTimeSec,
+        );
+      }
+      case SPHERICAL_MAPPING_MODE.EQUIRECT_2D: {
+        const { thetaNorm, phiNorm } = equirectNorm(xDir, yDir, zDir);
+        return blendEquirectSeam(
+          (theta, phi) => {
+            const normRadialOffset =
+              Math.hypot(theta - 0.5, phi - 0.5) / HALF_DIAGONAL_UNIT_SQUARE;
+            return (
+              this.amplitude *
+              this.interpolateValuePeriodic(normRadialOffset)
+            );
+          },
+          thetaNorm,
+          phiNorm,
+        );
+      }
+      default:
+        return mode satisfies never;
+    }
   }
 }

@@ -3,6 +3,7 @@ import {
   type TOmitVisualProps,
   type TVisualProps,
 } from "@/components/visualizers/models";
+import { DEFAULT_SPHERICAL_MAPPING_MODE } from "@/lib/mappers/coordinateMappers/sphericalUtils";
 import { createConfigStore } from "@/lib/storeHelpers";
 
 import BaseVisual from "./base";
@@ -22,6 +23,7 @@ export const { useParams, useActions, usePresets } = createConfigStore<TConfig>(
       morphScale: 0.25,
       color: "#22CCBB",
       showMorphMesh: true,
+      mappingMode: DEFAULT_SPHERICAL_MAPPING_MODE,
     },
   },
 );

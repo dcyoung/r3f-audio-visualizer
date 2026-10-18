@@ -1,0 +1,1 @@
+import{n as e,u as a,M as r,N as s,a as d,C as t,b as o,R as n,W as p,T}from"./index-5Ai3PERb.js";const i={kind:"webgpu",three:T,Renderer:p,RenderTarget:n,CubeRenderTarget:o,CanvasTarget:t,occlusion:{Node:d,NodeUpdateType:s,MeshBasicNodeMaterial:r,uniform:a,nodeObject:e}};export{i as webgpuSupport};

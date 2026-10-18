@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
+import type { Vector3 } from "three";
 import {
   clamp,
   cos,
@@ -19,7 +20,7 @@ import {
   vec3,
   vec4,
 } from "three/tsl";
-import type { DataTexture } from "three/webgpu";
+import type { DataTexture, UniformNode } from "three/webgpu";
 
 /** Must match frenet bake resolution in `depolarization.tsx`. */
 export const NEURON_PARTICLE_FRAME_STEPS = 72;
@@ -57,8 +58,8 @@ export type NeuronDepolarizationUniforms = {
   uRepeatPeriodMs: any;
   /** LUT columns − 1 (see `depolarizationApDrive.ts`). */
   uApDriveLutSize: any;
-  uInfluxColor: any;
-  uEffluxColor: any;
+  uInfluxColor: UniformNode<"vec3", Vector3>;
+  uEffluxColor: UniformNode<"vec3", Vector3>;
   uParticleSize: any;
   /** Multiplies final alpha (tones down additive stack when particle count is high). */
   uParticleIntensityScale: any;
@@ -135,7 +136,9 @@ export function buildDepolarizationNodes(
     const organicDistance = distance
       .add(axialJitter.mul(bandWidth).mul(float(0.32)))
       .add(
-        sin(time.mul(float(1.65)).add(phaseJitter)).mul(bandWidth).mul(float(0.08)),
+        sin(time.mul(float(1.65)).add(phaseJitter))
+          .mul(bandWidth)
+          .mul(float(0.08)),
       );
 
     const tau = max(organicDistance.mul(u.uConductionMsPerWorldUnit), float(0));
@@ -143,7 +146,11 @@ export function buildDepolarizationNodes(
 
     const phaseBase = u.uPhaseMs.sub(tau);
     const phaseEff = phaseBase.sub(effluxLag);
-    const phaseUse = select(isEfflux.greaterThan(float(0.5)), phaseEff, phaseBase);
+    const phaseUse = select(
+      isEfflux.greaterThan(float(0.5)),
+      phaseEff,
+      phaseBase,
+    );
 
     const repeatSafe = max(u.uRepeatPeriodMs, float(1));
     const tWrapped = mod(phaseUse, repeatSafe);
@@ -229,38 +236,21 @@ export function buildDepolarizationNodes(
 
     const spinMul = float(1).add(u.uDriveDvSlow.mul(float(0.2)));
     const angle = angle0.add(
-      time
-        .mul(float(0.45).add(speedJitter.mul(float(0.18))))
-        .mul(spinMul),
+      time.mul(float(0.45).add(speedJitter.mul(float(0.18)))).mul(spinMul),
     );
 
-    center.addAssign(
-      tangent.mul(axialJitter.mul(bandWidth).mul(float(0.04))),
-    );
+    center.addAssign(tangent.mul(axialJitter.mul(bandWidth).mul(float(0.04))));
 
     const cosA = cos(angle);
     const sinA = sin(angle);
-    const radialDir = normal
-      .mul(cosA)
-      .add(binormal.mul(sinA))
-      .normalize();
+    const radialDir = normal.mul(cosA).add(binormal.mul(sinA)).normalize();
     center.addAssign(radialDir.mul(radialDistance));
 
     const spawnRamp = float(
-      smoothstep(
-        u.uPreInrushLeadSec.negate(),
-        float(0.18),
-        arrivalAge,
-      ),
+      smoothstep(u.uPreInrushLeadSec.negate(), float(0.18), arrivalAge),
     );
-    const inrushGlow = float(
-      smoothstep(float(0), float(0.86), inrushProgress),
-    );
-    const intensityRamp = mix(
-      float(0.2),
-      float(1),
-      max(spawnRamp, inrushGlow),
-    );
+    const inrushGlow = float(smoothstep(float(0), float(0.86), inrushProgress));
+    const intensityRamp = mix(float(0.2), float(1), max(spawnRamp, inrushGlow));
     const alpha = float(gateAlpha)
       .mul(float(intensityRamp))
       .mul(float(intensity))
@@ -303,7 +293,9 @@ export function buildDepolarizationNodes(
     const organicDistance = distance
       .add(axialJitter.mul(bandWidth).mul(float(0.32)))
       .add(
-        sin(time.mul(float(1.65)).add(phaseJitter)).mul(bandWidth).mul(float(0.08)),
+        sin(time.mul(float(1.65)).add(phaseJitter))
+          .mul(bandWidth)
+          .mul(float(0.08)),
       );
 
     const tau = max(organicDistance.mul(u.uConductionMsPerWorldUnit), float(0));
@@ -311,7 +303,11 @@ export function buildDepolarizationNodes(
 
     const phaseBase = u.uPhaseMs.sub(tau);
     const phaseEff = phaseBase.sub(effluxLag);
-    const phaseUse = select(isEfflux.greaterThan(float(0.5)), phaseEff, phaseBase);
+    const phaseUse = select(
+      isEfflux.greaterThan(float(0.5)),
+      phaseEff,
+      phaseBase,
+    );
 
     const repeatSafe = max(u.uRepeatPeriodMs, float(1));
     const tWrapped = mod(phaseUse, repeatSafe);
@@ -370,20 +366,10 @@ export function buildDepolarizationNodes(
     );
 
     const spawnRamp = float(
-      smoothstep(
-        u.uPreInrushLeadSec.negate(),
-        float(0.18),
-        arrivalAge,
-      ),
+      smoothstep(u.uPreInrushLeadSec.negate(), float(0.18), arrivalAge),
     );
-    const inrushGlow = float(
-      smoothstep(float(0), float(0.86), inrushProgress),
-    );
-    const intensityRamp = mix(
-      float(0.2),
-      float(1),
-      max(spawnRamp, inrushGlow),
-    );
+    const inrushGlow = float(smoothstep(float(0), float(0.86), inrushProgress));
+    const intensityRamp = mix(float(0.2), float(1), max(spawnRamp, inrushGlow));
     const alpha = float(gateAlpha)
       .mul(float(intensityRamp))
       .mul(float(intensity))

@@ -32,6 +32,8 @@ const BaseBoxes = ({
   );
   const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const geometry = useMemo(() => new BoxGeometry(), []);
+  const material = useMemo(() => new MeshBasicMaterial(), []);
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
@@ -64,10 +66,7 @@ const BaseBoxes = ({
       return;
     }
     for (let instanceIdx = 0; instanceIdx < nBoxes; instanceIdx++) {
-      mesh.setColorAt(
-        instanceIdx,
-        lut.getColor(instanceIdx / (nBoxes - 1)),
-      );
+      mesh.setColorAt(instanceIdx, lut.getColor(instanceIdx / (nBoxes - 1)));
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     mesh.instanceColor!.needsUpdate = true;
@@ -182,7 +181,7 @@ const BaseBoxes = ({
       ref={meshRef}
       castShadow={true}
       receiveShadow={true}
-      args={[new BoxGeometry(), new MeshBasicMaterial(), nBoxes]}
+      args={[geometry, material, nBoxes]}
     >
       <boxGeometry attach="geometry" args={[cellSize, cellSize, cellSize, 1]} />
       <meshBasicMaterial attach="material" color={"white"} toneMapped={false} />

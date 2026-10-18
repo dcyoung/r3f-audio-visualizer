@@ -1,7 +1,5 @@
-import "@/r3f-webgpu";
-
 import ModalVisual from "@/components/visualizers/visualizerModal";
-import { Canvas } from "@react-three/fiber/webgpu";
+import { Canvas } from "@react-three/fiber";
 import * as THREE from "three/webgpu";
 
 import { DebugStats } from "./DebugStats";
@@ -10,6 +8,7 @@ import { WebGPUPostProcessing } from "./webgpu/WebGPUPostProcessing";
 const AudioScopeTSLCanvas = () => {
   return (
     <Canvas
+      background="#010204"
       orthographic
       camera={{
         left: -1,
@@ -27,7 +26,6 @@ const AudioScopeTSLCanvas = () => {
         toneMapping: THREE.NoToneMapping,
       }}
     >
-      <color attach="background" args={["#010204"]} />
       <ModalVisual />
       <WebGPUPostProcessing strength={1.0} radius={0.4} threshold={0.2} />
       <DebugStats />

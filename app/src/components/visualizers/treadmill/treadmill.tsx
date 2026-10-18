@@ -39,6 +39,8 @@ export const Treadmill = ({
   stoneLength?: number;
 }) => {
   const stoneRef = useRef<InstancedMesh>(null);
+  const geometry = useMemo(() => new BoxGeometry(), []);
+  const material = useMemo(() => new MeshStandardMaterial(), []);
   const [tmpMatrix, tmpVecPosition, tmpQuat, tmpVecScale] = useMemo(
     () => [new Matrix4(), new Vector3(), new Quaternion(), new Vector3()],
     [],
@@ -123,7 +125,7 @@ export const Treadmill = ({
         castShadow={true}
         receiveShadow={true}
         count={nStones}
-        args={[new BoxGeometry(), new MeshStandardMaterial(), nStones]}
+        args={[geometry, material, nStones]}
       >
         <boxGeometry
           attach="geometry"

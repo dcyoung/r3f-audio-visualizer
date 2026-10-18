@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useFrame, useThree } from "@react-three/fiber/webgpu";
+import { useThree } from "@react-three/fiber";
+import { useRenderPipeline } from "@react-three/tsl";
 import { bloom } from "three/addons/tsl/display/BloomNode.js";
-import { pass } from "three/tsl";
-import * as THREE from "three/webgpu";
 
 export function WebGPUPostProcessing({
   strength = 1.5,
@@ -13,38 +12,40 @@ export function WebGPUPostProcessing({
   radius?: number;
   threshold?: number;
 }) {
-  const { renderer, scene, camera, size } = useThree();
-  const postProcessingRef = useRef<THREE.PostProcessing | null>(null);
+  const size = useThree((s) => s.size);
+  const seen = useRef({
+    strength,
+    radius,
+    threshold,
+    w: size.width,
+    h: size.height,
+  });
+  const { rebuild } = useRenderPipeline(({ renderPipeline, passes }) => {
+    const scenePassColor = passes.scenePass.getTextureNode("output");
+    const bloomPass = bloom(scenePassColor, strength, radius, threshold);
+    renderPipeline.outputNode = scenePassColor.add(bloomPass);
+  });
 
   useEffect(() => {
-    if (!renderer || !scene || !camera) return;
-
-    const scenePass = pass(scene, camera);
-    const scenePassColor = scenePass.getTextureNode("output");
-
-    const bloomPass = bloom(scenePassColor, strength, radius, threshold);
-    const outputNode = scenePassColor.add(bloomPass);
-
-    const postProcessing = new THREE.PostProcessing(
-      renderer as unknown as THREE.Renderer,
-    );
-    postProcessing.outputNode = outputNode;
-    postProcessingRef.current = postProcessing;
-
-    return () => {
-      postProcessingRef.current = null;
+    const prev = seen.current;
+    if (
+      prev.strength === strength &&
+      prev.radius === radius &&
+      prev.threshold === threshold &&
+      prev.w === size.width &&
+      prev.h === size.height
+    ) {
+      return;
+    }
+    seen.current = {
+      strength,
+      radius,
+      threshold,
+      w: size.width,
+      h: size.height,
     };
-  }, [renderer, scene, camera, size, strength, radius, threshold]);
-
-  useFrame(
-    ({ renderer: r }) => {
-      if (postProcessingRef.current) {
-        r.clear();
-        postProcessingRef.current.render();
-      }
-    },
-    { phase: "render" },
-  );
+    rebuild();
+  }, [rebuild, strength, radius, threshold, size.width, size.height]);
 
   return null;
 }

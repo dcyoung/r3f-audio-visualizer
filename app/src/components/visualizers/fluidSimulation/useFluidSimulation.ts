@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { MathUtils, Vector3 } from "three";
-import { type Mesh, type WebGPURenderer } from "three/webgpu";
+import { Vector3 } from "three";
+import { type Mesh } from "three/webgpu";
 
 import { createParticleMesh } from "./rendering";
 import { createFluidSimulation, type SimulationInstance } from "./simulation";
@@ -110,18 +110,17 @@ export function useFluidSimulation(options: UseFluidSimulationOptions) {
     (sim.uniforms.gravity as { value: Vector3 }).value.copy(gravity);
   }, [stiffness, restDensity, dynamicViscosity, gravity]);
 
-  useFrame(({ gl }) => {
-    const sim = simRef.current;
-    if (!sim) return;
+  useFrame(
+    ({ renderer, delta }) => {
+      const sim = simRef.current;
+      if (!sim) return;
 
-    const dt = MathUtils.clamp(1 / 60, 0.00001, 1 / 30);
-    (sim.uniforms.dt as { value: number }).value = dt;
-
-    onBeforeStepRef.current?.(sim, dt);
-
-    const typedSim = sim as { step: (r: WebGPURenderer) => void };
-    typedSim.step(gl as unknown as WebGPURenderer);
-  });
+      (sim.uniforms.dt as { value: number }).value = delta;
+      onBeforeStepRef.current?.(sim, delta);
+      sim.step(renderer);
+    },
+    { phase: "physics" },
+  );
 
   return { simRef, meshRef };
 }

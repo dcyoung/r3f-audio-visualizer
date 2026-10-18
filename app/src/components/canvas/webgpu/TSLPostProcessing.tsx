@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
-import { useFrame, useThree } from "@react-three/fiber/webgpu";
+import { useThree } from "@react-three/fiber";
+import { useRenderPipeline } from "@react-three/tsl";
 import { bloom } from "three/addons/tsl/display/BloomNode.js";
 import { film } from "three/addons/tsl/display/FilmNode.js";
-import { float, pass, screenUV, smoothstep, vec4 } from "three/tsl";
-import * as THREE from "three/webgpu";
+import { float, screenUV, smoothstep, vec4 } from "three/tsl";
+import type { Node } from "three/webgpu";
 
 /**
  * Lightweight TSL post-processing for individual visualizers.
@@ -24,26 +25,25 @@ export function TSLBloomPostProcessing({
   vignetteOffset?: number;
   vignetteDarkness?: number;
 }) {
-  const { renderer, scene, camera, size } = useThree();
-  const postProcessingRef = useRef<THREE.PostProcessing | null>(null);
-
-  useEffect(() => {
-    if (!renderer || !scene || !camera) return;
-
-    const scenePass = pass(scene, camera);
-    const scenePassColor = scenePass.getTextureNode("output");
-
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
-    let result: any = scenePassColor;
+  const size = useThree((s) => s.size);
+  const seen = useRef({
+    bloomStrength,
+    bloomRadius,
+    bloomThreshold,
+    noiseIntensity,
+    vignetteOffset,
+    vignetteDarkness,
+    w: size.width,
+    h: size.height,
+  });
+  const { rebuild } = useRenderPipeline(({ renderPipeline, passes }) => {
+    const scenePassColor = passes.scenePass.getTextureNode("output");
+    let result: Node = scenePassColor;
 
     if (bloomStrength > 0) {
-      const bloomPass = bloom(
-        scenePassColor,
-        bloomStrength,
-        bloomRadius,
-        bloomThreshold,
+      result = scenePassColor.add(
+        bloom(scenePassColor, bloomStrength, bloomRadius, bloomThreshold),
       );
-      result = result.add(bloomPass);
     }
 
     if (noiseIntensity > 0) {
@@ -51,44 +51,51 @@ export function TSLBloomPostProcessing({
     }
 
     if (vignetteDarkness > 0) {
-      const uv = screenUV;
-      const dist = uv.sub(0.5).length();
+      const dist = screenUV.sub(0.5).length();
       const vignette = smoothstep(float(0.8), float(vignetteOffset), dist);
-      result = vec4(result.rgb.mul(vignette), result.a);
+      const color = result as typeof scenePassColor;
+      result = vec4(color.rgb.mul(vignette), color.a);
     }
 
-    const postProcessing = new THREE.PostProcessing(
-      renderer as unknown as THREE.Renderer,
-    );
-    postProcessing.outputNode = result;
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
-    postProcessingRef.current = postProcessing;
+    renderPipeline.outputNode = result;
+  });
 
-    return () => {
-      postProcessingRef.current = null;
+  useEffect(() => {
+    const prev = seen.current;
+    if (
+      prev.bloomStrength === bloomStrength &&
+      prev.bloomRadius === bloomRadius &&
+      prev.bloomThreshold === bloomThreshold &&
+      prev.noiseIntensity === noiseIntensity &&
+      prev.vignetteOffset === vignetteOffset &&
+      prev.vignetteDarkness === vignetteDarkness &&
+      prev.w === size.width &&
+      prev.h === size.height
+    ) {
+      return;
+    }
+    seen.current = {
+      bloomStrength,
+      bloomRadius,
+      bloomThreshold,
+      noiseIntensity,
+      vignetteOffset,
+      vignetteDarkness,
+      w: size.width,
+      h: size.height,
     };
+    rebuild();
   }, [
-    renderer,
-    scene,
-    camera,
-    size,
+    rebuild,
     bloomStrength,
     bloomRadius,
     bloomThreshold,
     noiseIntensity,
     vignetteOffset,
     vignetteDarkness,
+    size.width,
+    size.height,
   ]);
-
-  useFrame(
-    ({ renderer: r }) => {
-      if (postProcessingRef.current) {
-        r.clear();
-        postProcessingRef.current.render();
-      }
-    },
-    { phase: "render" },
-  );
 
   return null;
 }

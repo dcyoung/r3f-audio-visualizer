@@ -1,7 +1,5 @@
-import "@/r3f-webgpu";
-
 import { useEffect, useRef } from "react";
-import { BackgroundFog, CanvasBackground } from "@/components/canvas/common";
+import { BackgroundFog, useBackgroundColor } from "@/components/canvas/common";
 import ModalVisual from "@/components/visualizers/visualizerModal";
 import {
   useAppStateActions,
@@ -10,7 +8,7 @@ import {
   useVisual,
 } from "@/lib/appState";
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber/webgpu";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three/webgpu";
 
 import { AutoOrbitCameraControls } from "./AutoOrbitCamera";
@@ -95,8 +93,11 @@ const CameraControls = () => {
 };
 
 const Visual3DCanvas = () => {
+  const backgroundColor = useBackgroundColor();
+
   return (
     <Canvas
+      background={backgroundColor}
       renderer={{
         powerPreference: "high-performance",
         antialias: true,
@@ -111,7 +112,6 @@ const Visual3DCanvas = () => {
         up: [0, 0, 1],
       }}
     >
-      <CanvasBackground />
       <SceneLighting />
       <BackgroundFog />
       <ModalVisual />

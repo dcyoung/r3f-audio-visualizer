@@ -32,6 +32,8 @@ const BaseSphere = ({
   const palette = usePalette();
   const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const geometry = useMemo(() => new BoxGeometry(), []);
+  const material = useMemo(() => new MeshBasicMaterial(), []);
   const lut = ColorPalette.getPalette(palette).buildLut();
   useLayoutEffect(() => {
     const mesh = meshRef.current;
@@ -101,7 +103,7 @@ const BaseSphere = ({
       ref={meshRef}
       castShadow={true}
       receiveShadow={true}
-      args={[new BoxGeometry(), new MeshBasicMaterial(), nPoints]}
+      args={[geometry, material, nPoints]}
     >
       <boxGeometry
         attach="geometry"

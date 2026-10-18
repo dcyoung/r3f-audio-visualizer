@@ -4,7 +4,7 @@ import { ColorPalette } from "@/lib/palettes";
 const FLUID_VISUAL_IDS = new Set(["fluidBox", "fluidSpeaker", "fluidBall"]);
 const DARK_BACKGROUND_VISUAL_IDS = new Set(["waveHistory"]);
 
-const useBackgroundColor = () => {
+export const useBackgroundColor = () => {
   const { colorBackground, palette } = useAppearance();
   const visual = useVisual();
 
@@ -19,11 +19,6 @@ const useBackgroundColor = () => {
   return colorBackground
     ? ColorPalette.getPalette(palette).calcBackgroundColor(0)
     : "#010204";
-};
-
-export const CanvasBackground = () => {
-  const backgroundColor = useBackgroundColor();
-  return <color attach="background" args={[backgroundColor]} />;
 };
 
 export const BackgroundFog = () => {

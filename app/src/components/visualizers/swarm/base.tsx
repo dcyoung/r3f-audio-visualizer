@@ -21,6 +21,7 @@ export default ({
   const refPoints = useRef<Points>(null);
   const tmpPosBefore = useMemo(() => new Vector3(), []);
   const tmpPosAfter = useMemo(() => new Vector3(), []);
+  const positions = useMemo(() => new Float32Array(nPoints * 3), [nPoints]);
 
   useEffect(() => {
     if (!refPoints.current) {
@@ -42,7 +43,7 @@ export default ({
       }
     }
     positionsBuffer.needsUpdate = true;
-  });
+  }, [maxDim, nPerSide, nPoints]);
 
   useFrame(({ elapsed, delta }) => {
     if (!refPoints.current) {
@@ -63,10 +64,7 @@ export default ({
   return (
     <points ref={refPoints}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[new Float32Array(nPoints * 3), 3]}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial attach="material" color={color} size={pointSize} />
     </points>

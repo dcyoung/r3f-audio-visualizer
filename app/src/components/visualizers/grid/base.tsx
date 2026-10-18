@@ -28,6 +28,8 @@ const BaseGrid = ({
 }) => {
   const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const geometry = useMemo(() => new BoxGeometry(), []);
+  const material = useMemo(() => new MeshBasicMaterial(), []);
   const palette = usePalette();
   const lut = ColorPalette.getPalette(palette).buildLut();
 
@@ -108,7 +110,7 @@ const BaseGrid = ({
       ref={meshRef}
       castShadow={true}
       receiveShadow={true}
-      args={[new BoxGeometry(), new MeshBasicMaterial(), nGridRows * nGridCols]}
+      args={[geometry, material, nGridRows * nGridCols]}
     >
       <boxGeometry
         attach="geometry"

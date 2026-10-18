@@ -29,6 +29,8 @@ const BaseCube = ({
 }) => {
   const meshRef = useRef<InstancedMesh>(null);
   const tmpMatrix = useMemo(() => new Matrix4(), []);
+  const geometry = useMemo(() => new BoxGeometry(), []);
+  const material = useMemo(() => new MeshBasicMaterial(), []);
   const inputCoordinateType = volume
     ? COORDINATE_TYPE.CARTESIAN_3D
     : COORDINATE_TYPE.CARTESIAN_CUBE_FACES;
@@ -132,7 +134,7 @@ const BaseCube = ({
       ref={meshRef}
       castShadow={true}
       receiveShadow={true}
-      args={[new BoxGeometry(), new MeshBasicMaterial(), nPerSide ** 3]}
+      args={[geometry, material, nPerSide ** 3]}
     >
       <boxGeometry
         attach="geometry"
